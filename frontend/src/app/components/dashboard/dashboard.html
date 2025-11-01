@@ -18,7 +18,7 @@
     <div class="calendar-section">
       <div class="section-header">
         <h2>📅 Mi Calendario</h2>
-        <button class="btn-new-appointment">+ Nueva Cita</button>
+        <button class="btn-new-appointment" routerLink="/app/appointments">+ Nueva Cita</button>
       </div>
       
       <div class="calendar-container">
@@ -68,7 +68,14 @@
           <div class="card-icon">👤</div>
           <h3>Mi Perfil</h3>
           <p>Actualizar información</p>
-          <button class="btn-action">Editar</button>
+          <button class="btn-action" routerLink="/app/profile">Editar</button>
+        </div>
+
+        <div *ngIf="currentUser?.role === 'admin'" class="action-card admin">
+          <div class="card-icon">👨⚕️</div>
+          <h3>Gestionar Profesionales</h3>
+          <p>Registrar nuevos médicos</p>
+          <button class="btn-action" routerLink="/app/professionals">Gestionar</button>
         </div>
       </div>
     </div>

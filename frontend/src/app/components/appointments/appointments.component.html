@@ -1,0 +1,125 @@
+<div class="appointments-container">
+  <!-- Header -->
+  <div class="appointments-header">
+    <button class="btn-back" (click)="goBack()">← Volver</button>
+    <h1>Agendar Nueva Cita</h1>
+    <div class="steps-indicator">
+      <div class="step" [class.active]="step >= 1" [class.completed]="step > 1">1</div>
+      <div class="step-line" [class.completed]="step > 1"></div>
+      <div class="step" [class.active]="step >= 2" [class.completed]="step > 2">2</div>
+      <div class="step-line" [class.completed]="step > 2"></div>
+      <div class="step" [class.active]="step >= 3">3</div>
+    </div>
+  </div>
+
+  <!-- Step 1: Select Professional -->
+  <div class="step-content" *ngIf="step === 1">
+    <h2>Selecciona un Profesional</h2>
+    <div class="professionals-grid">
+      <div 
+        class="professional-card" 
+        *ngFor="let prof of professionals"
+        (click)="selectProfessional(prof)">
+        <div class="prof-avatar">{{ prof.image }}</div>
+        <div class="prof-info">
+          <h3>{{ prof.name }}</h3>
+          <p class="specialty">{{ prof.specialty }}</p>
+          <div class="prof-details">
+            <span class="rating">⭐ {{ prof.rating }}</span>
+            <span class="experience">{{ prof.experience }}</span>
+          </div>
+        </div>
+        <div class="select-btn">Seleccionar</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 2: Select Date & Time -->
+  <div class="step-content" *ngIf="step === 2">
+    <div class="selected-prof-summary">
+      <div class="prof-avatar-small">{{ selectedProfessional.image }}</div>
+      <div>
+        <h3>{{ selectedProfessional.name }}</h3>
+        <p>{{ selectedProfessional.specialty }}</p>
+      </div>
+    </div>
+
+    <h2>Selecciona Fecha y Hora</h2>
+    
+    <div class="datetime-selection">
+      <div class="date-section">
+        <label>Fecha:</label>
+        <input 
+          type="date" 
+          [(ngModel)]="selectedDate"
+          [min]="getMinDate()"
+          class="date-input">
+      </div>
+
+      <div class="time-section" *ngIf="selectedDate">
+        <label>Hora disponible:</label>
+        <div class="time-grid">
+          <button 
+            class="time-slot"
+            *ngFor="let time of availableTimes"
+            [class.selected]="selectedTime === time"
+            (click)="selectedTime = time">
+            {{ time }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <button 
+      class="btn-continue"
+      [disabled]="!selectedDate || !selectedTime"
+      (click)="selectDateTime()">
+      Continuar
+    </button>
+  </div>
+
+  <!-- Step 3: Confirm Appointment -->
+  <div class="step-content" *ngIf="step === 3">
+    <h2>Confirmar Cita</h2>
+    
+    <div class="appointment-summary">
+      <div class="summary-card">
+        <h3>Resumen de la Cita</h3>
+        
+        <div class="summary-item">
+          <span class="label">Profesional:</span>
+          <span class="value">{{ selectedProfessional.name }}</span>
+        </div>
+        
+        <div class="summary-item">
+          <span class="label">Especialidad:</span>
+          <span class="value">{{ selectedProfessional.specialty }}</span>
+        </div>
+        
+        <div class="summary-item">
+          <span class="label">Fecha:</span>
+          <span class="value">{{ selectedDate | date:'dd/MM/yyyy' }}</span>
+        </div>
+        
+        <div class="summary-item">
+          <span class="label">Hora:</span>
+          <span class="value">{{ selectedTime }}</span>
+        </div>
+      </div>
+
+      <div class="reason-section">
+        <label for="reason">Motivo de la consulta (opcional):</label>
+        <textarea 
+          id="reason"
+          [(ngModel)]="appointmentReason"
+          placeholder="Describe brevemente el motivo de tu consulta..."
+          class="reason-textarea"></textarea>
+      </div>
+    </div>
+
+    <div class="confirm-buttons">
+      <button class="btn-cancel" (click)="goBack()">Modificar</button>
+      <button class="btn-confirm" (click)="confirmAppointment()">Confirmar Cita</button>
+    </div>
+  </div>
+</div>

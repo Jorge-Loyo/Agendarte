@@ -1,0 +1,215 @@
+<div class="professionals-container">
+  <!-- Header -->
+  <div class="professionals-header">
+    <button class="btn-back" (click)="goBack()">← Volver</button>
+    <h1>Gestión de Profesionales</h1>
+    <button class="btn-add-professional" (click)="toggleForm()">
+      {{ showForm ? 'Cancelar' : '+ Agregar Profesional' }}
+    </button>
+  </div>
+
+  <!-- Add Professional Form -->
+  <div class="form-container" *ngIf="showForm">
+    <div class="form-card">
+      <h2>Registrar Nuevo Profesional</h2>
+      
+      <form (ngSubmit)="onSubmit()" #professionalForm="ngForm">
+        <!-- Personal Information -->
+        <div class="form-section">
+          <h3>Información Personal</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Nombre *</label>
+              <input 
+                type="text" 
+                [(ngModel)]="professional.firstName"
+                name="firstName"
+                required
+                class="form-control">
+            </div>
+            <div class="form-group">
+              <label>Apellido *</label>
+              <input 
+                type="text" 
+                [(ngModel)]="professional.lastName"
+                name="lastName"
+                required
+                class="form-control">
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label>Email *</label>
+              <input 
+                type="email" 
+                [(ngModel)]="professional.email"
+                name="email"
+                required
+                class="form-control">
+            </div>
+            <div class="form-group">
+              <label>Teléfono</label>
+              <input 
+                type="tel" 
+                [(ngModel)]="professional.phone"
+                name="phone"
+                class="form-control">
+            </div>
+          </div>
+        </div>
+
+        <!-- Professional Information -->
+        <div class="form-section">
+          <h3>Información Profesional</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Especialidad *</label>
+              <select 
+                [(ngModel)]="professional.specialty"
+                name="specialty"
+                required
+                class="form-control">
+                <option value="">Seleccionar especialidad</option>
+                <option *ngFor="let spec of specialties" [value]="spec">{{ spec }}</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Número de Matrícula *</label>
+              <input 
+                type="text" 
+                [(ngModel)]="professional.licenseNumber"
+                name="licenseNumber"
+                required
+                class="form-control">
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label>Años de Experiencia</label>
+              <input 
+                type="number" 
+                [(ngModel)]="professional.experience"
+                name="experience"
+                min="0"
+                class="form-control">
+            </div>
+            <div class="form-group">
+              <label>Tarifa de Consulta ($)</label>
+              <input 
+                type="number" 
+                [(ngModel)]="professional.consultationFee"
+                name="consultationFee"
+                min="0"
+                class="form-control">
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label>Formación Académica</label>
+            <textarea 
+              [(ngModel)]="professional.education"
+              name="education"
+              placeholder="Universidad, títulos, certificaciones..."
+              class="form-control textarea"></textarea>
+          </div>
+          
+          <div class="form-group">
+            <label>Descripción Profesional</label>
+            <textarea 
+              [(ngModel)]="professional.description"
+              name="description"
+              placeholder="Breve descripción de su experiencia y enfoque..."
+              class="form-control textarea"></textarea>
+          </div>
+        </div>
+
+
+
+        <!-- Submit Button -->
+        <div class="form-actions">
+          <button type="button" class="btn-cancel" (click)="toggleForm()">Cancelar</button>
+          <button type="submit" class="btn-submit" [disabled]="!professionalForm.valid">
+            Registrar Profesional
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Professionals List -->
+  <div class="professionals-list" *ngIf="!showForm">
+    <h2>Profesionales Registrados</h2>
+    
+    <div class="professionals-grid">
+      <div class="professional-card" *ngFor="let prof of professionals">
+        <div class="prof-header">
+          <div class="prof-avatar">👨⚕️</div>
+          <div class="prof-info">
+            <h3>{{ prof.name }}</h3>
+            <p class="specialty">{{ prof.specialty }}</p>
+            <p class="email">{{ prof.email }}</p>
+          </div>
+          <div class="prof-status" [class]="prof.status.toLowerCase()">
+            {{ prof.status }}
+          </div>
+        </div>
+        
+        <div class="prof-actions">
+          <button class="btn-edit">Editar</button>
+          <button class="btn-view">Ver Perfil</button>
+          <button class="btn-schedule" (click)="openSchedule(prof.id)">Horarios</button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="empty-state" *ngIf="professionals.length === 0">
+      <p>No hay profesionales registrados</p>
+      <button class="btn-add-first" (click)="toggleForm()">Agregar Primer Profesional</button>
+    </div>
+  </div>
+
+  <!-- Schedule Modal -->
+  <div class="modal-overlay" *ngIf="showScheduleModal" (click)="closeScheduleModal()">
+    <div class="schedule-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Configurar Horarios de Atención</h2>
+        <button class="btn-close" (click)="closeScheduleModal()">×</button>
+      </div>
+      
+      <div class="modal-content">
+        <div class="working-hours">
+          <div 
+            class="day-schedule" 
+            *ngFor="let day of ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']">
+            <div class="day-header">
+              <input 
+                type="checkbox" 
+                [(ngModel)]="scheduleData[day].active"
+                class="day-checkbox">
+              <label class="day-label">{{ getDayName(day) }}</label>
+            </div>
+            
+            <div class="time-inputs" *ngIf="scheduleData[day].active">
+              <input 
+                type="time" 
+                [(ngModel)]="scheduleData[day].start"
+                class="time-input">
+              <span class="time-separator">a</span>
+              <input 
+                type="time" 
+                [(ngModel)]="scheduleData[day].end"
+                class="time-input">
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="modal-actions">
+        <button class="btn-cancel" (click)="closeScheduleModal()">Cancelar</button>
+        <button class="btn-save" (click)="saveSchedule()">Guardar Horarios</button>
+      </div>
+    </div>
+  </div>
+</div>

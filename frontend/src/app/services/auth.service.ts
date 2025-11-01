@@ -21,6 +21,7 @@ export interface AuthResponse {
 })
 export class AuthService {
   private baseUrl = 'http://localhost:3000/api/auth';
+  private profileUrl = 'http://localhost:3000/api/profile';
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
@@ -78,5 +79,17 @@ export class AuthService {
   hasRole(role: string): boolean {
     const user = this.getCurrentUser();
     return user?.role === role;
+  }
+
+  updateProfile(userData: any): Observable<any> {
+    return this.http.put(this.profileUrl, userData, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    }).pipe(
+      tap((response: any) => {
+        if (response.user) {
+          this.currentUserSubject.next(response.user);
+        }
+      })
+    );
   }
 }

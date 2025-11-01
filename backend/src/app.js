@@ -29,6 +29,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Rutas
 app.use("/api/home", homeRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/profile", require("./routes/profile.routes"));
 
 // Ruta raíz
 app.get("/", (req, res) => {
