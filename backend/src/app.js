@@ -11,6 +11,7 @@ const models = require('./models');
 
 // Importar rutas
 const homeRoutes = require("./routes/home.routes");
+const authRoutes = require("./routes/auth.routes");
 
 // Crear la aplicación express
 const app = express();
@@ -27,6 +28,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // Rutas
 app.use("/api/home", homeRoutes);
+app.use("/api/auth", authRoutes);
 
 // Ruta raíz
 app.get("/", (req, res) => {
