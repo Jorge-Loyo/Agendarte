@@ -36,10 +36,10 @@ export class Login {
     
     console.log('Enviando request a:', 'http://localhost:3000/api/auth/login');
 
-    this.authService.login(this.email, this.password).subscribe({
+    this.authService.login(this.email.toLowerCase(), this.password).subscribe({
       next: (response) => {
         console.log('Login exitoso:', response);
-        this.router.navigate(['/dashboard']);
+        this.router.navigate(['/app/dashboard']);
       },
       error: (error) => {
         console.error('Error en login:', error);

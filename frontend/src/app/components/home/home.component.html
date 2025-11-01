@@ -11,7 +11,8 @@
       <h1>Agendarte</h1>
     </div>
     <div class="header-actions">
-      <a routerLink="/login" class="btn-login">Iniciar Sesión</a>
+      <a routerLink="/login" class="btn-login">Iniciar Sesión Usuario</a>
+      <a routerLink="/login" class="btn-professional">Iniciar Sesión Profesional</a>
       <a routerLink="/register" class="btn-register">Registrarse</a>
     </div>
   </div>
@@ -19,22 +20,24 @@
 
 <!-- Hero Section -->
 <section class="hero">
-  <div class="hero-content">
-    <h1>Gestiona tus citas médicas de forma inteligente</h1>
-    <p>La plataforma que conecta pacientes y profesionales de la salud para una experiencia médica más eficiente</p>
-    <div class="hero-buttons">
-      <a routerLink="/register" class="btn-primary">Comenzar Gratis</a>
-      <a href="#features" class="btn-secondary">Conocer Más</a>
+  <div class="hero-card">
+    <div class="hero-content">
+      <h1>Gestiona tus citas médicas de forma inteligente</h1>
+      <p>La plataforma que conecta pacientes y profesionales de la salud para una experiencia médica más eficiente</p>
+      <div class="hero-buttons">
+        <a routerLink="/register" class="btn-primary">Comenzar Gratis</a>
+        <a href="#features" class="btn-secondary">Conocer Más</a>
+      </div>
     </div>
-  </div>
-  <div class="hero-image">
-    <div class="medical-illustration">
-      <div class="pulse-circle"></div>
-      <svg width="300" height="300" viewBox="0 0 300 300">
-        <circle cx="150" cy="150" r="120" fill="var(--primary-color)" opacity="0.1"/>
-        <path d="M150 80v140M100 120l50 50 50-50" stroke="var(--primary-color)" stroke-width="4" stroke-linecap="round"/>
-        <circle cx="150" cy="100" r="8" fill="var(--primary-color)"/>
-      </svg>
+    <div class="hero-image">
+      <div class="medical-illustration">
+        <div class="pulse-circle"></div>
+        <svg width="300" height="300" viewBox="0 0 300 300">
+          <circle cx="150" cy="150" r="120" fill="var(--primary-color)" opacity="0.1"/>
+          <path d="M150 80v140M100 120l50 50 50-50" stroke="var(--primary-color)" stroke-width="4" stroke-linecap="round"/>
+          <circle cx="150" cy="100" r="8" fill="var(--primary-color)"/>
+        </svg>
+      </div>
     </div>
   </div>
 </section>
