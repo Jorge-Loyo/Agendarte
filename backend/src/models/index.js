@@ -1,0 +1,1 @@
+// Este archivo define los modelos de datos que se utilizarán en la aplicación. Actualmente está vacío.
