@@ -12,9 +12,36 @@
   <div class="profile-content">
     <!-- User Avatar Section -->
     <div class="avatar-section">
-      <div class="user-avatar-large">
-        {{ (currentUser?.profile?.firstName || currentUser?.email || 'U').charAt(0).toUpperCase() }}
+      <div class="avatar-container">
+        <div class="user-avatar-large" *ngIf="!imagePreview && !profileData.profileImage">
+          {{ (currentUser?.profile?.firstName || currentUser?.email || 'U').charAt(0).toUpperCase() }}
+        </div>
+        <img 
+          *ngIf="imagePreview || profileData.profileImage" 
+          [src]="imagePreview || profileData.profileImage" 
+          alt="Foto de perfil"
+          class="profile-image">
+        
+        <div class="image-upload" *ngIf="editMode">
+          <input 
+            type="file" 
+            #fileInput 
+            (change)="onFileSelected($event)"
+            accept="image/*"
+            style="display: none;">
+          <button type="button" class="btn-upload" (click)="fileInput.click()">
+            📷 Cambiar Foto
+          </button>
+          <button 
+            type="button" 
+            class="btn-remove" 
+            *ngIf="imagePreview || profileData.profileImage"
+            (click)="removeImage()">
+            🗑️ Quitar
+          </button>
+        </div>
       </div>
+      
       <div class="user-info">
         <h2>{{ currentUser?.profile?.firstName || 'Usuario' }} {{ currentUser?.profile?.lastName || '' }}</h2>
         <p class="user-role">{{ currentUser?.role | titlecase }}</p>

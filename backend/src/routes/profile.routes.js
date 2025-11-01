@@ -7,7 +7,7 @@ const { User, Profile } = require('../models');
 router.put('/', authenticateToken, async (req, res) => {
   try {
     const userId = req.user.id;
-    const { firstName, lastName, email, phone, dni, birthDate, gender, address } = req.body;
+    const { firstName, lastName, email, phone, dni, birthDate, gender, address, profileImage } = req.body;
 
     // Actualizar datos del usuario
     await User.update(
@@ -27,7 +27,8 @@ router.put('/', authenticateToken, async (req, res) => {
         dni,
         birthDate,
         gender,
-        address
+        address,
+        profileImage
       });
     } else {
       // Crear nuevo perfil
@@ -39,7 +40,8 @@ router.put('/', authenticateToken, async (req, res) => {
         dni,
         birthDate,
         gender,
-        address
+        address,
+        profileImage
       });
     }
 

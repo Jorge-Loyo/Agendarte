@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService, User } from '../../services/auth.service';
+import { GoogleCalendarService } from '../../services/google-calendar.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -20,7 +21,8 @@ export class Dashboard implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private googleCalendar: GoogleCalendarService
   ) {}
 
   ngOnInit() {
@@ -33,6 +35,40 @@ export class Dashboard implements OnInit {
     
     this.generateCalendar();
     this.loadUpcomingAppointments();
+    this.initializeGoogleCalendar();
+  }
+
+  async initializeGoogleCalendar() {
+    try {
+      await this.googleCalendar.initializeGapi();
+    } catch (error) {
+      console.error('Error inicializando Google Calendar:', error);
+    }
+  }
+
+  async connectGoogleCalendar() {
+    try {
+      const success = await this.googleCalendar.signIn();
+      if (success) {
+        console.log('Conectado a Google Calendar');
+        this.syncWithGoogleCalendar();
+      }
+    } catch (error) {
+      console.error('Error conectando con Google Calendar:', error);
+    }
+  }
+
+  async syncWithGoogleCalendar() {
+    try {
+      const events = await this.googleCalendar.getEvents();
+      console.log('Eventos de Google Calendar:', events);
+    } catch (error) {
+      console.error('Error sincronizando eventos:', error);
+    }
+  }
+
+  isGoogleConnected(): boolean {
+    return this.googleCalendar.isUserSignedIn();
   }
 
   generateCalendar() {

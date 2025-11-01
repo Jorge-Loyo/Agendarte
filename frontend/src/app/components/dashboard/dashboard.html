@@ -18,7 +18,21 @@
     <div class="calendar-section">
       <div class="section-header">
         <h2>📅 Mi Calendario</h2>
-        <button class="btn-new-appointment" routerLink="/app/appointments">+ Nueva Cita</button>
+        <div class="calendar-actions">
+          <button class="btn-new-appointment" routerLink="/app/appointments">+ Nueva Cita</button>
+          <button 
+            class="btn-google-sync" 
+            (click)="connectGoogleCalendar()"
+            *ngIf="!isGoogleConnected()">
+            📅 Conectar Google Calendar
+          </button>
+          <button 
+            class="btn-google-connected" 
+            (click)="syncWithGoogleCalendar()"
+            *ngIf="isGoogleConnected()">
+            ✅ Sincronizar Google Calendar
+          </button>
+        </div>
       </div>
       
       <div class="calendar-container">
