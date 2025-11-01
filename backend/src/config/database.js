@@ -1,19 +1,53 @@
 const { Sequelize } = require('sequelize');
+require('dotenv').config();
 
-const sequelize = new Sequelize('nombre_base_datos', 'usuario', 'contraseña', {
-    host: 'localhost',
-    dialect: 'mysql' // o 'postgres', 'sqlite', etc. según la base de datos que estés utilizando
-});
+// Configuración de la base de datos PostgreSQL
+const sequelize = new Sequelize(
+    process.env.DATABASE_URL || `postgres://${process.env.DB_USER || 'postgres'}:${process.env.DB_PASSWORD || ''}@${process.env.DB_HOST || 'localhost'}:${process.env.DB_PORT || 5432}/${process.env.DB_NAME || 'agendarte'}`,
+    {
+        dialect: 'postgres',
+        logging: process.env.NODE_ENV === 'development' ? console.log : false,
+        pool: {
+            max: 5,
+            min: 0,
+            acquire: 30000,
+            idle: 10000
+        },
+        dialectOptions: {
+            ssl: process.env.NODE_ENV === 'production' ? {
+                require: true,
+                rejectUnauthorized: false // Para AWS RDS
+            } : false
+        },
+        timezone: '-03:00' // Argentina timezone
+    }
+);
 
+// Función para probar la conexión
 const testConnection = async () => {
     try {
         await sequelize.authenticate();
-        console.log('Conexión a la base de datos establecida con éxito.');
+        console.log('✅ Conexión a PostgreSQL establecida correctamente');
+        console.log(`📊 Base de datos: ${process.env.DB_NAME || 'agendarte'}`);
+        console.log(`🌐 Entorno: ${process.env.NODE_ENV || 'development'}`);
     } catch (error) {
-        console.error('No se pudo conectar a la base de datos:', error);
+        console.error('❌ Error conectando a PostgreSQL:', error.message);
+        process.exit(1);
     }
 };
 
-testConnection();
+// Función para sincronizar modelos
+const syncDatabase = async () => {
+    try {
+        await sequelize.sync({ alter: true });
+        console.log('🔄 Modelos sincronizados con la base de datos');
+    } catch (error) {
+        console.error('❌ Error sincronizando modelos:', error.message);
+    }
+};
 
-module.exports = sequelize;
+module.exports = {
+    sequelize,
+    testConnection,
+    syncDatabase
+};
