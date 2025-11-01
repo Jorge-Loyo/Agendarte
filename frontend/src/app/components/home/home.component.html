@@ -1,0 +1,131 @@
+<!-- Header promocional -->
+<header class="promo-header">
+  <div class="header-container">
+    <div class="logo-brand">
+      <svg width="45" height="45" viewBox="0 0 45 45" fill="none">
+        <circle cx="22.5" cy="22.5" r="20" fill="var(--primary-color)" opacity="0.1"/>
+        <path d="M22.5 9v27M13.5 18l9 9 9-9" stroke="var(--primary-color)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="22.5" cy="13.5" r="2.5" fill="var(--primary-color)"/>
+        <path d="M15 30h15" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <h1>Agendarte</h1>
+    </div>
+    <div class="header-actions">
+      <a routerLink="/login" class="btn-login">Iniciar Sesión</a>
+      <a routerLink="/register" class="btn-register">Registrarse</a>
+    </div>
+  </div>
+</header>
+
+<!-- Hero Section -->
+<section class="hero">
+  <div class="hero-content">
+    <h1>Gestiona tus citas médicas de forma inteligente</h1>
+    <p>La plataforma que conecta pacientes y profesionales de la salud para una experiencia médica más eficiente</p>
+    <div class="hero-buttons">
+      <a routerLink="/register" class="btn-primary">Comenzar Gratis</a>
+      <a href="#features" class="btn-secondary">Conocer Más</a>
+    </div>
+  </div>
+  <div class="hero-image">
+    <div class="medical-illustration">
+      <div class="pulse-circle"></div>
+      <svg width="300" height="300" viewBox="0 0 300 300">
+        <circle cx="150" cy="150" r="120" fill="var(--primary-color)" opacity="0.1"/>
+        <path d="M150 80v140M100 120l50 50 50-50" stroke="var(--primary-color)" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="150" cy="100" r="8" fill="var(--primary-color)"/>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- Features Section -->
+<section id="features" class="features">
+  <div class="container">
+    <h2>Para Pacientes y Profesionales</h2>
+    
+    <div class="features-grid">
+      <!-- Para Pacientes -->
+      <div class="feature-card patient-card">
+        <div class="card-icon">
+          <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
+            <circle cx="30" cy="20" r="8" stroke="var(--primary-color)" stroke-width="2"/>
+            <path d="M18 50c0-8 5.4-14 12-14s12 6 12 14" stroke="var(--primary-color)" stroke-width="2"/>
+          </svg>
+        </div>
+        <h3>Para Pacientes</h3>
+        <ul>
+          <li>Agenda citas 24/7</li>
+          <li>Encuentra especialistas</li>
+          <li>Historial médico digital</li>
+          <li>Recordatorios automáticos</li>
+        </ul>
+      </div>
+
+      <!-- Para Profesionales -->
+      <div class="feature-card professional-card">
+        <div class="card-icon">
+          <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
+            <rect x="15" y="10" width="30" height="40" rx="3" stroke="var(--primary-color)" stroke-width="2"/>
+            <path d="M25 20h10M25 30h10M25 40h6" stroke="var(--primary-color)" stroke-width="2"/>
+          </svg>
+        </div>
+        <h3>Para Profesionales</h3>
+        <ul>
+          <li>Gestión de agenda inteligente</li>
+          <li>Perfil profesional completo</li>
+          <li>Sistema de valoraciones</li>
+          <li>Reportes y estadísticas</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Benefits Section -->
+<section class="benefits">
+  <div class="container">
+    <div class="benefits-content">
+      <h2>¿Por qué elegir Agendarte?</h2>
+      <div class="benefits-list">
+        <div class="benefit-item">
+          <div class="benefit-icon">✓</div>
+          <div>
+            <h4>Fácil de usar</h4>
+            <p>Interfaz intuitiva diseñada para todos</p>
+          </div>
+        </div>
+        <div class="benefit-item">
+          <div class="benefit-icon">✓</div>
+          <div>
+            <h4>Seguro y confiable</h4>
+            <p>Protección de datos médicos garantizada</p>
+          </div>
+        </div>
+        <div class="benefit-item">
+          <div class="benefit-icon">✓</div>
+          <div>
+            <h4>Disponible siempre</h4>
+            <p>Acceso 24/7 desde cualquier dispositivo</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta">
+  <div class="container">
+    <h2>Comienza hoy mismo</h2>
+    <p>Únete a miles de usuarios que ya confían en Agendarte</p>
+    <a routerLink="/register" class="btn-cta">Crear Cuenta Gratis</a>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="container">
+    <p>&copy; 2024 Agendarte. Todos los derechos reservados.</p>
+  </div>
+</footer>

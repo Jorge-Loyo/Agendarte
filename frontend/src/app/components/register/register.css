@@ -3,34 +3,54 @@
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #f8fdff 0%, #e8f4f8 30%, #d6eaf8 70%, #f0f8ff 100%);
   padding: 20px;
+  position: relative;
+}
+
+.register-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="%234a90a4" opacity="0.1"/><circle cx="80" cy="80" r="2" fill="%237fb3d3" opacity="0.1"/><circle cx="40" cy="60" r="1.5" fill="%235dade2" opacity="0.1"/></svg>') repeat;
+  pointer-events: none;
 }
 
 .register-card {
-  background: white;
-  padding: 40px;
-  border-radius: 10px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  padding: 50px 40px;
+  border-radius: 20px;
+  box-shadow: var(--shadow-medium);
+  border: 1px solid rgba(74, 144, 164, 0.1);
   width: 100%;
-  max-width: 600px;
+  max-width: 650px;
   text-align: center;
+  position: relative;
+  z-index: 1;
 }
 
 .register-card h2 {
-  color: #333;
-  margin-bottom: 10px;
-  font-size: 2rem;
+  color: var(--primary-dark);
+  margin-bottom: 8px;
+  font-size: 2.2rem;
+  font-weight: 600;
+  letter-spacing: -0.5px;
 }
 
 .register-card p {
-  color: #666;
-  margin-bottom: 30px;
+  color: var(--text-secondary);
+  margin-bottom: 35px;
+  font-size: 15px;
+  font-weight: 400;
 }
 
 .form-row {
   display: flex;
-  gap: 15px;
+  gap: 20px;
 }
 
 .form-row .form-group {
@@ -38,34 +58,41 @@
 }
 
 .form-group {
-  margin-bottom: 20px;
+  margin-bottom: 25px;
   text-align: left;
 }
 
 .form-group label {
   display: block;
-  margin-bottom: 5px;
-  color: #333;
+  margin-bottom: 8px;
+  color: var(--text-primary);
   font-weight: 500;
+  font-size: 14px;
+  letter-spacing: 0.3px;
 }
 
 .form-control {
   width: 100%;
-  padding: 12px;
-  border: 2px solid #ddd;
-  border-radius: 5px;
-  font-size: 16px;
-  transition: border-color 0.3s;
+  padding: 16px 18px;
+  border: 2px solid var(--border-light);
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 400;
+  background: var(--background-light);
+  transition: all 0.3s ease;
   box-sizing: border-box;
 }
 
 .form-control:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(74, 144, 164, 0.1);
+  background: var(--background-soft);
 }
 
 .form-control.ng-invalid.ng-touched {
-  border-color: #e74c3c;
+  border-color: var(--error-color);
+  box-shadow: 0 0 0 3px rgba(236, 112, 99, 0.1);
 }
 
 textarea.form-control {
@@ -75,122 +102,156 @@ textarea.form-control {
 
 .btn-register {
   width: 100%;
-  padding: 12px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 16px;
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
   color: white;
   border: none;
-  border-radius: 5px;
+  border-radius: 12px;
   font-size: 16px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: transform 0.2s;
-  margin-top: 10px;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-soft);
+  letter-spacing: 0.5px;
+  margin-top: 15px;
 }
 
 .btn-register:hover:not(:disabled) {
   transform: translateY(-2px);
+  box-shadow: 0 6px 25px rgba(74, 144, 164, 0.25);
+  background: linear-gradient(135deg, var(--primary-light) 0%, var(--accent-color) 100%);
 }
 
 .btn-register:disabled {
-  opacity: 0.6;
+  opacity: 0.5;
   cursor: not-allowed;
+  transform: none;
 }
 
 .error-message {
-  background: #fee;
-  color: #c33;
-  padding: 10px;
-  border-radius: 5px;
+  background: linear-gradient(135deg, #fdf2f2 0%, #fbeaea 100%);
+  color: var(--error-color);
+  padding: 14px 18px;
+  border-radius: 10px;
   margin-bottom: 20px;
-  border: 1px solid #fcc;
+  border: 1px solid rgba(236, 112, 99, 0.2);
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .success-message {
-  background: #efe;
-  color: #3c3;
-  padding: 10px;
-  border-radius: 5px;
+  background: linear-gradient(135deg, #f0fff4 0%, #e8f5e8 100%);
+  color: var(--success-color);
+  padding: 14px 18px;
+  border-radius: 10px;
   margin-bottom: 20px;
-  border: 1px solid #cfc;
+  border: 1px solid rgba(88, 214, 141, 0.2);
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .register-footer {
-  margin-top: 20px;
-  padding-top: 20px;
-  border-top: 1px solid #eee;
+  margin-top: 30px;
+  padding-top: 25px;
+  border-top: 1px solid rgba(74, 144, 164, 0.1);
 }
 
 .register-footer a {
-  color: #667eea;
+  color: var(--primary-color);
   text-decoration: none;
   cursor: pointer;
+  font-weight: 500;
+  transition: color 0.3s ease;
 }
 
 .register-footer a:hover {
+  color: var(--primary-light);
   text-decoration: underline;
 }
 
 /* Indicador de fortaleza de contraseña */
 .password-strength {
-  margin-top: 5px;
-  font-size: 14px;
+  margin-top: 8px;
+  font-size: 13px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: var(--background-soft);
 }
 
 .strength-label {
-  color: #666;
+  color: var(--text-secondary);
+  font-weight: 500;
 }
 
 .strength-indicator {
-  font-weight: bold;
-  margin-left: 5px;
+  font-weight: 600;
+  margin-left: 8px;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.5px;
 }
 
 .strength-indicator.weak {
-  color: #e74c3c;
+  color: var(--error-color);
 }
 
 .strength-indicator.medium {
-  color: #f39c12;
+  color: var(--warning-color);
 }
 
 .strength-indicator.strong {
-  color: #27ae60;
+  color: var(--success-color);
 }
 
 .password-requirements {
-  margin-top: 5px;
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: var(--background-soft);
+  border-radius: 8px;
+  border-left: 3px solid var(--primary-color);
 }
 
 .password-requirements small {
-  color: #666;
+  color: var(--text-secondary);
   font-size: 12px;
+  line-height: 1.4;
 }
 
 /* Validación de campos */
 .form-control.invalid {
-  border-color: #e74c3c;
+  border-color: var(--error-color);
+  box-shadow: 0 0 0 3px rgba(236, 112, 99, 0.1);
 }
 
 .form-control.valid {
-  border-color: #27ae60;
+  border-color: var(--success-color);
+  box-shadow: 0 0 0 3px rgba(88, 214, 141, 0.1);
 }
 
 .field-error {
-  margin-top: 5px;
+  margin-top: 8px;
+  padding: 6px 10px;
+  background: rgba(236, 112, 99, 0.05);
+  border-radius: 6px;
 }
 
 .field-error small {
-  color: #e74c3c;
+  color: var(--error-color);
   font-size: 12px;
+  font-weight: 500;
 }
 
 .field-success {
-  margin-top: 5px;
+  margin-top: 8px;
+  padding: 6px 10px;
+  background: rgba(88, 214, 141, 0.05);
+  border-radius: 6px;
 }
 
 .field-success small {
-  color: #27ae60;
+  color: var(--success-color);
   font-size: 12px;
+  font-weight: 500;
 }
 
 /* Responsive */
@@ -201,6 +262,11 @@ textarea.form-control {
   }
   
   .register-card {
-    padding: 20px;
+    padding: 30px 20px;
+    margin: 10px;
+  }
+  
+  .register-card h2 {
+    font-size: 1.8rem;
   }
 }

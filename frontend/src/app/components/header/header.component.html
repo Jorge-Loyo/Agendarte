@@ -1,0 +1,48 @@
+<header class="main-header">
+  <div class="header-container">
+    <!-- Logo y nombre -->
+    <div class="header-brand">
+      <div class="logo">
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+          <circle cx="20" cy="20" r="18" fill="var(--primary-color)" opacity="0.1"/>
+          <path d="M20 8v24M12 16l8 8 8-8" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="20" cy="12" r="2" fill="var(--primary-color)"/>
+        </svg>
+      </div>
+      <h1 class="brand-name">Agendarte</h1>
+    </div>
+
+    <!-- Navegación principal -->
+    <nav class="main-nav" *ngIf="isLoggedIn">
+      <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+      <a routerLink="/appointments" routerLinkActive="active">Citas</a>
+      <a routerLink="/professionals" routerLinkActive="active">Profesionales</a>
+      <a routerLink="/profile" routerLinkActive="active">Perfil</a>
+    </nav>
+
+    <!-- Usuario y acciones -->
+    <div class="header-actions">
+      <div *ngIf="isLoggedIn; else loginActions" class="user-menu">
+        <div class="user-info">
+          <div class="user-avatar">
+            {{ userProfile?.firstName?.charAt(0) || 'U' }}
+          </div>
+          <span class="user-name">{{ userProfile?.firstName || 'Usuario' }}</span>
+        </div>
+        <button class="logout-btn" (click)="logout()">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M6 2h8v12H6v-1h7V3H6V2zM2 8l3-3v2h6v2H5v2L2 8z"/>
+          </svg>
+          Salir
+        </button>
+      </div>
+      
+      <ng-template #loginActions>
+        <div class="auth-buttons">
+          <a routerLink="/login" class="btn-login">Iniciar Sesión</a>
+          <a routerLink="/register" class="btn-register">Registrarse</a>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</header>
