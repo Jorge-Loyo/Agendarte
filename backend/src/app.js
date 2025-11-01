@@ -6,6 +6,9 @@ require('dotenv').config();
 // Importar configuración de base de datos
 const { testConnection, syncDatabase } = require('./config/database');
 
+// Importar modelos
+const models = require('./models');
+
 // Importar rutas
 const homeRoutes = require("./routes/home.routes");
 
@@ -52,8 +55,8 @@ const startServer = async () => {
     // Probar conexión a la base de datos
     await testConnection();
     
-    // Sincronizar modelos (cuando los creemos)
-    // await syncDatabase();
+    // Sincronizar modelos
+    await syncDatabase();
     
     // Iniciar servidor
     app.listen(PORT, () => {
