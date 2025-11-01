@@ -130,6 +130,69 @@ textarea.form-control {
   text-decoration: underline;
 }
 
+/* Indicador de fortaleza de contraseña */
+.password-strength {
+  margin-top: 5px;
+  font-size: 14px;
+}
+
+.strength-label {
+  color: #666;
+}
+
+.strength-indicator {
+  font-weight: bold;
+  margin-left: 5px;
+}
+
+.strength-indicator.weak {
+  color: #e74c3c;
+}
+
+.strength-indicator.medium {
+  color: #f39c12;
+}
+
+.strength-indicator.strong {
+  color: #27ae60;
+}
+
+.password-requirements {
+  margin-top: 5px;
+}
+
+.password-requirements small {
+  color: #666;
+  font-size: 12px;
+}
+
+/* Validación de campos */
+.form-control.invalid {
+  border-color: #e74c3c;
+}
+
+.form-control.valid {
+  border-color: #27ae60;
+}
+
+.field-error {
+  margin-top: 5px;
+}
+
+.field-error small {
+  color: #e74c3c;
+  font-size: 12px;
+}
+
+.field-success {
+  margin-top: 5px;
+}
+
+.field-success small {
+  color: #27ae60;
+  font-size: 12px;
+}
+
 /* Responsive */
 @media (max-width: 600px) {
   .form-row {

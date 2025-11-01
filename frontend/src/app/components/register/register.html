@@ -42,7 +42,11 @@
           required 
           email
           class="form-control"
+          [class.invalid]="email && !isEmailValid(email)"
           placeholder="tu@email.com">
+        <div *ngIf="email && !isEmailValid(email)" class="field-error">
+          <small>Por favor ingresa un email válido</small>
+        </div>
       </div>
 
       <div class="form-row">
@@ -57,6 +61,13 @@
             minlength="8"
             class="form-control"
             placeholder="Mínimo 8 caracteres">
+          <div *ngIf="password" class="password-strength">
+            <span class="strength-label">Fortaleza:</span>
+            <span [class]="'strength-indicator ' + getPasswordStrengthClass()">{{ getPasswordStrength() }}</span>
+          </div>
+          <div class="password-requirements">
+            <small>Debe contener: 1 mayúscula, 1 minúscula, 1 número, 1 carácter especial (@$!%*?&)</small>
+          </div>
         </div>
         
         <div class="form-group">
@@ -68,7 +79,15 @@
             [(ngModel)]="confirmPassword" 
             required 
             class="form-control"
+            [class.invalid]="confirmPassword && !passwordsMatch()"
+            [class.valid]="confirmPassword && passwordsMatch()"
             placeholder="Repetir contraseña">
+          <div *ngIf="confirmPassword && !passwordsMatch()" class="field-error">
+            <small>Las contraseñas no coinciden</small>
+          </div>
+          <div *ngIf="confirmPassword && passwordsMatch()" class="field-success">
+            <small>✓ Las contraseñas coinciden</small>
+          </div>
         </div>
       </div>
 
@@ -82,7 +101,16 @@
             name="dni"
             [(ngModel)]="dni" 
             class="form-control"
-            placeholder="12345678">
+            [class.invalid]="dni && !isDniValid(dni)"
+            [class.valid]="dni && isDniValid(dni)"
+            placeholder="12345678"
+            maxlength="20">
+          <div *ngIf="dni && !isDniValid(dni)" class="field-error">
+            <small>DNI debe tener entre 7 y 20 caracteres numéricos</small>
+          </div>
+          <div *ngIf="dni && isDniValid(dni)" class="field-success">
+            <small>✓ DNI válido</small>
+          </div>
         </div>
         
         <div class="form-group">

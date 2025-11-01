@@ -6,10 +6,15 @@ const validateRegister = (req, res, next) => {
       'string.email': 'Email debe ser válido',
       'any.required': 'Email es requerido'
     }),
-    password: Joi.string().min(8).required().messages({
-      'string.min': 'Contraseña debe tener al menos 8 caracteres',
-      'any.required': 'Contraseña es requerida'
-    }),
+    password: Joi.string()
+      .min(8)
+      .pattern(new RegExp('^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]'))
+      .required()
+      .messages({
+        'string.min': 'Contraseña debe tener al menos 8 caracteres',
+        'string.pattern.base': 'Contraseña debe contener al menos: 1 mayúscula, 1 minúscula, 1 número y 1 carácter especial (@$!%*?&)',
+        'any.required': 'Contraseña es requerida'
+      }),
     firstName: Joi.string().min(2).max(50).required().messages({
       'string.min': 'Nombre debe tener al menos 2 caracteres',
       'any.required': 'Nombre es requerido'

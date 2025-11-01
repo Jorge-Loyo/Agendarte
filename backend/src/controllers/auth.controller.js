@@ -20,6 +20,16 @@ const register = async (req, res) => {
       });
     }
 
+    // Verificar si el DNI ya existe (si se proporciona)
+    if (dni) {
+      const existingDNI = await Profile.findOne({ where: { dni } });
+      if (existingDNI) {
+        return res.status(400).json({
+          message: 'El DNI ya está registrado'
+        });
+      }
+    }
+
     // Encriptar contraseña
     const hashedPassword = await bcrypt.hash(password, 10);
 
