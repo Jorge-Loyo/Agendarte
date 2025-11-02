@@ -95,47 +95,47 @@
     <div class="quick-actions-section">
       <h2>⚡ Acciones Rápidas</h2>
       
-      <div class="action-cards">
-        <div *ngIf="currentUser?.role === 'patient'" class="action-card patient">
-          <div class="card-icon">👨‍⚕️</div>
-          <h3>Buscar Profesionales</h3>
-          <p>Encuentra especialistas</p>
-          <button class="btn-action" routerLink="/app/find-professionals">Explorar</button>
+      <div class="actions-horizontal">
+        <!-- Columna Izquierda -->
+        <div class="actions-left">
+          <div *ngIf="currentUser?.role === 'patient'" class="action-item">
+            <div class="action-icon">👨⚕️</div>
+            <div class="action-content">
+              <h3>Buscar profesionales</h3>
+              <p>Encuentra especialistas</p>
+              <button class="btn-action" routerLink="/app/find-professionals">Explorar</button>
+            </div>
+          </div>
+
+          <div class="action-item">
+            <div class="action-icon">👤</div>
+            <div class="action-content">
+              <h3>Mi perfil</h3>
+              <p>Actualizar información</p>
+              <button class="btn-action" routerLink="/app/profile">Editor</button>
+            </div>
+          </div>
         </div>
 
-        <div *ngIf="currentUser?.role === 'professional'" class="action-card professional">
-          <div class="card-icon">🩺</div>
-          <h3>Mi Agenda</h3>
-          <p>Gestiona horarios</p>
-          <button class="btn-action">Ver Agenda</button>
-        </div>
+        <!-- Columna Derecha -->
+        <div class="actions-right">
+          <div *ngIf="currentUser?.role === 'patient'" class="action-item">
+            <div class="action-icon">📅</div>
+            <div class="action-content">
+              <h3>Mis Turnos</h3>
+              <p>Ver citas agendadas</p>
+              <button class="btn-action" routerLink="/app/my-appointments">Ver Turnos</button>
+            </div>
+          </div>
 
-        <div class="action-card">
-          <div class="card-icon">👤</div>
-          <h3>Mi Perfil</h3>
-          <p>Actualizar información</p>
-          <button class="btn-action" routerLink="/app/profile">Editar</button>
-        </div>
-
-        <div *ngIf="currentUser?.role === 'patient'" class="action-card patient">
-          <div class="card-icon">📅</div>
-          <h3>Mis Turnos</h3>
-          <p>Ver citas agendadas</p>
-          <button class="btn-action" routerLink="/app/my-appointments">Ver Turnos</button>
-        </div>
-
-        <div *ngIf="currentUser?.role === 'patient'" class="action-card patient">
-          <div class="card-icon">📋</div>
-          <h3>Historial Médico</h3>
-          <p>Ver expediente digital</p>
-          <button class="btn-action" routerLink="/app/medical-history">Ver Historial</button>
-        </div>
-
-        <div *ngIf="currentUser?.role === 'admin'" class="action-card admin">
-          <div class="card-icon">👨⚕️</div>
-          <h3>Gestionar Profesionales</h3>
-          <p>Registrar nuevos médicos</p>
-          <button class="btn-action" routerLink="/app/professionals">Gestionar</button>
+          <div *ngIf="currentUser?.role === 'patient'" class="action-item">
+            <div class="action-icon">📋</div>
+            <div class="action-content">
+              <h3>Médico histórico</h3>
+              <p>Ver no digital</p>
+              <button class="btn-action" routerLink="/app/medical-history">Ver Historial</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

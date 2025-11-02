@@ -23,7 +23,8 @@ export const routes: Routes = [
       { path: 'my-appointments', loadComponent: () => import('./components/my-appointments/my-appointments.component').then(m => m.MyAppointmentsComponent) },
       { path: 'profile', loadComponent: () => import('./components/profile/profile.component').then(m => m.ProfileComponent) },
       { path: 'medical-history', loadComponent: () => import('./components/medical-history/medical-history.component').then(m => m.MedicalHistoryComponent) },
-      { path: 'professional-dashboard', loadComponent: () => import('./components/professional-dashboard/professional-dashboard.component').then(m => m.ProfessionalDashboardComponent) }
+      { path: 'professional-dashboard', loadComponent: () => import('./components/professional-dashboard/professional-dashboard.component').then(m => m.ProfessionalDashboardComponent) },
+      { path: 'admin', loadComponent: () => import('./components/admin/admin.component').then(m => m.AdminComponent) }
     ]
   },
   { path: '**', redirectTo: '/home' }

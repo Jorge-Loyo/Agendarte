@@ -39,10 +39,26 @@ const testConnection = async () => {
 // Función para sincronizar modelos
 const syncDatabase = async () => {
     try {
-        await sequelize.sync({ alter: true });
+        await sequelize.sync({ force: false, alter: true });
         console.log('🔄 Modelos sincronizados con la base de datos');
     } catch (error) {
         console.error('❌ Error sincronizando modelos:', error.message);
+        // Intentar crear tabla specialties manualmente si no existe
+        try {
+            await sequelize.query(`
+                CREATE TABLE IF NOT EXISTS specialties (
+                    id SERIAL PRIMARY KEY,
+                    name VARCHAR(255) UNIQUE NOT NULL,
+                    description TEXT,
+                    "isActive" BOOLEAN DEFAULT true,
+                    "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+                    "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+                );
+            `);
+            console.log('✅ Tabla specialties creada manualmente');
+        } catch (createError) {
+            console.error('❌ Error creando tabla specialties:', createError.message);
+        }
     }
 };
 

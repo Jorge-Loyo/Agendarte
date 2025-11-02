@@ -65,6 +65,18 @@
   background: rgba(74, 144, 164, 0.1);
 }
 
+.admin-link {
+  background: linear-gradient(135deg, #ff6b6b, #ee5a24) !important;
+  color: white !important;
+  font-weight: 600;
+}
+
+.admin-link:hover {
+  background: linear-gradient(135deg, #ee5a24, #ff6b6b) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+}
+
 .header-actions {
   display: flex;
   align-items: center;

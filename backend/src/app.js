@@ -7,8 +7,9 @@ require('dotenv').config();
 const { testConnection, syncDatabase } = require('./config/database');
 
 // Importar modelos
-const { User, Profile, Professional, Appointment } = require('./models');
+const { User, Profile, Professional, Appointment, Specialty } = require('./models');
 const { seedProfessionals } = require('./seeders/professionals');
+const seedSpecialties = require('./seeders/specialties');
 
 // Importar rutas
 const homeRoutes = require("./routes/home.routes");
@@ -33,6 +34,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/profile", require("./routes/profile.routes"));
 app.use("/api/appointments", require("./routes/appointment.routes"));
 app.use("/api/professionals", require("./routes/professional.routes"));
+app.use("/api/specialties", require("./routes/specialty.routes"));
 
 // Ruta raíz
 app.get("/", (req, res) => {
@@ -65,6 +67,7 @@ const startServer = async () => {
     await syncDatabase();
     
     // Crear datos de prueba
+    await seedSpecialties();
     await seedProfessionals();
     
     // Iniciar servidor

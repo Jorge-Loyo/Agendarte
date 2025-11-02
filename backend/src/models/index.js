@@ -2,6 +2,7 @@ const User = require('./User');
 const Profile = require('./Profile');
 const Professional = require('./Professional');
 const Appointment = require('./Appointment');
+const Specialty = require('./specialty.model');
 
 // Asociaciones User - Profile
 User.hasOne(Profile, { 
@@ -57,5 +58,6 @@ module.exports = {
   User,
   Profile,
   Professional,
-  Appointment
+  Appointment,
+  Specialty
 };
