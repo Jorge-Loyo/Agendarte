@@ -9,15 +9,15 @@
 ## 🎯 RESUMEN EJECUTIVO
 
 - **Total HU:** 21
-- **HU Completadas:** 8 ✅
+- **HU Completadas:** 9 ✅
 - **HU Parcialmente Implementadas:** 2 🔄
-- **HU Pendientes:** 11 ❌
-- **Progreso General:** **52.4%** (10/21 HU iniciadas)
-- **Puntos Completados:** 115/234 pts (**49.1%**)
+- **HU Pendientes:** 10 ❌
+- **Progreso General:** **57.1%** (11/21 HU iniciadas)
+- **Puntos Completados:** 136/234 pts (**58.1%**)
 
 ---
 
-## ✅ HISTORIAS DE USUARIO COMPLETADAS (8)
+## ✅ HISTORIAS DE USUARIO COMPLETADAS (9)
 
 ### **HU-01: Registro de Paciente** ✅ **COMPLETADA**
 **Puntos:** 5 | **Prioridad:** Alta
@@ -174,10 +174,24 @@
 
 ## ❌ HISTORIAS DE USUARIO PENDIENTES (11)
 
-### **Alta Prioridad (1 HU)**
-- ❌ **HU-04**: Pago con Mercado Pago (21 pts)
+### **HU-04: Pago con Mercado Pago** ✅ **COMPLETADA**
+**Puntos:** 21 | **Prioridad:** Alta
 
-### **Media Prioridad (9 HU)**
+**✅ Criterios de Aceptación Cumplidos:**
+- ✅ Selección de método de pago Mercado Pago
+- ✅ Monto a pagar mostrado claramente
+- ✅ Redirección a Mercado Pago (real/simulada)
+- ✅ Confirmación de pago exitoso
+- ✅ Confirmación automática de turnos
+- ✅ Webhook para procesamiento de pagos
+
+**📁 Archivos:** `payment/`, `mercadopago.service.js`, `payment.controller.js`
+
+---
+
+### **Alta Prioridad (0 HU)**
+
+### **Media Prioridad (10 HU)**
 - ❌ **HU-11**: Historial de Paciente (8 pts)
 - ❌ **HU-12**: Cancelar/Reprogramar Profesional (8 pts)
 - ❌ **HU-13**: Notas de Consulta (5 pts)
@@ -236,7 +250,7 @@
 - **Calendarios:** 100% ✅
 - **Perfiles:** 95% ✅
 - **Notificaciones:** 100% ✅
-- **Pagos:** 0% ❌
+- **Pagos:** 100% ✅
 - **Reportes:** 0% ❌
 - **Reseñas:** 0% ❌
 
@@ -246,8 +260,8 @@
 
 ### **Inmediato (Sprint Actual)**
 1. **Completar HU-10** - Finalizar agendado de turnos profesional
-2. **HU-04** - Implementar integración con Mercado Pago
-3. **HU-13** - Notas de consulta
+2. **HU-13** - Notas de consulta
+3. **HU-11** - Historial de paciente
 
 ### **Corto Plazo (Próximo Sprint)**
 4. **HU-11** - Historial de paciente
@@ -286,8 +300,8 @@ El proyecto Agendarte ha alcanzado un **52.4% de progreso** con **8 HU completad
 
 **Próximas Prioridades:**
 - 🔄 **Completar HU-10:** Agendado profesional
-- 💳 **HU-04:** Integración de pagos
 - 📝 **HU-13:** Notas de consulta
+- 📄 **HU-11:** Historial de paciente
 - 👥 **Funcionalidades administrativas**
 
 **El proyecto tiene una base sólida y funcional, listo para producción con las funcionalidades core implementadas.**

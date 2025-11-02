@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { ProfessionalService } from '../../services/professional.service';
 import { AppointmentService } from '../../services/appointment.service';
 import { CalendarService } from '../../services/calendar.service';
@@ -36,6 +36,7 @@ export class AppointmentsComponent implements OnInit {
 
   constructor(
     private router: Router,
+    private route: ActivatedRoute,
     private professionalService: ProfessionalService,
     private appointmentService: AppointmentService,
     private calendarService: CalendarService,
@@ -44,6 +45,20 @@ export class AppointmentsComponent implements OnInit {
 
   ngOnInit() {
     this.loadProfessionals();
+    
+    // Verificar si viene un profesional preseleccionado
+    this.route.queryParams.subscribe(params => {
+      if (params['professionalId']) {
+        const professionalId = Number(params['professionalId']);
+        // Preseleccionar el profesional cuando se carguen
+        setTimeout(() => {
+          const professional = this.professionals.find(p => p.id === professionalId);
+          if (professional) {
+            this.selectProfessional(professional);
+          }
+        }, 1000);
+      }
+    });
   }
 
   loadProfessionals() {

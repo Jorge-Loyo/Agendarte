@@ -41,6 +41,7 @@ app.use("/api/specialties", require("./routes/specialty.routes"));
 app.use("/api/calendar", require("./routes/calendar.routes"));
 app.use("/api/patients", require("./routes/patient.routes"));
 app.use("/api/notifications", require("./routes/notification.routes"));
+app.use("/api/payments", require("./routes/payment.routes"));
 // Debug: Cargar rutas de horarios
 console.log('Cargando rutas de schedules...');
 app.use("/api/schedules", require("./routes/schedule.routes"));

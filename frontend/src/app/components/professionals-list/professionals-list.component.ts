@@ -110,7 +110,9 @@ export class ProfessionalsListComponent implements OnInit {
   }
 
   bookAppointment(professional: any) {
-    console.log('Agendar cita con:', professional.name);
+    this.router.navigate(['/app/appointments'], { 
+      queryParams: { professionalId: professional.id } 
+    });
   }
 
   private loadFavorites() {

@@ -64,6 +64,12 @@
       <div class="apt-actions">
         <button class="btn-details" (click)="viewDetails(apt)">Ver Detalles</button>
         <button 
+          class="btn-pay" 
+          *ngIf="apt.status === 'pending' && apt.paymentStatus !== 'paid'"
+          [routerLink]="['/app/payment', apt.id]">
+          Pagar
+        </button>
+        <button 
           class="btn-reschedule" 
           *ngIf="canModifyAppointment(apt)"
           (click)="rescheduleAppointment(apt)">

@@ -1,0 +1,79 @@
+<div class="payment-container">
+  <div class="payment-header">
+    <button class="btn-back" (click)="goBack()">← Volver</button>
+    <h1>Pagar Turno</h1>
+  </div>
+
+  <div class="loading-state" *ngIf="loading">
+    <p>Procesando pago...</p>
+  </div>
+
+  <div class="payment-content" *ngIf="!loading && paymentData">
+    <div class="appointment-summary">
+      <h2>Resumen del Turno</h2>
+      <div class="summary-card">
+        <div class="summary-item">
+          <span class="label">Profesional:</span>
+          <span class="value">{{ paymentData.appointment.professional }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Fecha:</span>
+          <span class="value">{{ paymentData.appointment.date | date:'dd/MM/yyyy' }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Hora:</span>
+          <span class="value">{{ paymentData.appointment.time }}</span>
+        </div>
+        <div class="summary-item total">
+          <span class="label">Total a pagar:</span>
+          <span class="value">${{ paymentData.appointment.price | number }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pago Real -->
+    <div class="payment-section" *ngIf="!showSimulation">
+      <h3>💳 Pagar con Mercado Pago</h3>
+      <p>Serás redirigido a Mercado Pago para completar tu pago de forma segura.</p>
+      
+      <div class="payment-methods">
+        <div class="method-item">
+          <span class="icon">💳</span>
+          <span>Tarjetas de crédito y débito</span>
+        </div>
+        <div class="method-item">
+          <span class="icon">🏦</span>
+          <span>Transferencia bancaria</span>
+        </div>
+        <div class="method-item">
+          <span class="icon">💰</span>
+          <span>Efectivo (Rapipago, Pago Fácil)</span>
+        </div>
+      </div>
+
+      <button class="btn-pay" (click)="proceedToPayment()">
+        Pagar con Mercado Pago
+      </button>
+    </div>
+
+    <!-- Simulación para Desarrollo -->
+    <div class="simulation-section" *ngIf="showSimulation">
+      <h3>🧪 Simulación de Pago (Desarrollo)</h3>
+      <p>Esto es una simulación para desarrollo. En producción se redirigirá a Mercado Pago.</p>
+      
+      <div class="simulation-buttons">
+        <button class="btn-success" (click)="simulateSuccess()" [disabled]="loading">
+          ✅ Simular Pago Exitoso
+        </button>
+        <button class="btn-failure" (click)="simulateFailure()">
+          ❌ Simular Pago Rechazado
+        </button>
+      </div>
+    </div>
+
+    <div class="security-info">
+      <p>🔒 Tu información está protegida con encriptación SSL</p>
+      <p>💯 Mercado Pago garantiza la seguridad de tu transacción</p>
+    </div>
+  </div>
+</div>

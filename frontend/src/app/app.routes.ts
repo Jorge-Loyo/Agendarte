@@ -28,6 +28,7 @@ export const routes: Routes = [
       { path: 'professional-dashboard', loadComponent: () => import('./components/professional-dashboard/professional-dashboard.component').then(m => m.ProfessionalDashboardComponent) },
       { path: 'professional-appointment', loadComponent: () => import('./components/professional-appointment/professional-appointment.component').then(m => m.ProfessionalAppointmentComponent) },
       { path: 'schedule-config', loadComponent: () => import('./components/schedule-config/schedule-config.component').then(m => m.ScheduleConfigComponent) },
+      { path: 'payment/:id', loadComponent: () => import('./components/payment/payment.component').then(m => m.PaymentComponent) },
       { 
         path: 'admin', 
         children: [
