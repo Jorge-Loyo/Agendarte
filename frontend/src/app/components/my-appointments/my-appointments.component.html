@@ -63,6 +63,18 @@
       
       <div class="apt-actions">
         <button class="btn-details" (click)="viewDetails(apt)">Ver Detalles</button>
+        <button 
+          class="btn-reschedule" 
+          *ngIf="canModifyAppointment(apt)"
+          (click)="rescheduleAppointment(apt)">
+          Reprogramar
+        </button>
+        <button 
+          class="btn-cancel" 
+          *ngIf="canModifyAppointment(apt)"
+          (click)="cancelAppointment(apt)">
+          Cancelar
+        </button>
       </div>
     </div>
 

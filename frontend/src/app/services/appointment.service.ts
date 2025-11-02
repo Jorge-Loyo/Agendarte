@@ -21,4 +21,16 @@ export class AppointmentService {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     });
   }
+
+  cancelAppointment(appointmentId: number, reason?: string): Observable<any> {
+    return this.http.put(`${this.baseUrl}/${appointmentId}/cancel`, { reason }, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    });
+  }
+
+  rescheduleAppointment(appointmentId: number, newDate: string, newTime: string, reason?: string): Observable<any> {
+    return this.http.put(`${this.baseUrl}/${appointmentId}/reschedule`, { newDate, newTime, reason }, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    });
+  }
 }

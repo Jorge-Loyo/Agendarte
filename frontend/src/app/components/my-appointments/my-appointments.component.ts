@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AppointmentService } from '../../services/appointment.service';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-my-appointments',
@@ -20,7 +21,8 @@ export class MyAppointmentsComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private appointmentService: AppointmentService
+    private appointmentService: AppointmentService,
+    private notificationService: NotificationService
   ) {}
 
   ngOnInit() {
@@ -104,6 +106,58 @@ export class MyAppointmentsComponent implements OnInit {
 
   viewDetails(appointment: any) {
     console.log('Ver detalles:', appointment);
+  }
+
+  canModifyAppointment(appointment: any): boolean {
+    const appointmentDate = new Date(`${appointment.date}T${appointment.time}`);
+    const now = new Date();
+    const hoursUntil = (appointmentDate.getTime() - now.getTime()) / (1000 * 60 * 60);
+    return hoursUntil >= 24 && appointment.status !== 'cancelled' && appointment.status !== 'completed';
+  }
+
+  cancelAppointment(appointment: any) {
+    if (!this.canModifyAppointment(appointment)) {
+      this.notificationService.warning('No disponible', 'No se puede cancelar con menos de 24 horas de anticipación');
+      return;
+    }
+
+    const reason = prompt('Motivo de cancelación (opcional):');
+    
+    this.appointmentService.cancelAppointment(appointment.id, reason || '').subscribe({
+      next: (response) => {
+        this.notificationService.success('Éxito', 'Turno cancelado exitosamente');
+        this.loadAppointments();
+      },
+      error: (error) => {
+        this.notificationService.error('Error', error.error?.message || 'Error al cancelar el turno');
+      }
+    });
+  }
+
+  rescheduleAppointment(appointment: any) {
+    if (!this.canModifyAppointment(appointment)) {
+      this.notificationService.warning('No disponible', 'No se puede reprogramar con menos de 24 horas de anticipación');
+      return;
+    }
+
+    const newDate = prompt('Nueva fecha (YYYY-MM-DD):');
+    const newTime = prompt('Nueva hora (HH:MM):');
+    const reason = prompt('Motivo de reprogramación (opcional):');
+
+    if (!newDate || !newTime) {
+      this.notificationService.warning('Datos incompletos', 'Debe proporcionar fecha y hora');
+      return;
+    }
+
+    this.appointmentService.rescheduleAppointment(appointment.id, newDate, newTime, reason || '').subscribe({
+      next: (response) => {
+        this.notificationService.success('Éxito', 'Turno reprogramado exitosamente');
+        this.loadAppointments();
+      },
+      error: (error) => {
+        this.notificationService.error('Error', error.error?.message || 'Error al reprogramar el turno');
+      }
+    });
   }
 
   goBack() {
