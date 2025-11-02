@@ -15,7 +15,7 @@ export class Dashboard implements OnInit {
   currentUser: User | null = null;
   selectedDate: Date | null = new Date();
   upcomingAppointments: any[] = [];
-  sidebarOpen = false;
+
   
   // Variables del calendario
   currentMonth = '';
@@ -198,10 +198,6 @@ export class Dashboard implements OnInit {
     this.currentDate = new Date();
     this.selectedDate = new Date();
     this.generateCalendar();
-  }
-
-  toggleSidebar() {
-    this.sidebarOpen = !this.sidebarOpen;
   }
 
   logout() {

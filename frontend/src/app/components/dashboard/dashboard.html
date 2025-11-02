@@ -1,58 +1,6 @@
 <div class="dashboard-container">
-  <!-- Sidebar Menu -->
-  <div class="sidebar" [class.open]="sidebarOpen">
-    <div class="sidebar-header">
-      <h3>⚡ Acciones Rápidas</h3>
-      <button class="close-btn" (click)="toggleSidebar()">×</button>
-    </div>
-    
-    <div class="sidebar-menu">
-      <div *ngIf="currentUser?.role === 'patient'" class="menu-item" routerLink="/app/find-professionals">
-        <div class="menu-icon">👨⚕️</div>
-        <div class="menu-text">
-          <span class="menu-title">Buscar profesionales</span>
-          <span class="menu-desc">Encuentra especialistas</span>
-        </div>
-      </div>
-
-      <div class="menu-item" routerLink="/app/profile">
-        <div class="menu-icon">👤</div>
-        <div class="menu-text">
-          <span class="menu-title">Mi perfil</span>
-          <span class="menu-desc">Actualizar información</span>
-        </div>
-      </div>
-
-      <div *ngIf="currentUser?.role === 'patient'" class="menu-item" routerLink="/app/my-appointments">
-        <div class="menu-icon">📅</div>
-        <div class="menu-text">
-          <span class="menu-title">Mis Turnos</span>
-          <span class="menu-desc">Ver citas agendadas</span>
-        </div>
-      </div>
-
-      <div *ngIf="currentUser?.role === 'patient'" class="menu-item" routerLink="/app/medical-history">
-        <div class="menu-icon">📋</div>
-        <div class="menu-text">
-          <span class="menu-title">Historial médico</span>
-          <span class="menu-desc">Ver historial</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Hamburger Button -->
-  <button class="hamburger-btn" (click)="toggleSidebar()">
-    <span></span>
-    <span></span>
-    <span></span>
-  </button>
-
-  <!-- Sidebar Overlay -->
-  <div class="sidebar-overlay" [class.active]="sidebarOpen" (click)="toggleSidebar()"></div>
-
   <!-- Main Content -->
-  <div class="main-content" [class.sidebar-open]="sidebarOpen">
+  <div class="main-content">
     <!-- Top Stats Cards -->
     <div class="stats-grid">
       <div class="stat-card">
