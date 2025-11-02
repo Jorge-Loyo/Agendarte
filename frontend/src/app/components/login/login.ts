@@ -22,32 +22,29 @@ export class Login {
   ) {}
 
   onSubmit() {
-    console.log('=== INICIO LOGIN ===');
-    console.log('Email:', this.email);
-    console.log('Password length:', this.password.length);
-    
     if (!this.email || !this.password) {
       this.error = 'Email y contraseña son requeridos';
       return;
     }
 
+    if (this.password.length < 8) {
+      this.error = 'La contraseña debe tener al menos 8 caracteres';
+      return;
+    }
+
     this.loading = true;
     this.error = '';
-    
-    console.log('Enviando request a:', 'http://localhost:3000/api/auth/login');
 
     this.authService.login(this.email.toLowerCase(), this.password).subscribe({
       next: (response) => {
-        console.log('Login exitoso:', response);
         this.router.navigate(['/app/dashboard']);
       },
       error: (error) => {
-        console.error('Error en login:', error);
-        this.error = error.error?.message || 'Error en el login';
+        console.error('Error completo:', error);
+        this.error = error.error?.message || error.message || 'Error de conexión';
         this.loading = false;
       },
       complete: () => {
-        console.log('Login completado');
         this.loading = false;
       }
     });

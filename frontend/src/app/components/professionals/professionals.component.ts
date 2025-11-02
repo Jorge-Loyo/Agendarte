@@ -28,7 +28,16 @@ export class ProfessionalsComponent implements OnInit {
 
   showScheduleModal = false;
   selectedProfessionalId: number | null = null;
-  scheduleData = {
+  
+  // Filtros
+  searchTerm = '';
+  selectedSpecialty = '';
+  selectedLocation = '';
+  filteredProfessionals: any[] = [];
+  
+  locations = ['Buenos Aires', 'Córdoba', 'Rosario', 'Mendoza', 'La Plata'];
+  
+  scheduleData: { [key: string]: { start: string; end: string; active: boolean } } = {
     monday: { start: '', end: '', active: false },
     tuesday: { start: '', end: '', active: false },
     wednesday: { start: '', end: '', active: false },
@@ -36,7 +45,7 @@ export class ProfessionalsComponent implements OnInit {
     friday: { start: '', end: '', active: false },
     saturday: { start: '', end: '', active: false },
     sunday: { start: '', end: '', active: false }
-  } as { [key: string]: { start: string; end: string; active: boolean } };
+  };
 
   specialties = [
     'Cardiología', 'Dermatología', 'Neurología', 'Pediatría', 
@@ -44,15 +53,32 @@ export class ProfessionalsComponent implements OnInit {
     'Otorrinolaringología', 'Urología', 'Endocrinología', 'Gastroenterología'
   ];
 
-  professionals = [
-    { id: 1, name: 'Dr. Carlos García', specialty: 'Cardiología', email: 'carlos@example.com', status: 'Activo' },
-    { id: 2, name: 'Dra. Ana López', specialty: 'Dermatología', email: 'ana@example.com', status: 'Activo' },
-    { id: 3, name: 'Dr. Miguel Rodríguez', specialty: 'Neurología', email: 'miguel@example.com', status: 'Pendiente' }
-  ];
+  professionals = this.getInitialProfessionals();
 
   constructor(private router: Router) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.filteredProfessionals = [...this.professionals];
+  }
+
+  applyFilters() {
+    this.filteredProfessionals = this.professionals.filter(prof => {
+      const searchTerm = this.searchTerm.toLowerCase();
+      const matchesSearch = prof.name.toLowerCase().includes(searchTerm) ||
+                           prof.specialty.toLowerCase().includes(searchTerm);
+      const matchesSpecialty = !this.selectedSpecialty || prof.specialty === this.selectedSpecialty;
+      const matchesLocation = !this.selectedLocation || prof.location === this.selectedLocation;
+      
+      return matchesSearch && matchesSpecialty && matchesLocation;
+    });
+  }
+
+  clearFilters() {
+    this.searchTerm = '';
+    this.selectedSpecialty = '';
+    this.selectedLocation = '';
+    this.filteredProfessionals = [...this.professionals];
+  }
 
   toggleForm() {
     this.showForm = !this.showForm;
@@ -118,7 +144,8 @@ export class ProfessionalsComponent implements OnInit {
       name: `${this.professional.firstName} ${this.professional.lastName}`,
       specialty: this.professional.specialty,
       email: this.professional.email,
-      status: 'Pendiente'
+      status: 'Pendiente',
+      location: this.selectedLocation || ''
     });
     
     this.toggleForm();
@@ -126,6 +153,16 @@ export class ProfessionalsComponent implements OnInit {
 
   goBack() {
     this.router.navigate(['/app/dashboard']);
+  }
+
+  private getInitialProfessionals() {
+    return [
+      { id: 1, name: 'Dr. Carlos García', specialty: 'Cardiología', email: 'carlos@example.com', status: 'Activo', location: 'Buenos Aires' },
+      { id: 2, name: 'Dra. Ana López', specialty: 'Dermatología', email: 'ana@example.com', status: 'Activo', location: 'Córdoba' },
+      { id: 3, name: 'Dr. Miguel Rodríguez', specialty: 'Neurología', email: 'miguel@example.com', status: 'Pendiente', location: 'Rosario' },
+      { id: 4, name: 'Dra. Laura Martínez', specialty: 'Pediatría', email: 'laura@example.com', status: 'Activo', location: 'Buenos Aires' },
+      { id: 5, name: 'Dr. Juan Pérez', specialty: 'Cardiología', email: 'juan@example.com', status: 'Activo', location: 'Mendoza' }
+    ];
   }
 
   getDayName(key: string): string {

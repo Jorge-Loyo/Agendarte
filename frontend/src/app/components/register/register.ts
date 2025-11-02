@@ -26,6 +26,9 @@ export class Register {
   loading = false;
   error = '';
   success = '';
+  fieldErrors: { [key: string]: string } = {};
+  showPassword = false;
+  showConfirmPassword = false;
 
   constructor(
     private authService: AuthService,
@@ -33,34 +36,7 @@ export class Register {
   ) {}
 
   onSubmit() {
-    console.log('=== INICIO REGISTRO ===');
-    
-    // Validaciones básicas
-    if (!this.email || !this.password || !this.firstName || !this.lastName) {
-      this.error = 'Email, contraseña, nombre y apellido son requeridos';
-      return;
-    }
-
-    if (this.password !== this.confirmPassword) {
-      this.error = 'Las contraseñas no coinciden';
-      return;
-    }
-
-    // Validación de contraseña segura
-    if (!this.isPasswordSecure(this.password)) {
-      this.error = 'La contraseña debe tener al menos 8 caracteres, incluyendo: 1 mayúscula, 1 minúscula, 1 número y 1 carácter especial (@$!%*?&)';
-      return;
-    }
-
-    // Validación de email
-    if (!this.isEmailValid(this.email)) {
-      this.error = 'Por favor ingresa un email válido';
-      return;
-    }
-
-    // Validación de DNI (si se proporciona)
-    if (this.dni && !this.isDniValid(this.dni)) {
-      this.error = 'DNI debe tener entre 7 y 20 caracteres numéricos';
+    if (!this.validateForm()) {
       return;
     }
 
@@ -91,24 +67,13 @@ export class Register {
         }, 2000);
       },
       error: (error) => {
-        console.error('=== ERROR COMPLETO ===', error);
-        console.error('Error status:', error.status);
-        console.error('Error error:', error.error);
-        console.error('Error message:', error.error?.message);
-        
-        // Manejar errores específicos del backend
-        if (error.error?.message) {
-          this.error = error.error.message;
-          console.log('Usando error.error.message:', this.error);
+        if (error.error?.field) {
+          this.fieldErrors[error.error.field] = error.error.message;
         } else if (error.error?.errors && Array.isArray(error.error.errors)) {
-          // Errores de validación de Joi
           this.error = error.error.errors.join(', ');
-          console.log('Usando error.error.errors:', this.error);
         } else {
-          this.error = 'Error en el registro. Por favor intenta nuevamente.';
-          console.log('Usando mensaje genérico:', this.error);
+          this.error = error.error?.message || 'Error en el registro';
         }
-        
         this.loading = false;
       },
       complete: () => {
@@ -161,9 +126,72 @@ export class Register {
     return this.password === this.confirmPassword;
   }
 
-  // Validación de DNI
+  validateForm(): boolean {
+    let isValid = true;
+    this.fieldErrors = {};
+
+    if (!this.firstName.trim()) {
+      this.fieldErrors['firstName'] = 'Nombre es requerido';
+      isValid = false;
+    }
+
+    if (!this.lastName.trim()) {
+      this.fieldErrors['lastName'] = 'Apellido es requerido';
+      isValid = false;
+    }
+
+    if (!this.email.trim()) {
+      this.fieldErrors['email'] = 'Email es requerido';
+      isValid = false;
+    } else if (!this.isEmailValid(this.email)) {
+      this.fieldErrors['email'] = 'Email inválido';
+      isValid = false;
+    }
+
+    if (!this.dni.trim()) {
+      this.fieldErrors['dni'] = 'DNI es requerido';
+      isValid = false;
+    } else if (!this.isDniValid(this.dni)) {
+      this.fieldErrors['dni'] = 'DNI debe tener entre 7 y 20 dígitos';
+      isValid = false;
+    }
+
+    if (!this.password) {
+      this.fieldErrors['password'] = 'Contraseña es requerida';
+      isValid = false;
+    } else if (!this.isPasswordSecure(this.password)) {
+      this.fieldErrors['password'] = 'Contraseña debe tener 8+ caracteres, mayúscula, minúscula y número';
+      isValid = false;
+    }
+
+    if (!this.confirmPassword) {
+      this.fieldErrors['confirmPassword'] = 'Confirmar contraseña es requerido';
+      isValid = false;
+    } else if (this.password !== this.confirmPassword) {
+      this.fieldErrors['confirmPassword'] = 'Las contraseñas no coinciden';
+      isValid = false;
+    }
+
+    return isValid;
+  }
+
+  getFieldError(field: string): string {
+    return this.fieldErrors[field] || '';
+  }
+
+  hasFieldError(field: string): boolean {
+    return !!this.fieldErrors[field];
+  }
+
+  togglePasswordVisibility() {
+    this.showPassword = !this.showPassword;
+  }
+
+  toggleConfirmPasswordVisibility() {
+    this.showConfirmPassword = !this.showConfirmPassword;
+  }
+
   isDniValid(dni: string): boolean {
-    if (!dni) return true; // DNI es opcional
     const dniRegex = /^[0-9]{7,20}$/;
     return dniRegex.test(dni);
   }

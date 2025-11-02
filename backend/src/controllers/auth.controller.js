@@ -2,6 +2,15 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { User, Profile } = require('../models');
 
+// Simulación de envío de email (en producción usar nodemailer)
+const sendConfirmationEmail = async (email, firstName) => {
+  console.log(`📧 Email de confirmación enviado a: ${email}`);
+  console.log(`Hola ${firstName}, bienvenido a Agendarte!`);
+  console.log('Tu cuenta ha sido creada exitosamente.');
+  // En producción: implementar con nodemailer, SendGrid, etc.
+  return true;
+};
+
 const generateToken = (userId) => {
   return jwt.sign({ userId }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN || '24h'
@@ -12,22 +21,29 @@ const register = async (req, res) => {
   try {
     const { email, password, firstName, lastName, dni, age, gender, address, phone } = req.body;
 
-    // Verificar si el usuario ya existe
-    const existingUser = await User.findOne({ where: { email } });
+    // Verificar si el email ya existe
+    const existingUser = await User.findOne({ where: { email: email.toLowerCase() } });
     if (existingUser) {
       return res.status(400).json({
-        message: 'El email ya está registrado'
+        message: 'El email ya está registrado',
+        field: 'email'
       });
     }
 
-    // Verificar si el DNI ya existe (si se proporciona)
-    if (dni) {
-      const existingDNI = await Profile.findOne({ where: { dni } });
-      if (existingDNI) {
-        return res.status(400).json({
-          message: 'El DNI ya está registrado'
-        });
-      }
+    // Verificar si el DNI ya existe (obligatorio)
+    if (!dni) {
+      return res.status(400).json({
+        message: 'El DNI es requerido',
+        field: 'dni'
+      });
+    }
+
+    const existingDNI = await Profile.findOne({ where: { dni } });
+    if (existingDNI) {
+      return res.status(400).json({
+        message: 'El DNI ya está registrado',
+        field: 'dni'
+      });
     }
 
     // Encriptar contraseña
@@ -35,33 +51,40 @@ const register = async (req, res) => {
 
     // Crear usuario
     const user = await User.create({
-      email,
+      email: email.toLowerCase(),
       password: hashedPassword,
-      role: 'patient' // Por defecto es paciente
+      role: 'patient'
     });
 
     // Crear perfil
-    await Profile.create({
+    const profile = await Profile.create({
       userId: user.id,
       firstName,
       lastName,
       dni,
-      age,
-      gender,
-      address,
-      phone
+      age: age || null,
+      gender: gender || null,
+      address: address || null,
+      phone: phone || null
     });
+
+    // Enviar email de confirmación
+    await sendConfirmationEmail(email, firstName);
 
     // Generar token
     const token = generateToken(user.id);
 
     res.status(201).json({
-      message: 'Usuario registrado exitosamente',
+      message: 'Usuario registrado exitosamente. Revisa tu email para confirmar tu cuenta.',
       token,
       user: {
         id: user.id,
         email: user.email,
-        role: user.role
+        role: user.role,
+        profile: {
+          firstName: profile.firstName,
+          lastName: profile.lastName
+        }
       }
     });
   } catch (error) {

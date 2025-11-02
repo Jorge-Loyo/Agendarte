@@ -1,0 +1,144 @@
+<div class="professional-dashboard">
+  <!-- Welcome Section -->
+  <div class="welcome-section">
+    <div class="welcome-card">
+      <div class="doctor-avatar">
+        👨⚕️
+      </div>
+      <div class="welcome-info">
+        <h1>Dr. {{ currentUser?.profile?.firstName || 'Profesional' }} {{ currentUser?.profile?.lastName || '' }}</h1>
+        <p class="specialty">Especialista en Cardiología</p>
+        <p class="today-date">{{ currentDate | date:'fullDate' }}</p>
+      </div>
+      <div class="quick-stats">
+        <div class="stat-item">
+          <span class="stat-number">{{ todayAppointments.length }}</span>
+          <span class="stat-label">Citas Hoy</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Dashboard Grid -->
+  <div class="dashboard-grid">
+    <!-- Today's Appointments -->
+    <div class="appointments-today">
+      <div class="section-header">
+        <h2>📅 Agenda de Hoy</h2>
+        <button class="btn-manage-schedule">Gestionar Horarios</button>
+      </div>
+      
+      <div class="appointments-list">
+        <div class="appointment-card" *ngFor="let apt of todayAppointments">
+          <div class="apt-time">
+            <span class="time">{{ apt.time }}</span>
+          </div>
+          <div class="apt-details">
+            <h3>{{ apt.patient }}</h3>
+            <p>{{ apt.reason }}</p>
+          </div>
+          <div class="apt-status" [class]="getAppointmentStatusClass(apt.status)">
+            {{ apt.status === 'confirmed' ? 'Confirmada' : apt.status === 'pending' ? 'Pendiente' : 'Cancelada' }}
+          </div>
+          <div class="apt-actions">
+            <button class="btn-start" *ngIf="apt.status === 'confirmed'">Iniciar</button>
+            <button class="btn-reschedule" *ngIf="apt.status === 'pending'">Confirmar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Weekly Statistics -->
+    <div class="weekly-stats">
+      <h2>📊 Estadísticas Semanales</h2>
+      
+      <div class="stats-grid">
+        <div class="stat-card appointments">
+          <div class="stat-icon">📋</div>
+          <div class="stat-info">
+            <span class="stat-value">{{ weeklyStats.totalAppointments }}</span>
+            <span class="stat-title">Total Citas</span>
+          </div>
+        </div>
+        
+        <div class="stat-card completed">
+          <div class="stat-icon">✅</div>
+          <div class="stat-info">
+            <span class="stat-value">{{ weeklyStats.completedAppointments }}</span>
+            <span class="stat-title">Completadas</span>
+          </div>
+        </div>
+        
+        <div class="stat-card patients">
+          <div class="stat-icon">👥</div>
+          <div class="stat-info">
+            <span class="stat-value">{{ weeklyStats.newPatients }}</span>
+            <span class="stat-title">Nuevos Pacientes</span>
+          </div>
+        </div>
+        
+        <div class="stat-card revenue">
+          <div class="stat-icon">💰</div>
+          <div class="stat-info">
+            <span class="stat-value">${{ weeklyStats.revenue | number }}</span>
+            <span class="stat-title">Ingresos</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Patients -->
+    <div class="recent-patients">
+      <div class="section-header">
+        <h2>👥 Pacientes Recientes</h2>
+        <button class="btn-view-all">Ver Todos</button>
+      </div>
+      
+      <div class="patients-list">
+        <div class="patient-card" *ngFor="let patient of recentPatients">
+          <div class="patient-avatar">
+            {{ patient.name.charAt(0) }}
+          </div>
+          <div class="patient-info">
+            <h3>{{ patient.name }}</h3>
+            <p class="last-visit">Última visita: {{ patient.lastVisit | date:'dd/MM/yyyy' }}</p>
+            <p class="condition">{{ patient.condition }}</p>
+          </div>
+          <div class="patient-status" [class]="getPatientStatusClass(patient.status)">
+            {{ patient.status }}
+          </div>
+          <div class="patient-actions">
+            <button class="btn-view-history">Ver Historial</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+      <h2>⚡ Acciones Rápidas</h2>
+      
+      <div class="actions-grid">
+        <button class="action-btn new-appointment">
+          <div class="action-icon">📝</div>
+          <span>Nueva Cita</span>
+        </button>
+        
+        <button class="action-btn patient-search">
+          <div class="action-icon">🔍</div>
+          <span>Buscar Paciente</span>
+        </button>
+        
+        <button class="action-btn medical-notes">
+          <div class="action-icon">📋</div>
+          <span>Notas Médicas</span>
+        </button>
+        
+        <button class="action-btn reports">
+          <div class="action-icon">📈</div>
+          <span>Reportes</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

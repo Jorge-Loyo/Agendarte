@@ -1,0 +1,108 @@
+<div class="appointments-container">
+  <div class="header">
+    <button class="btn-back" (click)="goBack()">← Volver</button>
+    <h1>Mis Turnos</h1>
+  </div>
+
+  <div class="tabs-section">
+    <button 
+      class="tab-btn"
+      [class.active]="activeTab === 'upcoming'"
+      (click)="activeTab = 'upcoming'">
+      Próximos ({{ upcomingAppointments.length }})
+    </button>
+    <button 
+      class="tab-btn"
+      [class.active]="activeTab === 'history'"
+      (click)="activeTab = 'history'">
+      Historial ({{ pastAppointments.length }})
+    </button>
+  </div>
+
+  <div class="filters-section">
+    <select 
+      [(ngModel)]="statusFilter"
+      class="filter-select">
+      <option value="">Todos los estados</option>
+      <option value="confirmed">Confirmados</option>
+      <option value="pending">Pendientes</option>
+      <option value="completed">Completados</option>
+      <option value="cancelled">Cancelados</option>
+    </select>
+  </div>
+
+  <!-- Próximos Turnos -->
+  <div class="appointments-list" *ngIf="activeTab === 'upcoming'">
+    <div class="appointment-card" *ngFor="let apt of upcomingAppointments">
+      <div class="apt-date">
+        <div class="day">{{ apt.date | date:'dd' }}</div>
+        <div class="month">{{ apt.date | date:'MMM' }}</div>
+      </div>
+      
+      <div class="apt-info">
+        <div class="apt-header">
+          <h3>{{ apt.professional }}</h3>
+          <span class="status" [class]="getStatusClass(apt.status)">
+            {{ getStatusText(apt.status) }}
+          </span>
+        </div>
+        
+        <div class="apt-details">
+          <p class="specialty">{{ apt.specialty }}</p>
+          <p class="time">🕐 {{ apt.time }}</p>
+          <p class="location">📍 {{ apt.location }}</p>
+          <p class="price">💰 ${{ apt.price | number }}</p>
+          <p class="notes" *ngIf="apt.notes">📝 {{ apt.notes }}</p>
+        </div>
+      </div>
+      
+      <div class="apt-actions">
+        <button class="btn-details" (click)="viewDetails(apt)">Ver Detalles</button>
+      </div>
+    </div>
+
+    <div class="empty-state" *ngIf="upcomingAppointments.length === 0">
+      <div class="empty-icon">📅</div>
+      <h3>No tienes turnos próximos</h3>
+      <p>¡Agenda tu primera cita con un profesional!</p>
+      <button class="btn-book" routerLink="/app/find-professionals">Buscar Profesionales</button>
+    </div>
+  </div>
+
+  <!-- Historial -->
+  <div class="appointments-list" *ngIf="activeTab === 'history'">
+    <div class="appointment-card history" *ngFor="let apt of pastAppointments">
+      <div class="apt-date">
+        <div class="day">{{ apt.date | date:'dd' }}</div>
+        <div class="month">{{ apt.date | date:'MMM' }}</div>
+      </div>
+      
+      <div class="apt-info">
+        <div class="apt-header">
+          <h3>{{ apt.professional }}</h3>
+          <span class="status" [class]="getStatusClass(apt.status)">
+            {{ getStatusText(apt.status) }}
+          </span>
+        </div>
+        
+        <div class="apt-details">
+          <p class="specialty">{{ apt.specialty }}</p>
+          <p class="time">🕐 {{ apt.time }}</p>
+          <p class="location">📍 {{ apt.location }}</p>
+          <p class="price">💰 ${{ apt.price | number }}</p>
+          <p class="notes" *ngIf="apt.notes">📝 {{ apt.notes }}</p>
+        </div>
+      </div>
+      
+      <div class="apt-actions">
+        <button class="btn-details" (click)="viewDetails(apt)">Ver Detalles</button>
+      </div>
+    </div>
+
+    <div class="empty-state" *ngIf="pastAppointments.length === 0">
+      <div class="empty-icon">📋</div>
+      <h3>No tienes historial de turnos</h3>
+      <p>Aquí aparecerán tus citas pasadas</p>
+    </div>
+  </div>
+</div>

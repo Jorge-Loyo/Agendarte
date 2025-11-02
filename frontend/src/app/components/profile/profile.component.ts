@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService, User } from '../../services/auth.service';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-profile',
@@ -46,7 +47,8 @@ export class ProfileComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private notificationService: NotificationService
   ) {}
 
   ngOnInit() {
@@ -89,19 +91,20 @@ export class ProfileComponent implements OnInit {
     this.loading = true;
     this.message = '';
     
-    console.log('Actualizando perfil:', this.profileData);
-    
-    // Si hay imagen seleccionada, convertir a base64
     if (this.selectedFile) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        this.profileData.profileImage = reader.result as string;
-        this.sendProfileUpdate();
-      };
-      reader.readAsDataURL(this.selectedFile);
+      this.processImageAndUpdate();
     } else {
       this.sendProfileUpdate();
     }
+  }
+
+  private processImageAndUpdate() {
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.profileData.profileImage = reader.result as string;
+      this.sendProfileUpdate();
+    };
+    reader.readAsDataURL(this.selectedFile!);
   }
 
   sendProfileUpdate() {
@@ -110,28 +113,30 @@ export class ProfileComponent implements OnInit {
         this.loading = false;
         this.editMode = false;
         this.message = 'Perfil actualizado correctamente';
+        this.notificationService.success('Éxito', 'Perfil actualizado correctamente');
         console.log('Perfil actualizado:', response);
       },
       error: (error) => {
         this.loading = false;
         this.message = 'Error al actualizar el perfil';
+        this.notificationService.error('Error', 'No se pudo actualizar el perfil');
         console.error('Error:', error);
       }
     });
   }
 
-  onFileSelected(event: any) {
-    const file = event.target.files[0];
-    if (file) {
-      this.selectedFile = file;
-      
-      // Crear preview
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        this.imagePreview = e.target.result;
-      };
-      reader.readAsDataURL(file);
-    }
+  onFileSelected(event: Event) {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    
+    this.selectedFile = file;
+    this.createImagePreview(file);
+  }
+
+  private createImagePreview(file: File) {
+    const reader = new FileReader();
+    reader.onload = () => this.imagePreview = reader.result as string;
+    reader.readAsDataURL(file);
   }
 
   removeImage() {

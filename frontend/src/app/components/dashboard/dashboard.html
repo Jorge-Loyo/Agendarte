@@ -37,24 +37,56 @@
       
       <div class="calendar-container">
         <div class="calendar-header">
-          <button class="nav-btn" (click)="previousMonth()">&lt;</button>
-          <h3>{{ currentMonth }} {{ currentYear }}</h3>
-          <button class="nav-btn" (click)="nextMonth()">&gt;</button>
+          <button class="nav-btn" (click)="previousMonth()" title="Mes anterior">
+            ←
+          </button>
+          <div class="month-year-selector">
+            <h3>{{ currentMonth }} {{ currentYear }}</h3>
+            <button class="btn-today" (click)="goToToday()">Hoy</button>
+          </div>
+          <button class="nav-btn" (click)="nextMonth()" title="Mes siguiente">
+            →
+          </button>
         </div>
         
-        <div class="calendar-grid">
-          <div class="day-header" *ngFor="let day of weekDays">{{ day }}</div>
-          <div 
-            class="calendar-day" 
-            *ngFor="let day of calendarDays" 
-            [class.other-month]="!day.isCurrentMonth"
-            [class.today]="day.isToday"
-            [class.has-appointment]="day.hasAppointment">
-            <span class="day-number">{{ day.number }}</span>
-            <div class="appointments" *ngIf="day.appointments?.length">
-              <div class="appointment-dot" *ngFor="let apt of day.appointments"></div>
+        <div class="calendar-wrapper">
+          <div class="calendar-grid">
+            <div class="day-header" *ngFor="let day of weekDays">{{ day }}</div>
+            <div 
+              class="calendar-day" 
+              *ngFor="let day of calendarDays"
+              [class.other-month]="!day.isCurrentMonth"
+              [class.today]="day.isToday"
+              [class.has-appointment]="day.hasAppointment"
+              [class.weekend]="day.isWeekend"
+              [class.selected]="selectedDate && day.date.toDateString() === selectedDate.toDateString()"
+              (click)="onDateSelected(day)">
+              <span class="day-number">{{ day.number }}</span>
+              <div class="day-content">
+                <div class="appointments" *ngIf="day.appointments?.length">
+                  <div 
+                    class="appointment-dot" 
+                    *ngFor="let apt of day.appointments"
+                    [class]="'apt-' + apt.type"
+                    [title]="apt.title">
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
+        </div>
+        
+        <div class="selected-date-info" *ngIf="selectedDate">
+          <h4>{{ selectedDate | date:'fullDate' }}</h4>
+          <div class="day-appointments" *ngIf="getAppointmentsForSelectedDate().length > 0">
+            <div class="appointment-item" *ngFor="let apt of getAppointmentsForSelectedDate()">
+              <span class="apt-dot" [class]="'apt-' + apt.type"></span>
+              <span>{{ apt.title }}</span>
+            </div>
+          </div>
+          <p *ngIf="getAppointmentsForSelectedDate().length === 0" class="no-appointments-day">
+            No hay citas programadas para este día
+          </p>
         </div>
       </div>
     </div>
@@ -68,7 +100,7 @@
           <div class="card-icon">👨‍⚕️</div>
           <h3>Buscar Profesionales</h3>
           <p>Encuentra especialistas</p>
-          <button class="btn-action">Explorar</button>
+          <button class="btn-action" routerLink="/app/find-professionals">Explorar</button>
         </div>
 
         <div *ngIf="currentUser?.role === 'professional'" class="action-card professional">
@@ -83,6 +115,20 @@
           <h3>Mi Perfil</h3>
           <p>Actualizar información</p>
           <button class="btn-action" routerLink="/app/profile">Editar</button>
+        </div>
+
+        <div *ngIf="currentUser?.role === 'patient'" class="action-card patient">
+          <div class="card-icon">📅</div>
+          <h3>Mis Turnos</h3>
+          <p>Ver citas agendadas</p>
+          <button class="btn-action" routerLink="/app/my-appointments">Ver Turnos</button>
+        </div>
+
+        <div *ngIf="currentUser?.role === 'patient'" class="action-card patient">
+          <div class="card-icon">📋</div>
+          <h3>Historial Médico</h3>
+          <p>Ver expediente digital</p>
+          <button class="btn-action" routerLink="/app/medical-history">Ver Historial</button>
         </div>
 
         <div *ngIf="currentUser?.role === 'admin'" class="action-card admin">
@@ -112,8 +158,9 @@
         </div>
         
         <div class="no-appointments" *ngIf="!upcomingAppointments?.length">
+          <div class="empty-icon">📅</div>
           <p>No tienes citas próximas</p>
-          <button class="btn-schedule">Agendar Primera Cita</button>
+          <button class="btn-schedule" routerLink="/app/my-appointments">Ver Mis Turnos</button>
         </div>
       </div>
     </div>

@@ -1,0 +1,149 @@
+<div class="medical-history-container">
+  <!-- Header -->
+  <div class="history-header">
+    <button class="btn-back" (click)="goBack()">← Volver</button>
+    <h1>📋 Historial Médico</h1>
+    <button class="btn-add-record" (click)="toggleAddForm()">
+      {{ showAddForm ? 'Cancelar' : '+ Nuevo Registro' }}
+    </button>
+  </div>
+
+  <!-- Medical Information -->
+  <div class="medical-info-section">
+    <h2>Información Médica General</h2>
+    <div class="info-grid">
+      <div class="info-card">
+        <label>Alergias:</label>
+        <textarea [(ngModel)]="medicalHistory.allergies" placeholder="Ej: Penicilina, Polen..."></textarea>
+      </div>
+      
+      <div class="info-card">
+        <label>Medicamentos Actuales:</label>
+        <textarea [(ngModel)]="medicalHistory.medications" placeholder="Ej: Enalapril 10mg..."></textarea>
+      </div>
+      
+      <div class="info-card">
+        <label>Condiciones Crónicas:</label>
+        <textarea [(ngModel)]="medicalHistory.chronicConditions" placeholder="Ej: Hipertensión, Diabetes..."></textarea>
+      </div>
+      
+      <div class="info-card">
+        <label>Cirugías Previas:</label>
+        <textarea [(ngModel)]="medicalHistory.surgeries" placeholder="Ej: Apendicectomía (2015)..."></textarea>
+      </div>
+      
+      <div class="info-card">
+        <label>Antecedentes Familiares:</label>
+        <textarea [(ngModel)]="medicalHistory.familyHistory" placeholder="Ej: Diabetes (padre)..."></textarea>
+      </div>
+      
+      <div class="info-card">
+        <label>Tipo de Sangre:</label>
+        <select [(ngModel)]="medicalHistory.bloodType">
+          <option value="">Seleccionar</option>
+          <option value="A+">A+</option>
+          <option value="A-">A-</option>
+          <option value="B+">B+</option>
+          <option value="B-">B-</option>
+          <option value="AB+">AB+</option>
+          <option value="AB-">AB-</option>
+          <option value="O+">O+</option>
+          <option value="O-">O-</option>
+        </select>
+      </div>
+      
+      <div class="info-card">
+        <label>Contacto de Emergencia:</label>
+        <input type="text" [(ngModel)]="medicalHistory.emergencyContact" placeholder="Nombre y relación">
+      </div>
+      
+      <div class="info-card">
+        <label>Teléfono de Emergencia:</label>
+        <input type="tel" [(ngModel)]="medicalHistory.emergencyPhone" placeholder="+54 11 1234-5678">
+      </div>
+    </div>
+    
+    <button class="btn-update-info" (click)="updateMedicalInfo()">
+      💾 Actualizar Información
+    </button>
+  </div>
+
+  <!-- Add New Record Form -->
+  <div class="add-record-form" *ngIf="showAddForm">
+    <h2>Agregar Nuevo Registro</h2>
+    <form (ngSubmit)="addRecord()" #recordForm="ngForm">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Fecha *</label>
+          <input type="date" [(ngModel)]="newRecord.date" name="date" required class="form-control">
+        </div>
+        <div class="form-group">
+          <label>Profesional *</label>
+          <input type="text" [(ngModel)]="newRecord.professional" name="professional" required class="form-control">
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label>Especialidad</label>
+          <input type="text" [(ngModel)]="newRecord.specialty" name="specialty" class="form-control">
+        </div>
+        <div class="form-group">
+          <label>Diagnóstico *</label>
+          <input type="text" [(ngModel)]="newRecord.diagnosis" name="diagnosis" required class="form-control">
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label>Tratamiento</label>
+        <textarea [(ngModel)]="newRecord.treatment" name="treatment" class="form-control"></textarea>
+      </div>
+      
+      <div class="form-group">
+        <label>Notas</label>
+        <textarea [(ngModel)]="newRecord.notes" name="notes" class="form-control"></textarea>
+      </div>
+      
+      <div class="form-actions">
+        <button type="button" class="btn-cancel" (click)="toggleAddForm()">Cancelar</button>
+        <button type="submit" class="btn-save" [disabled]="!recordForm.valid">Guardar Registro</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Medical Records History -->
+  <div class="records-section">
+    <h2>Historial de Consultas</h2>
+    
+    <div class="records-timeline">
+      <div class="record-item" *ngFor="let record of appointments">
+        <div class="record-date">
+          <span class="date">{{ record.date | date:'dd/MM/yyyy' }}</span>
+        </div>
+        
+        <div class="record-content">
+          <div class="record-header">
+            <h3>{{ record.professional }}</h3>
+            <span class="specialty-badge">{{ record.specialty }}</span>
+          </div>
+          
+          <div class="record-details">
+            <div class="detail-item">
+              <strong>Diagnóstico:</strong> {{ record.diagnosis }}
+            </div>
+            <div class="detail-item" *ngIf="record.treatment">
+              <strong>Tratamiento:</strong> {{ record.treatment }}
+            </div>
+            <div class="detail-item" *ngIf="record.notes">
+              <strong>Notas:</strong> {{ record.notes }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="empty-records" *ngIf="appointments.length === 0">
+      <p>No hay registros médicos disponibles</p>
+    </div>
+  </div>
+</div>

@@ -15,7 +15,11 @@
             [(ngModel)]="firstName" 
             required 
             class="form-control"
+            [class.error]="hasFieldError('firstName')"
             placeholder="Tu nombre">
+          <div *ngIf="hasFieldError('firstName')" class="field-error">
+            <small>{{ getFieldError('firstName') }}</small>
+          </div>
         </div>
         
         <div class="form-group">
@@ -27,7 +31,11 @@
             [(ngModel)]="lastName" 
             required 
             class="form-control"
+            [class.error]="hasFieldError('lastName')"
             placeholder="Tu apellido">
+          <div *ngIf="hasFieldError('lastName')" class="field-error">
+            <small>{{ getFieldError('lastName') }}</small>
+          </div>
         </div>
       </div>
 
@@ -42,50 +50,60 @@
           required 
           email
           class="form-control"
-          [class.invalid]="email && !isEmailValid(email)"
+          [class.error]="hasFieldError('email')"
           placeholder="tu@email.com">
-        <div *ngIf="email && !isEmailValid(email)" class="field-error">
-          <small>Por favor ingresa un email válido</small>
+        <div *ngIf="hasFieldError('email')" class="field-error">
+          <small>{{ getFieldError('email') }}</small>
         </div>
       </div>
 
       <div class="form-row">
         <div class="form-group">
           <label for="password">Contraseña *:</label>
-          <input 
-            type="password" 
-            id="password" 
-            name="password"
-            [(ngModel)]="password" 
-            required 
-            minlength="8"
-            class="form-control"
-            placeholder="Mínimo 8 caracteres">
-          <div *ngIf="password" class="password-strength">
+          <div class="password-input">
+            <input 
+              [type]="showPassword ? 'text' : 'password'" 
+              id="password" 
+              name="password"
+              [(ngModel)]="password" 
+              required 
+              minlength="8"
+              class="form-control"
+              [class.error]="hasFieldError('password')"
+              placeholder="Mínimo 8 caracteres">
+            <button type="button" class="toggle-password" (click)="togglePasswordVisibility()">
+              {{ showPassword ? '🙈' : '👁️' }}
+            </button>
+          </div>
+          <div *ngIf="hasFieldError('password')" class="field-error">
+            <small>{{ getFieldError('password') }}</small>
+          </div>
+          <div *ngIf="password && !hasFieldError('password')" class="password-strength">
             <span class="strength-label">Fortaleza:</span>
             <span [class]="'strength-indicator ' + getPasswordStrengthClass()">{{ getPasswordStrength() }}</span>
-          </div>
-          <div class="password-requirements">
-            <small>Debe contener: 1 mayúscula, 1 minúscula, 1 número, 1 carácter especial (@$!%*?&)</small>
           </div>
         </div>
         
         <div class="form-group">
           <label for="confirmPassword">Confirmar Contraseña *:</label>
-          <input 
-            type="password" 
-            id="confirmPassword" 
-            name="confirmPassword"
-            [(ngModel)]="confirmPassword" 
-            required 
-            class="form-control"
-            [class.invalid]="confirmPassword && !passwordsMatch()"
-            [class.valid]="confirmPassword && passwordsMatch()"
-            placeholder="Repetir contraseña">
-          <div *ngIf="confirmPassword && !passwordsMatch()" class="field-error">
-            <small>Las contraseñas no coinciden</small>
+          <div class="password-input">
+            <input 
+              [type]="showConfirmPassword ? 'text' : 'password'" 
+              id="confirmPassword" 
+              name="confirmPassword"
+              [(ngModel)]="confirmPassword" 
+              required 
+              class="form-control"
+              [class.error]="hasFieldError('confirmPassword')"
+              placeholder="Repetir contraseña">
+            <button type="button" class="toggle-password" (click)="toggleConfirmPasswordVisibility()">
+              {{ showConfirmPassword ? '🙈' : '👁️' }}
+            </button>
           </div>
-          <div *ngIf="confirmPassword && passwordsMatch()" class="field-success">
+          <div *ngIf="hasFieldError('confirmPassword')" class="field-error">
+            <small>{{ getFieldError('confirmPassword') }}</small>
+          </div>
+          <div *ngIf="confirmPassword && passwordsMatch() && !hasFieldError('confirmPassword')" class="field-success">
             <small>✓ Las contraseñas coinciden</small>
           </div>
         </div>
@@ -94,21 +112,21 @@
       <!-- Datos personales opcionales -->
       <div class="form-row">
         <div class="form-group">
-          <label for="dni">DNI:</label>
+          <label for="dni">DNI *:</label>
           <input 
             type="text" 
             id="dni" 
             name="dni"
             [(ngModel)]="dni" 
+            required
             class="form-control"
-            [class.invalid]="dni && !isDniValid(dni)"
-            [class.valid]="dni && isDniValid(dni)"
+            [class.error]="hasFieldError('dni')"
             placeholder="12345678"
             maxlength="20">
-          <div *ngIf="dni && !isDniValid(dni)" class="field-error">
-            <small>DNI debe tener entre 7 y 20 caracteres numéricos</small>
+          <div *ngIf="hasFieldError('dni')" class="field-error">
+            <small>{{ getFieldError('dni') }}</small>
           </div>
-          <div *ngIf="dni && isDniValid(dni)" class="field-success">
+          <div *ngIf="dni && isDniValid(dni) && !hasFieldError('dni')" class="field-success">
             <small>✓ DNI válido</small>
           </div>
         </div>

@@ -7,7 +7,8 @@ require('dotenv').config();
 const { testConnection, syncDatabase } = require('./config/database');
 
 // Importar modelos
-const models = require('./models');
+const { User, Profile, Professional, Appointment } = require('./models');
+const { seedProfessionals } = require('./seeders/professionals');
 
 // Importar rutas
 const homeRoutes = require("./routes/home.routes");
@@ -19,7 +20,7 @@ const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:4200',
+  origin: ['http://localhost:4200', 'http://localhost:52632'],
   credentials: true
 }));
 app.use(express.json());
@@ -30,6 +31,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use("/api/home", homeRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/profile", require("./routes/profile.routes"));
+app.use("/api/appointments", require("./routes/appointment.routes"));
+app.use("/api/professionals", require("./routes/professional.routes"));
 
 // Ruta raíz
 app.get("/", (req, res) => {
@@ -38,7 +41,7 @@ app.get("/", (req, res) => {
     status: "API funcionando correctamente",
     version: "1.0.0",
     environment: process.env.NODE_ENV || 'development',
-    database: "MySQL conectado"
+    database: "PostgreSQL conectado"
   });
 });
 
@@ -60,6 +63,9 @@ const startServer = async () => {
     
     // Sincronizar modelos
     await syncDatabase();
+    
+    // Crear datos de prueba
+    await seedProfessionals();
     
     // Iniciar servidor
     app.listen(PORT, () => {

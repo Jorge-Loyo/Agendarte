@@ -140,10 +140,46 @@
 
   <!-- Professionals List -->
   <div class="professionals-list" *ngIf="!showForm">
-    <h2>Profesionales Registrados</h2>
+    <div class="list-header">
+      <h2>Profesionales Registrados</h2>
+      
+      <!-- Filtros -->
+      <div class="filters-section">
+        <div class="search-bar">
+          <input 
+            type="text" 
+            [(ngModel)]="searchTerm"
+            (input)="applyFilters()"
+            placeholder="Buscar por nombre o especialidad..."
+            class="search-input">
+        </div>
+        
+        <div class="filter-controls">
+          <select 
+            [(ngModel)]="selectedSpecialty"
+            (change)="applyFilters()"
+            class="filter-select">
+            <option value="">Todas las especialidades</option>
+            <option *ngFor="let spec of specialties" [value]="spec">{{ spec }}</option>
+          </select>
+          
+          <select 
+            [(ngModel)]="selectedLocation"
+            (change)="applyFilters()"
+            class="filter-select">
+            <option value="">Todas las ubicaciones</option>
+            <option *ngFor="let loc of locations" [value]="loc">{{ loc }}</option>
+          </select>
+          
+          <button class="btn-clear-filters" (click)="clearFilters()">
+            🗑️ Limpiar
+          </button>
+        </div>
+      </div>
+    </div>
     
     <div class="professionals-grid">
-      <div class="professional-card" *ngFor="let prof of professionals">
+      <div class="professional-card" *ngFor="let prof of filteredProfessionals">
         <div class="prof-header">
           <div class="prof-avatar">👨⚕️</div>
           <div class="prof-info">
@@ -164,7 +200,13 @@
       </div>
     </div>
     
-    <div class="empty-state" *ngIf="professionals.length === 0">
+    <div class="empty-state" *ngIf="filteredProfessionals.length === 0">
+      <p *ngIf="searchTerm || selectedSpecialty || selectedLocation; else noData">
+        No se encontraron profesionales con los filtros aplicados
+      </p>
+      <ng-template #noData>
+        <p>No hay profesionales registrados</p>
+      </ng-template>
       <p>No hay profesionales registrados</p>
       <button class="btn-add-first" (click)="toggleForm()">Agregar Primer Profesional</button>
     </div>

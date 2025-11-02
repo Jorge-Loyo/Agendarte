@@ -1,0 +1,96 @@
+<div class="professionals-container">
+  <div class="header">
+    <button class="btn-back" (click)="goBack()">← Volver</button>
+    <h1>Profesionales Disponibles</h1>
+  </div>
+
+  <div class="filters-section">
+    <div class="search-bar">
+      <input 
+        type="text" 
+        [(ngModel)]="searchTerm"
+        (input)="applyFilters()"
+        placeholder="Buscar profesional o especialidad..."
+        class="search-input">
+    </div>
+    
+    <div class="filter-controls">
+      <select 
+        [(ngModel)]="selectedSpecialty"
+        (change)="applyFilters()"
+        class="filter-select">
+        <option value="">Todas las especialidades</option>
+        <option *ngFor="let spec of specialties" [value]="spec">{{ spec }}</option>
+      </select>
+      
+      <select 
+        [(ngModel)]="minRating"
+        (change)="applyFilters()"
+        class="filter-select">
+        <option value="0">Cualquier calificación</option>
+        <option value="4">4+ estrellas</option>
+        <option value="4.5">4.5+ estrellas</option>
+        <option value="4.8">4.8+ estrellas</option>
+      </select>
+      
+      <select 
+        [(ngModel)]="sortBy"
+        (change)="applyFilters()"
+        class="filter-select">
+        <option value="rating">Mejor calificados</option>
+        <option value="price">Menor precio</option>
+        <option value="name">Nombre A-Z</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="professionals-grid">
+    <div class="professional-card" *ngFor="let prof of filteredProfessionals">
+      <div class="card-header">
+        <div class="prof-image">👨⚕️</div>
+        <button 
+          class="btn-favorite"
+          [class.active]="isFavorite(prof.id)"
+          (click)="toggleFavorite(prof.id)">
+          {{ isFavorite(prof.id) ? '❤️' : '🤍' }}
+        </button>
+      </div>
+      
+      <div class="prof-info">
+        <h3>{{ prof.name }}</h3>
+        <p class="specialty">{{ prof.specialty }}</p>
+        <p class="description">{{ prof.bio }}</p>
+        
+        <div class="prof-stats">
+          <div class="stat">
+            <span class="label">Calificación:</span>
+            <span class="value">⭐ {{ prof.rating }}</span>
+          </div>
+          <div class="stat">
+            <span class="label">Reseñas:</span>
+            <span class="value">{{ prof.totalReviews }} reseñas</span>
+          </div>
+          <div class="stat">
+            <span class="label">Consulta:</span>
+            <span class="value">${{ prof.consultationPrice | number }}</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card-actions">
+        <button class="btn-profile" (click)="viewProfile(prof)">Ver Perfil</button>
+        <button class="btn-book" (click)="bookAppointment(prof)">Agendar Turno</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="loading" *ngIf="loading">
+    <p>Cargando profesionales...</p>
+  </div>
+
+  <div class="empty-state" *ngIf="!loading && filteredProfessionals.length === 0">
+    <div class="empty-icon">👨⚕️</div>
+    <h3>No se encontraron profesionales</h3>
+    <p>Intenta ajustar los filtros de búsqueda</p>
+  </div>
+</div>
