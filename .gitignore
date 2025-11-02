@@ -15,6 +15,9 @@ build/
 */.env
 */.env.local
 
+# Local environment files
+src/environments/environment.local.ts
+
 # Logs
 *.log
 npm-debug.log*
