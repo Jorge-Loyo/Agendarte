@@ -1,0 +1,121 @@
+<div class="schedule-container">
+  <div class="schedule-header">
+    <button class="btn-back" (click)="goBack()">← Volver</button>
+    <h1>Configurar Horarios de Atención</h1>
+    <button class="btn-save" (click)="saveSchedules()" [disabled]="loading">
+      {{ loading ? 'Guardando...' : 'Guardar Horarios' }}
+    </button>
+  </div>
+
+  <div class="schedule-content">
+    <!-- Configuración General -->
+    <div class="general-config">
+      <h2>Configuración General</h2>
+      <div class="config-row">
+        <div class="config-item">
+          <label>Duración de Consulta (minutos)</label>
+          <select [(ngModel)]="defaultDuration" class="form-control">
+            <option value="15">15 minutos</option>
+            <option value="30">30 minutos</option>
+            <option value="45">45 minutos</option>
+            <option value="60">60 minutos</option>
+          </select>
+        </div>
+        <div class="config-item">
+          <label>Descanso entre consultas (minutos)</label>
+          <select [(ngModel)]="breakTime" class="form-control">
+            <option value="0">Sin descanso</option>
+            <option value="5">5 minutos</option>
+            <option value="10">10 minutos</option>
+            <option value="15">15 minutos</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="config-actions">
+        <button class="btn-apply-all" (click)="applyToAllDays()">Aplicar a Todos los Días</button>
+      </div>
+    </div>
+
+    <!-- Horarios por Día -->
+    <div class="days-config">
+      <h2>Horarios por Día de la Semana</h2>
+      
+      <div class="day-schedule" *ngFor="let day of weekDays; let i = index">
+        <div class="day-header">
+          <div class="day-toggle">
+            <input 
+              type="checkbox" 
+              [(ngModel)]="day.isActive"
+              [id]="'day-' + i"
+              class="toggle-checkbox">
+            <label [for]="'day-' + i" class="toggle-label">
+              <span class="day-name">{{ day.name }}</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="day-times" *ngIf="day.isActive">
+          <div class="time-row">
+            <div class="time-group">
+              <label>Hora de Inicio</label>
+              <input 
+                type="time" 
+                [(ngModel)]="day.startTime"
+                class="form-control">
+            </div>
+            <div class="time-group">
+              <label>Hora de Fin</label>
+              <input 
+                type="time" 
+                [(ngModel)]="day.endTime"
+                class="form-control">
+            </div>
+            <div class="time-group">
+              <label>Duración (min)</label>
+              <select [(ngModel)]="day.duration" class="form-control">
+                <option value="15">15 min</option>
+                <option value="30">30 min</option>
+                <option value="45">45 min</option>
+                <option value="60">60 min</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Horarios Especiales -->
+          <div class="special-times" *ngIf="day.specialHours?.length">
+            <h4>Horarios Especiales</h4>
+            <div class="special-time" *ngFor="let special of day.specialHours; let j = index">
+              <input type="date" [(ngModel)]="special.date" class="form-control">
+              <input type="time" [(ngModel)]="special.startTime" class="form-control">
+              <input type="time" [(ngModel)]="special.endTime" class="form-control">
+              <button class="btn-remove" (click)="removeSpecialHour(i, j)">×</button>
+            </div>
+          </div>
+
+          <button class="btn-add-special" (click)="addSpecialHour(i)">
+            + Agregar Horario Especial
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vista Previa -->
+    <div class="preview-section">
+      <h2>Vista Previa de Disponibilidad</h2>
+      <div class="preview-grid">
+        <div class="preview-day" *ngFor="let day of weekDays; trackBy: trackByDay; index as i">
+          <div class="preview-header">{{ day.name }}</div>
+          <div class="preview-content" *ngIf="day.isActive; else dayOff">
+            <div class="preview-time">{{ day.startTime }} - {{ day.endTime }}</div>
+            <div class="preview-duration">Consultas de {{ day.duration }}min</div>
+            <div class="preview-slots">{{ calculateSlots(day) }} turnos disponibles</div>
+          </div>
+          <ng-template #dayOff>
+            <div class="preview-off">No disponible</div>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

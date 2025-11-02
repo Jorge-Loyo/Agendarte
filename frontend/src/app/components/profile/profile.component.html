@@ -90,7 +90,8 @@
                   [(ngModel)]="profileData.email"
                   name="email"
                   required
-                  class="form-control">
+                  readonly
+                  class="form-control form-readonly">
               </div>
               <div class="form-group">
                 <label>Teléfono</label>
@@ -129,10 +130,9 @@
                   name="gender"
                   class="form-control">
                   <option value="">Seleccionar</option>
-                  <option value="masculino">Masculino</option>
-                  <option value="femenino">Femenino</option>
-                  <option value="otro">Otro</option>
-                  <option value="prefiero_no_decir">Prefiero no decir</option>
+                  <option value="M">Masculino</option>
+                  <option value="F">Femenino</option>
+                  <option value="Other">Otro</option>
                 </select>
               </div>
               <div class="form-group">
@@ -161,42 +161,54 @@
         <div class="profile-view">
           <div class="view-section">
             <h3>Información Personal</h3>
-            <div class="info-grid">
-              <div class="info-item">
-                <span class="label">Nombre:</span>
-                <span class="value">{{ profileData.firstName || 'No especificado' }}</span>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Nombre</label>
+                <div class="form-display">{{ profileData.firstName || 'No especificado' }}</div>
               </div>
-              <div class="info-item">
-                <span class="label">Apellido:</span>
-                <span class="value">{{ profileData.lastName || 'No especificado' }}</span>
+              <div class="form-group">
+                <label>Apellido</label>
+                <div class="form-display">{{ profileData.lastName || 'No especificado' }}</div>
               </div>
-              <div class="info-item">
-                <span class="label">Email:</span>
-                <span class="value">{{ profileData.email || 'No especificado' }}</span>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label>Email</label>
+                <div class="form-display">{{ profileData.email || 'No especificado' }}</div>
               </div>
-              <div class="info-item">
-                <span class="label">Teléfono:</span>
-                <span class="value">{{ profileData.phone || 'No especificado' }}</span>
+              <div class="form-group">
+                <label>Teléfono</label>
+                <div class="form-display">{{ profileData.phone || 'No especificado' }}</div>
               </div>
-              <div class="info-item">
-                <span class="label">DNI:</span>
-                <span class="value">{{ profileData.dni || 'No especificado' }}</span>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label>DNI</label>
+                <div class="form-display">{{ profileData.dni || 'No especificado' }}</div>
               </div>
-              <div class="info-item">
-                <span class="label">Fecha de Nacimiento:</span>
-                <span class="value">{{ profileData.birthDate ? (profileData.birthDate | date:'dd/MM/yyyy') : 'No especificado' }}</span>
+              <div class="form-group">
+                <label>Fecha de Nacimiento</label>
+                <div class="form-display">{{ profileData.birthDate ? (profileData.birthDate | date:'dd/MM/yyyy') : 'No especificado' }}</div>
               </div>
-              <div class="info-item" *ngIf="calculatedAge">
-                <span class="label">Edad:</span>
-                <span class="value">{{ calculatedAge }} años</span>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label>Género</label>
+                <div class="form-display">{{ getGenderDisplay(profileData.gender) || 'No especificado' }}</div>
               </div>
-              <div class="info-item">
-                <span class="label">Género:</span>
-                <span class="value">{{ profileData.gender || 'No especificado' }}</span>
+              <div class="form-group">
+                <label>Dirección</label>
+                <div class="form-display">{{ profileData.address || 'No especificado' }}</div>
               </div>
-              <div class="info-item">
-                <span class="label">Dirección:</span>
-                <span class="value">{{ profileData.address || 'No especificado' }}</span>
+            </div>
+            
+            <div class="form-row" *ngIf="calculatedAge">
+              <div class="form-group">
+                <label>Edad</label>
+                <div class="form-display">{{ calculatedAge }} años</div>
               </div>
             </div>
           </div>

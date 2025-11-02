@@ -34,15 +34,16 @@ export class ProfileComponent implements OnInit {
   imagePreview: string | null = null;
 
   get calculatedAge(): number | null {
-    if (!this.profileData.birthDate) return null;
-    const today = new Date();
-    const birth = new Date(this.profileData.birthDate);
-    let age = today.getFullYear() - birth.getFullYear();
-    const monthDiff = today.getMonth() - birth.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
-      age--;
-    }
-    return age;
+    return this.currentUser?.profile?.age || null;
+  }
+
+  getGenderDisplay(gender: string): string {
+    const genderMap: { [key: string]: string } = {
+      'M': 'Masculino',
+      'F': 'Femenino', 
+      'Other': 'Otro'
+    };
+    return genderMap[gender] || gender;
   }
 
   constructor(
@@ -70,12 +71,11 @@ export class ProfileComponent implements OnInit {
         email: this.currentUser.email || '',
         phone: this.currentUser.profile?.phone || '',
         dni: this.currentUser.profile?.dni || '',
-        birthDate: this.currentUser.profile?.birthDate || '',
+        birthDate: '',
         gender: this.currentUser.profile?.gender || '',
         address: this.currentUser.profile?.address || '',
-        profileImage: this.currentUser.profile?.profileImage || ''
+        profileImage: ''
       };
-      this.imagePreview = this.profileData.profileImage || null;
     }
   }
 
@@ -99,12 +99,8 @@ export class ProfileComponent implements OnInit {
   }
 
   private processImageAndUpdate() {
-    const reader = new FileReader();
-    reader.onload = () => {
-      this.profileData.profileImage = reader.result as string;
-      this.sendProfileUpdate();
-    };
-    reader.readAsDataURL(this.selectedFile!);
+    // Por ahora omitir imagen hasta implementar almacenamiento
+    this.sendProfileUpdate();
   }
 
   sendProfileUpdate() {
@@ -142,7 +138,6 @@ export class ProfileComponent implements OnInit {
   removeImage() {
     this.selectedFile = null;
     this.imagePreview = null;
-    this.profileData.profileImage = '';
   }
 
   goBack() {

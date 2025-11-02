@@ -1,0 +1,122 @@
+<div class="appointment-container">
+  <div class="appointment-header">
+    <button class="btn-back" (click)="goBack()">← Volver</button>
+    <h1>Agendar Turno para Paciente</h1>
+  </div>
+
+  <!-- Buscar Paciente -->
+  <div class="search-section" *ngIf="step === 1">
+    <h2>Buscar Paciente</h2>
+    <div class="search-box">
+      <input 
+        type="text" 
+        [(ngModel)]="searchTerm"
+        (input)="searchPatients()"
+        placeholder="Buscar por nombre, apellido o DNI..."
+        class="search-input">
+    </div>
+
+    <div class="patients-list" *ngIf="patients.length > 0">
+      <div 
+        class="patient-card" 
+        *ngFor="let patient of patients"
+        (click)="selectPatient(patient)">
+        <div class="patient-avatar">{{ patient.firstName?.charAt(0) }}{{ patient.lastName?.charAt(0) }}</div>
+        <div class="patient-info">
+          <h3>{{ patient.firstName }} {{ patient.lastName }}</h3>
+          <p>DNI: {{ patient.dni }}</p>
+          <p *ngIf="patient.phone">Tel: {{ patient.phone }}</p>
+        </div>
+        <button class="btn-select">Seleccionar</button>
+      </div>
+    </div>
+
+    <div class="no-results" *ngIf="searchTerm && patients.length === 0">
+      <p>No se encontraron pacientes</p>
+    </div>
+  </div>
+
+  <!-- Seleccionar Fecha y Hora -->
+  <div class="datetime-section" *ngIf="step === 2">
+    <div class="selected-patient">
+      <div class="patient-avatar">{{ selectedPatient.firstName?.charAt(0) }}{{ selectedPatient.lastName?.charAt(0) }}</div>
+      <div>
+        <h3>{{ selectedPatient.firstName }} {{ selectedPatient.lastName }}</h3>
+        <p>DNI: {{ selectedPatient.dni }}</p>
+      </div>
+    </div>
+
+    <h2>Seleccionar Fecha y Hora</h2>
+    
+    <div class="datetime-grid">
+      <div class="date-section">
+        <label>Fecha:</label>
+        <input 
+          type="date" 
+          [(ngModel)]="selectedDate"
+          [min]="getMinDate()"
+          (change)="loadAvailableTimes()"
+          class="date-input">
+      </div>
+
+      <div class="time-section" *ngIf="selectedDate">
+        <label>Hora:</label>
+        <div class="time-grid">
+          <button 
+            class="time-slot"
+            *ngFor="let time of availableTimes"
+            [class.selected]="selectedTime === time"
+            (click)="selectedTime = time">
+            {{ time }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="notes-section">
+      <label>Notas (opcional):</label>
+      <textarea 
+        [(ngModel)]="notes"
+        placeholder="Motivo de la consulta, observaciones..."
+        class="notes-textarea"></textarea>
+    </div>
+
+    <button 
+      class="btn-continue"
+      [disabled]="!selectedDate || !selectedTime"
+      (click)="step = 3">
+      Continuar
+    </button>
+  </div>
+
+  <!-- Confirmar -->
+  <div class="confirm-section" *ngIf="step === 3">
+    <h2>Confirmar Turno</h2>
+    
+    <div class="summary-card">
+      <div class="summary-item">
+        <span class="label">Paciente:</span>
+        <span class="value">{{ selectedPatient.firstName }} {{ selectedPatient.lastName }}</span>
+      </div>
+      <div class="summary-item">
+        <span class="label">Fecha:</span>
+        <span class="value">{{ selectedDate | date:'dd/MM/yyyy' }}</span>
+      </div>
+      <div class="summary-item">
+        <span class="label">Hora:</span>
+        <span class="value">{{ selectedTime }}</span>
+      </div>
+      <div class="summary-item" *ngIf="notes">
+        <span class="label">Notas:</span>
+        <span class="value">{{ notes }}</span>
+      </div>
+    </div>
+
+    <div class="confirm-buttons">
+      <button class="btn-cancel" (click)="step = 2">Modificar</button>
+      <button class="btn-confirm" (click)="confirmAppointment()" [disabled]="loading">
+        {{ loading ? 'Agendando...' : 'Confirmar Turno' }}
+      </button>
+    </div>
+  </div>
+</div>

@@ -9,11 +9,7 @@ router.put('/', authenticateToken, async (req, res) => {
     const userId = req.user.id;
     const { firstName, lastName, email, phone, dni, birthDate, gender, address, profileImage } = req.body;
 
-    // Actualizar datos del usuario
-    await User.update(
-      { email },
-      { where: { id: userId } }
-    );
+    // Email no se actualiza por seguridad
 
     // Buscar o crear perfil
     let profile = await Profile.findOne({ where: { userId } });
@@ -25,10 +21,9 @@ router.put('/', authenticateToken, async (req, res) => {
         lastName,
         phone,
         dni,
-        birthDate,
+        age: birthDate ? new Date().getFullYear() - new Date(birthDate).getFullYear() : null,
         gender,
-        address,
-        profileImage
+        address
       });
     } else {
       // Crear nuevo perfil
@@ -38,10 +33,9 @@ router.put('/', authenticateToken, async (req, res) => {
         lastName,
         phone,
         dni,
-        birthDate,
+        age: birthDate ? new Date().getFullYear() - new Date(birthDate).getFullYear() : null,
         gender,
-        address,
-        profileImage
+        address
       });
     }
 

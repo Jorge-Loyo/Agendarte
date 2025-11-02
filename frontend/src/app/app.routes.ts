@@ -25,6 +25,8 @@ export const routes: Routes = [
       { path: 'profile', loadComponent: () => import('./components/profile/profile.component').then(m => m.ProfileComponent) },
       { path: 'medical-history', loadComponent: () => import('./components/medical-history/medical-history.component').then(m => m.MedicalHistoryComponent) },
       { path: 'professional-dashboard', loadComponent: () => import('./components/professional-dashboard/professional-dashboard.component').then(m => m.ProfessionalDashboardComponent) },
+      { path: 'professional-appointment', loadComponent: () => import('./components/professional-appointment/professional-appointment.component').then(m => m.ProfessionalAppointmentComponent) },
+      { path: 'schedule-config', loadComponent: () => import('./components/schedule-config/schedule-config.component').then(m => m.ScheduleConfigComponent) },
       { 
         path: 'admin', 
         children: [

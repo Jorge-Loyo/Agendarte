@@ -37,6 +37,11 @@ app.use("/api/appointments", require("./routes/appointment.routes"));
 app.use("/api/professionals", require("./routes/professional.routes"));
 app.use("/api/specialties", require("./routes/specialty.routes"));
 app.use("/api/calendar", require("./routes/calendar.routes"));
+app.use("/api/patients", require("./routes/patient.routes"));
+// Debug: Cargar rutas de horarios
+console.log('Cargando rutas de schedules...');
+app.use("/api/schedules", require("./routes/schedule.routes"));
+console.log('Rutas de schedules cargadas');
 
 // Ruta raíz
 app.get("/", (req, res) => {

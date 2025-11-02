@@ -58,6 +58,30 @@ import { AuthService } from '../../services/auth.service';
             </div>
           </div>
 
+          <div class="menu-item" routerLink="/app/professional-dashboard">
+            <div class="menu-icon">👨⚕️</div>
+            <div class="menu-text">
+              <span class="menu-title">Dashboard Profesional</span>
+              <span class="menu-desc">Panel de profesional</span>
+            </div>
+          </div>
+
+          <div class="menu-item" routerLink="/app/schedule-config">
+            <div class="menu-icon">🕰️</div>
+            <div class="menu-text">
+              <span class="menu-title">Configurar Horarios</span>
+              <span class="menu-desc">Definir disponibilidad</span>
+            </div>
+          </div>
+
+          <div class="menu-item" routerLink="/app/professional-appointment">
+            <div class="menu-icon">📝</div>
+            <div class="menu-text">
+              <span class="menu-title">Agendar para Paciente</span>
+              <span class="menu-desc">Crear turno profesional</span>
+            </div>
+          </div>
+
           <div class="menu-item" routerLink="/app/admin">
             <div class="menu-icon">⚙️</div>
             <div class="menu-text">
