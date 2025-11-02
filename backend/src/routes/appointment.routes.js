@@ -4,5 +4,6 @@ const appointmentController = require('../controllers/appointment.controller');
 const { authenticateToken } = require('../middleware/auth');
 
 router.get('/my-appointments', authenticateToken, appointmentController.getMyAppointments);
+router.post('/', authenticateToken, appointmentController.createAppointment);
 
 module.exports = router;

@@ -2,6 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { ProfessionalService } from '../../services/professional.service';
+import { AppointmentService } from '../../services/appointment.service';
+import { CalendarService } from '../../services/calendar.service';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-appointments',
@@ -16,6 +20,7 @@ export class AppointmentsComponent implements OnInit {
   selectedDate = '';
   selectedTime = '';
   appointmentReason = '';
+  loading = false;
   
   professionals = [
     { id: 1, name: 'Dr. Carlos García', specialty: 'Cardiología', rating: 4.8, experience: '15 años', image: '👨‍⚕️' },
@@ -29,13 +34,64 @@ export class AppointmentsComponent implements OnInit {
     '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00'
   ];
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private professionalService: ProfessionalService,
+    private appointmentService: AppointmentService,
+    private calendarService: CalendarService,
+    private notificationService: NotificationService
+  ) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.loadProfessionals();
+  }
+
+  loadProfessionals() {
+    this.loading = true;
+    this.professionalService.getAllProfessionals().subscribe({
+      next: (response) => {
+        this.professionals = response.professionals.map((prof: any) => ({
+          ...prof,
+          image: '👨⚕️',
+          experience: '10+ años'
+        }));
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Error loading professionals:', error);
+        this.loading = false;
+      }
+    });
+  }
 
   selectProfessional(professional: any) {
     this.selectedProfessional = professional;
     this.step = 2;
+    this.loadAvailableTimes();
+  }
+
+  loadAvailableTimes() {
+    if (this.selectedDate && this.selectedProfessional) {
+      const date = new Date(this.selectedDate);
+      this.calendarService.getProfessionalCalendar(
+        this.selectedProfessional.id,
+        date.getFullYear(),
+        date.getMonth() + 1
+      ).subscribe({
+        next: (response) => {
+          const dayData = response.calendar.find((day: any) => 
+            day.date === this.selectedDate
+          );
+          this.availableTimes = dayData?.slots
+            .filter((slot: any) => slot.available)
+            .map((slot: any) => slot.time) || [];
+        },
+        error: (error) => {
+          console.error('Error loading times:', error);
+          this.availableTimes = ['09:00', '10:00', '11:00', '14:00', '15:00', '16:00'];
+        }
+      });
+    }
   }
 
   selectDateTime() {
@@ -44,18 +100,36 @@ export class AppointmentsComponent implements OnInit {
     }
   }
 
+  onDateChange() {
+    this.selectedTime = '';
+    this.loadAvailableTimes();
+  }
+
   confirmAppointment() {
-    const appointment = {
-      professional: this.selectedProfessional,
+    const appointmentData = {
+      professionalId: this.selectedProfessional.id,
       date: this.selectedDate,
       time: this.selectedTime,
-      reason: this.appointmentReason
+      notes: this.appointmentReason
     };
     
-    console.log('Nueva cita:', appointment);
-    // Aquí se enviaría al backend
-    
-    this.router.navigate(['/app/dashboard']);
+    this.loading = true;
+    this.appointmentService.createAppointment(appointmentData).subscribe({
+      next: (response) => {
+        this.notificationService.success(
+          'Cita agendada',
+          'Tu cita ha sido agendada exitosamente'
+        );
+        this.router.navigate(['/app/dashboard']);
+      },
+      error: (error) => {
+        this.loading = false;
+        this.notificationService.error(
+          'Error',
+          error.error?.message || 'Error al agendar la cita'
+        );
+      }
+    });
   }
 
   goBack() {

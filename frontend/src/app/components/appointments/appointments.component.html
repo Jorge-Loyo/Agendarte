@@ -53,6 +53,7 @@
           type="date" 
           [(ngModel)]="selectedDate"
           [min]="getMinDate()"
+          (change)="onDateChange()"
           class="date-input">
       </div>
 
@@ -119,7 +120,9 @@
 
     <div class="confirm-buttons">
       <button class="btn-cancel" (click)="goBack()">Modificar</button>
-      <button class="btn-confirm" (click)="confirmAppointment()">Confirmar Cita</button>
+      <button class="btn-confirm" (click)="confirmAppointment()" [disabled]="loading">
+        {{ loading ? 'Agendando...' : 'Confirmar Cita' }}
+      </button>
     </div>
   </div>
 </div>

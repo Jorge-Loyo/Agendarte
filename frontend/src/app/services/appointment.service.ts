@@ -15,4 +15,10 @@ export class AppointmentService {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     });
   }
+
+  createAppointment(appointmentData: any): Observable<any> {
+    return this.http.post(this.baseUrl, appointmentData, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    });
+  }
 }

@@ -59,6 +59,33 @@ app.get("/api/health", (req, res) => {
   });
 });
 
+// Ruta para verificar citas en BD
+app.get("/api/debug/appointments", async (req, res) => {
+  try {
+    const appointments = await Appointment.findAll({
+      include: [{
+        model: User,
+        as: 'patient',
+        include: [{ model: Profile, as: 'profile' }]
+      }]
+    });
+    res.json({
+      total: appointments.length,
+      appointments: appointments.map(apt => ({
+        id: apt.id,
+        patientId: apt.patientId,
+        professionalId: apt.professionalId,
+        date: apt.appointmentDate,
+        time: apt.appointmentTime,
+        status: apt.status,
+        patient: apt.patient?.profile?.firstName + ' ' + apt.patient?.profile?.lastName
+      }))
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Inicializar base de datos y servidor
 const startServer = async () => {
   try {

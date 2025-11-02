@@ -1,13 +1,14 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService, User } from '../../services/auth.service';
 import { GoogleCalendarService } from '../../services/google-calendar.service';
+import { AppointmentService } from '../../services/appointment.service';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule, DatePipe],
+  imports: [CommonModule, RouterModule],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css'
 })
@@ -30,21 +31,22 @@ export class Dashboard implements OnInit {
   constructor(
     private authService: AuthService,
     private router: Router,
-    private googleCalendar: GoogleCalendarService
+    private googleCalendar: GoogleCalendarService,
+    private appointmentService: AppointmentService
   ) {}
 
   ngOnInit() {
-    // Simulamos un usuario para testing
-    this.currentUser = {
-      id: 1,
-      email: 'test@test.com',
-      role: 'patient',
-      profile: { firstName: 'Usuario' }
-    };
+    this.authService.currentUser$.subscribe(user => {
+      this.currentUser = user;
+    });
     
     this.generateCalendar();
     this.loadUpcomingAppointments();
-    this.generateMockAppointments();
+  }
+
+  ionViewWillEnter() {
+    // Recargar datos cuando se vuelve a la página
+    this.loadUpcomingAppointments();
   }
 
   async initializeGoogleCalendar() {
@@ -175,23 +177,43 @@ export class Dashboard implements OnInit {
   }
 
   loadUpcomingAppointments() {
-    // Datos simulados
-    this.upcomingAppointments = [
-      {
-        date: '15 Nov',
-        time: '10:30',
-        professional: 'Dr. García',
-        specialty: 'Cardiología',
-        status: 'confirmed'
+    this.appointmentService.getMyAppointments().subscribe({
+      next: (response) => {
+        this.upcomingAppointments = response.appointments.map((apt: any) => ({
+          date: new Date(apt.appointmentDate).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }),
+          time: apt.appointmentTime,
+          professional: apt.professional?.user?.profile?.firstName + ' ' + apt.professional?.user?.profile?.lastName || 'Profesional',
+          specialty: apt.professional?.specialty || 'Consulta',
+          status: apt.status
+        }));
+        this.updateCalendarWithAppointments();
       },
-      {
-        date: '18 Nov',
-        time: '14:00',
-        professional: 'Dra. López',
-        specialty: 'Dermatología',
-        status: 'pending'
+      error: (error) => {
+        console.error('Error loading appointments:', error);
       }
-    ];
+    });
+  }
+
+  updateCalendarWithAppointments() {
+    // Limpiar citas anteriores
+    this.appointmentsByDate.clear();
+    
+    // Agregar citas reales al calendario usando appointmentDate directamente
+    this.appointmentService.getMyAppointments().subscribe({
+      next: (response) => {
+        response.appointments.forEach((apt: any) => {
+          const dateKey = apt.appointmentDate; // Ya viene en formato YYYY-MM-DD
+          const existing = this.appointmentsByDate.get(dateKey) || [];
+          existing.push({
+            id: apt.id,
+            title: 'Cita médica',
+            type: 'medical' as const
+          });
+          this.appointmentsByDate.set(dateKey, existing);
+        });
+        this.generateCalendar();
+      }
+    });
   }
 
   goToToday() {
