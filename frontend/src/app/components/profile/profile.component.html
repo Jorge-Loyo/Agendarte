@@ -3,9 +3,14 @@
   <div class="profile-header">
     <button class="btn-back" (click)="goBack()">← Volver</button>
     <h1>Mi Perfil</h1>
-    <button class="btn-edit" (click)="toggleEditMode()">
-      {{ editMode ? 'Cancelar' : 'Editar Perfil' }}
-    </button>
+    <div class="header-actions">
+      <button class="btn-notifications" routerLink="/app/notification-preferences">
+        🔔 Recordatorios
+      </button>
+      <button class="btn-edit" (click)="toggleEditMode()">
+        {{ editMode ? 'Cancelar' : 'Editar Perfil' }}
+      </button>
+    </div>
   </div>
 
   <!-- Profile Content -->

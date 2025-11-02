@@ -1,0 +1,61 @@
+<div class="preferences-container">
+  <div class="header">
+    <button class="btn-back" (click)="goBack()">← Volver</button>
+    <h1>Preferencias de Recordatorios</h1>
+  </div>
+
+  <div class="preferences-card" *ngIf="!loading">
+    <div class="section">
+      <h2>Recordatorios por Email</h2>
+      <div class="preference-item">
+        <label class="switch">
+          <input type="checkbox" [(ngModel)]="preferences.emailReminders">
+          <span class="slider"></span>
+        </label>
+        <div class="preference-info">
+          <h3>Recordatorios por correo electrónico</h3>
+          <p>Recibe recordatorios de tus citas por email 24 horas antes</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Recordatorios por WhatsApp</h2>
+      <div class="preference-item">
+        <label class="switch">
+          <input type="checkbox" [(ngModel)]="preferences.whatsappReminders">
+          <span class="slider"></span>
+        </label>
+        <div class="preference-info">
+          <h3>Recordatorios por WhatsApp</h3>
+          <p>Recibe recordatorios de tus citas por WhatsApp 2 horas antes</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuración de Tiempo</h2>
+      <div class="time-config">
+        <label for="reminderHours">Horas de anticipación para email:</label>
+        <select id="reminderHours" [(ngModel)]="preferences.reminderHours" class="time-select">
+          <option value="1">1 hora</option>
+          <option value="2">2 horas</option>
+          <option value="6">6 horas</option>
+          <option value="12">12 horas</option>
+          <option value="24">24 horas</option>
+          <option value="48">48 horas</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn-save" (click)="savePreferences()" [disabled]="saving">
+        {{ saving ? 'Guardando...' : 'Guardar Preferencias' }}
+      </button>
+    </div>
+  </div>
+
+  <div class="loading-state" *ngIf="loading">
+    <p>Cargando preferencias...</p>
+  </div>
+</div>

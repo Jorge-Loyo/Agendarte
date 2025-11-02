@@ -4,6 +4,8 @@ const Professional = require('./Professional');
 const Appointment = require('./Appointment');
 const Specialty = require('./specialty.model');
 const Schedule = require('./Schedule');
+const Notification = require('./Notification');
+const UserPreference = require('./UserPreference');
 
 // Asociaciones User - Profile
 User.hasOne(Profile, { 
@@ -65,11 +67,43 @@ Schedule.belongsTo(Professional, {
   as: 'professional' 
 });
 
+// Asociaciones User - UserPreference
+User.hasOne(UserPreference, { 
+  foreignKey: 'userId', 
+  as: 'preferences' 
+});
+UserPreference.belongsTo(User, { 
+  foreignKey: 'userId', 
+  as: 'user' 
+});
+
+// Asociaciones Appointment - Notification
+Appointment.hasMany(Notification, { 
+  foreignKey: 'appointmentId', 
+  as: 'notifications' 
+});
+Notification.belongsTo(Appointment, { 
+  foreignKey: 'appointmentId', 
+  as: 'appointment' 
+});
+
+// Asociaciones User - Notification
+User.hasMany(Notification, { 
+  foreignKey: 'userId', 
+  as: 'notifications' 
+});
+Notification.belongsTo(User, { 
+  foreignKey: 'userId', 
+  as: 'user' 
+});
+
 module.exports = {
   User,
   Profile,
   Professional,
   Appointment,
   Specialty,
-  Schedule
+  Schedule,
+  Notification,
+  UserPreference
 };

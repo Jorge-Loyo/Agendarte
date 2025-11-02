@@ -9,15 +9,15 @@
 ## 🎯 RESUMEN EJECUTIVO
 
 - **Total HU:** 21
-- **HU Completadas:** 6 ✅
+- **HU Completadas:** 7 ✅
 - **HU Parcialmente Implementadas:** 2 🔄
-- **HU Pendientes:** 13 ❌
-- **Progreso General:** **42.9%** (8/21 HU iniciadas)
-- **Puntos Completados:** 94/234 pts (**40.2%**)
+- **HU Pendientes:** 12 ❌
+- **Progreso General:** **47.6%** (9/21 HU iniciadas)
+- **Puntos Completados:** 102/234 pts (**43.6%**)
 
 ---
 
-## ✅ HISTORIAS DE USUARIO COMPLETADAS (6)
+## ✅ HISTORIAS DE USUARIO COMPLETADAS (7)
 
 ### **HU-01: Registro de Paciente** ✅ **COMPLETADA**
 **Puntos:** 5 | **Prioridad:** Alta
@@ -179,6 +179,35 @@
 
 ---
 
+### **HU-07: Recordatorios de Turnos** ✅ **COMPLETADA**
+**Puntos:** 8 | **Prioridad:** Media
+
+**✅ Criterios de Aceptación Cumplidos:**
+- ✅ Recordatorio por email 24hs antes del turno
+- ✅ Recordatorio por WhatsApp 2hs antes del turno (simulado)
+- ✅ Configuración de preferencias de recordatorios
+- ✅ Información completa del turno en recordatorio
+- ✅ Registro del envío de recordatorios
+- ✅ Procesamiento automático de notificaciones
+
+**✅ Definición de Terminado Cumplida:**
+- ✅ Sistema de recordatorios automático implementado
+- ✅ Configuración de preferencias de usuario
+- ✅ Integración con servicio de email (simulado)
+- ✅ Integración con servicio de WhatsApp (simulado)
+- ✅ Logs de recordatorios enviados
+- ✅ Procesador automático cada 5 minutos
+
+**📁 Archivos Implementados:**
+- `backend/src/models/Notification.js`
+- `backend/src/models/UserPreference.js`
+- `backend/src/services/notification.service.js`
+- `backend/src/routes/notification.routes.js`
+- `frontend/src/app/components/notification-preferences/`
+- `frontend/src/app/services/notification-preferences.service.ts`
+
+---
+
 ## 🔄 HISTORIAS DE USUARIO PARCIALMENTE IMPLEMENTADAS (2)
 
 ### **HU-05: Ver Mis Turnos** ✅ **COMPLETADA**
@@ -311,9 +340,8 @@
 ### **Alta Prioridad (1 HU)**
 - ❌ **HU-04**: Pago con Mercado Pago (21 pts)
 
-### **Media Prioridad (11 HU)**
+### **Media Prioridad (10 HU)**
 - ❌ **HU-06**: Cancelar/Reprogramar Turnos (13 pts)
-- ❌ **HU-07**: Recordatorios (8 pts)
 - ❌ **HU-11**: Historial de Paciente (8 pts)
 - ❌ **HU-12**: Cancelar/Reprogramar Profesional (8 pts)
 - ❌ **HU-13**: Notas de Consulta (5 pts)
@@ -387,8 +415,8 @@
 
 ### **Corto Plazo (Próximo Sprint)**
 4. **HU-06** - Cancelar/Reprogramar turnos
-5. **HU-07** - Sistema de recordatorios
-6. **HU-13** - Notas de consulta
+5. **HU-13** - Notas de consulta
+6. **HU-11** - Historial de paciente
 
 ### **Mediano Plazo**
 7. **HU-19, HU-20, HU-21** - Sistema de reseñas completo

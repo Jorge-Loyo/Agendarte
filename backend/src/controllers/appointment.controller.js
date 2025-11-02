@@ -103,6 +103,10 @@ const createAppointment = async (req, res) => {
     
     console.log('✅ Cita creada exitosamente:', appointment.id);
 
+    // Crear notificaciones de recordatorio
+    const notificationService = require('../services/notification.service');
+    await notificationService.createNotificationsForAppointment(appointment.id);
+
     // Obtener la cita creada con datos del profesional
     const createdAppointment = await Appointment.findByPk(appointment.id, {
       include: [{
