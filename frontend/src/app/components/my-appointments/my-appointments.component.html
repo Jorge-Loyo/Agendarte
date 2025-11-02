@@ -31,8 +31,13 @@
     </select>
   </div>
 
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="loading">
+    <p>Cargando turnos...</p>
+  </div>
+
   <!-- Próximos Turnos -->
-  <div class="appointments-list" *ngIf="activeTab === 'upcoming'">
+  <div class="appointments-list" *ngIf="activeTab === 'upcoming' && !loading">
     <div class="appointment-card" *ngFor="let apt of upcomingAppointments">
       <div class="apt-date">
         <div class="day">{{ apt.date | date:'dd' }}</div>
@@ -70,7 +75,7 @@
   </div>
 
   <!-- Historial -->
-  <div class="appointments-list" *ngIf="activeTab === 'history'">
+  <div class="appointments-list" *ngIf="activeTab === 'history' && !loading">
     <div class="appointment-card history" *ngFor="let apt of pastAppointments">
       <div class="apt-date">
         <div class="day">{{ apt.date | date:'dd' }}</div>

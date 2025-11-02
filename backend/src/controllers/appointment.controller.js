@@ -24,9 +24,30 @@ const getMyAppointments = async (req, res) => {
 
     console.log(`📋 Encontradas ${appointments.length} citas para usuario ${userId}`);
     
+    const formattedAppointments = appointments.map(apt => ({
+      id: apt.id,
+      appointmentDate: apt.appointmentDate,
+      appointmentTime: apt.appointmentTime,
+      status: apt.status,
+      paymentStatus: apt.paymentStatus,
+      notes: apt.notes,
+      professional: {
+        id: apt.professional?.id,
+        specialty: apt.professional?.specialty,
+        consultationPrice: apt.professional?.consultationPrice,
+        user: {
+          profile: {
+            firstName: apt.professional?.user?.profile?.firstName,
+            lastName: apt.professional?.user?.profile?.lastName,
+            address: apt.professional?.user?.profile?.address
+          }
+        }
+      }
+    }));
+    
     res.json({
       message: 'Turnos obtenidos exitosamente',
-      appointments
+      appointments: formattedAppointments
     });
   } catch (error) {
     console.error('Error obteniendo turnos:', error);

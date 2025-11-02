@@ -11,6 +11,8 @@ const { User, Profile, Professional, Appointment, Specialty } = require('./model
 const { seedProfessionals } = require('./seeders/professionals');
 const seedSpecialties = require('./seeders/specialties');
 const { seedSchedules } = require('./seeders/schedules');
+const { seedAppointments } = require('./seeders/appointments');
+const { seedPatients } = require('./seeders/patients');
 
 // Importar rutas
 const homeRoutes = require("./routes/home.routes");
@@ -102,8 +104,10 @@ const startServer = async () => {
     
     // Crear datos de prueba
     await seedSpecialties();
+    await seedPatients();
     await seedProfessionals();
     await seedSchedules();
+    await seedAppointments();
     
     // Iniciar servidor
     app.listen(PORT, () => {

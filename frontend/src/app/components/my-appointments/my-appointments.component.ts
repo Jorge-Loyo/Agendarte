@@ -15,42 +15,8 @@ export class MyAppointmentsComponent implements OnInit {
   activeTab = 'upcoming';
   statusFilter = '';
   sortBy = 'date';
-  
-  appointments = [
-    {
-      id: 1,
-      date: '2024-11-15',
-      time: '10:30',
-      professional: 'Dr. Carlos García',
-      specialty: 'Cardiología',
-      status: 'confirmed',
-      price: 8000,
-      location: 'Buenos Aires',
-      notes: 'Control rutinario'
-    },
-    {
-      id: 2,
-      date: '2024-11-20',
-      time: '14:00',
-      professional: 'Dra. Ana López',
-      specialty: 'Dermatología',
-      status: 'pending',
-      price: 7500,
-      location: 'Córdoba',
-      notes: 'Consulta por lunar'
-    },
-    {
-      id: 3,
-      date: '2024-10-10',
-      time: '09:00',
-      professional: 'Dr. Miguel Rodríguez',
-      specialty: 'Neurología',
-      status: 'completed',
-      price: 9000,
-      location: 'Rosario',
-      notes: 'Seguimiento migraña'
-    }
-  ];
+  appointments: any[] = [];
+  loading = false;
 
   constructor(
     private router: Router,
@@ -62,15 +28,42 @@ export class MyAppointmentsComponent implements OnInit {
   }
 
   loadAppointments() {
+    this.loading = true;
     this.appointmentService.getMyAppointments().subscribe({
       next: (response) => {
-        this.appointments = response.appointments || [];
+        this.appointments = this.formatAppointments(response.appointments || []);
+        this.loading = false;
       },
       error: (error) => {
         console.error('Error cargando turnos:', error);
-        // Mantener datos simulados si falla la API
+        this.loading = false;
       }
     });
+  }
+
+  formatAppointments(appointments: any[]): any[] {
+    return appointments.map(apt => ({
+      id: apt.id,
+      date: apt.appointmentDate,
+      time: apt.appointmentTime,
+      professional: `${apt.professional?.user?.profile?.firstName || ''} ${apt.professional?.user?.profile?.lastName || ''}`.trim(),
+      specialty: apt.professional?.specialty || 'No especificado',
+      status: this.mapStatus(apt.status),
+      price: apt.professional?.consultationPrice || 0,
+      location: apt.professional?.user?.profile?.address || 'No especificado',
+      notes: apt.notes || ''
+    }));
+  }
+
+  mapStatus(status: string): string {
+    const statusMap: { [key: string]: string } = {
+      'scheduled': 'pending',
+      'confirmed': 'confirmed',
+      'completed': 'completed',
+      'cancelled': 'cancelled',
+      'no_show': 'cancelled'
+    };
+    return statusMap[status] || status;
   }
 
   get upcomingAppointments() {

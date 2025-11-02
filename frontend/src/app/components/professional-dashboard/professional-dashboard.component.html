@@ -21,28 +21,82 @@
 
   <!-- Main Dashboard Grid -->
   <div class="dashboard-grid">
-    <!-- Today's Appointments -->
-    <div class="appointments-today">
+    <!-- Professional Calendar -->
+    <div class="professional-calendar">
       <div class="section-header">
-        <h2>📅 Agenda de Hoy</h2>
-        <button class="btn-manage-schedule">Gestionar Horarios</button>
+        <h2>📅 Mi Agenda</h2>
+        <div class="calendar-controls">
+          <select [(ngModel)]="currentView" class="view-selector">
+            <option value="day">Vista Diaria</option>
+            <option value="week">Vista Semanal</option>
+            <option value="month">Vista Mensual</option>
+          </select>
+          <button class="btn-today" (click)="goToToday()">Hoy</button>
+          <button class="btn-prev" (click)="previousPeriod()">←</button>
+          <button class="btn-next" (click)="nextPeriod()">→</button>
+        </div>
       </div>
       
-      <div class="appointments-list">
-        <div class="appointment-card" *ngFor="let apt of todayAppointments">
-          <div class="apt-time">
-            <span class="time">{{ apt.time }}</span>
+      <!-- Day View -->
+      <div class="day-view" *ngIf="currentView === 'day'">
+        <div class="day-header">
+          <h3>{{ getFormattedDate() }}</h3>
+        </div>
+        <div class="time-slots">
+          <div class="time-slot" *ngFor="let slot of dayTimeSlots" [class.occupied]="slot.isOccupied" [class.duration-60]="slot.duration === 60">
+            <div class="slot-time">{{ slot.time }}</div>
+            <div class="slot-content" *ngIf="slot.appointment; else emptySlot">
+              <div class="appointment-info">
+                <h4>{{ slot.appointment.patientName }}</h4>
+                <p>{{ slot.appointment.reason }}</p>
+                <span class="status" [class]="slot.appointment.status">{{ slot.appointment.status }}</span>
+              </div>
+              <div class="appointment-actions">
+                <button class="btn-details" (click)="viewAppointmentDetails(slot.appointment)">Ver</button>
+                <button class="btn-notes" (click)="addNotes(slot.appointment)">Notas</button>
+              </div>
+            </div>
+            <ng-template #emptySlot>
+              <div class="empty-slot" (click)="scheduleAppointment(slot.time)">
+                <span>+ Agendar</span>
+              </div>
+            </ng-template>
           </div>
-          <div class="apt-details">
-            <h3>{{ apt.patient }}</h3>
-            <p>{{ apt.reason }}</p>
+        </div>
+      </div>
+      
+      <!-- Week View -->
+      <div class="week-view" *ngIf="currentView === 'week'">
+        <div class="week-title">
+          <h3>{{ getWeekRange() }}</h3>
+        </div>
+        <div class="week-header">
+          <div class="week-day" *ngFor="let day of weekDays">{{ day.name }}</div>
+        </div>
+        <div class="week-grid">
+          <div class="week-column" *ngFor="let day of weekDays">
+            <div class="day-appointments">
+              <div class="mini-appointment" *ngFor="let apt of day.appointments" [class]="apt.status">
+                <span class="apt-time">{{ apt.time }}</span>
+                <span class="apt-patient">{{ apt.patientName }}</span>
+              </div>
+            </div>
           </div>
-          <div class="apt-status" [class]="getAppointmentStatusClass(apt.status)">
-            {{ apt.status === 'confirmed' ? 'Confirmada' : apt.status === 'pending' ? 'Pendiente' : 'Cancelada' }}
-          </div>
-          <div class="apt-actions">
-            <button class="btn-start" *ngIf="apt.status === 'confirmed'">Iniciar</button>
-            <button class="btn-reschedule" *ngIf="apt.status === 'pending'">Confirmar</button>
+        </div>
+      </div>
+      
+      <!-- Month View -->
+      <div class="month-view" *ngIf="currentView === 'month'">
+        <div class="month-header">
+          <h3>{{ getFormattedMonth() }}</h3>
+        </div>
+        <div class="month-grid">
+          <div class="month-day-header" *ngFor="let day of ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']">{{ day }}</div>
+          <div class="month-day" *ngFor="let day of monthDays" [class.other-month]="!day.isCurrentMonth" [class.today]="day.isToday">
+            <span class="day-number">{{ day.number }}</span>
+            <div class="day-appointments">
+              <div class="apt-dot" *ngFor="let apt of day.appointments" [class]="apt.status"></div>
+            </div>
           </div>
         </div>
       </div>
