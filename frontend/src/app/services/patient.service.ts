@@ -10,8 +10,8 @@ export class PatientService {
 
   constructor(private http: HttpClient) {}
 
-  searchPatients(query: string): Observable<any> {
-    return this.http.get(`${this.baseUrl}/search?q=${query}`, {
+  searchPatients(searchTerm: string): Observable<any> {
+    return this.http.get(`${this.baseUrl}/search?q=${encodeURIComponent(searchTerm)}`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     });
   }

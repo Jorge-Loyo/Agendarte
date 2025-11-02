@@ -5,6 +5,7 @@ const { authenticateToken } = require('../middleware/auth');
 
 router.get('/my-appointments', authenticateToken, appointmentController.getMyAppointments);
 router.post('/', authenticateToken, appointmentController.createAppointment);
+router.post('/professional', authenticateToken, appointmentController.createProfessionalAppointment);
 router.put('/:id/cancel', authenticateToken, appointmentController.cancelAppointment);
 router.put('/:id/reschedule', authenticateToken, appointmentController.rescheduleAppointment);
 

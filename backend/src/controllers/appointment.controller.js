@@ -270,9 +270,65 @@ const rescheduleAppointment = async (req, res) => {
   }
 };
 
+const createProfessionalAppointment = async (req, res) => {
+  try {
+    const { patientId, date, time, notes } = req.body;
+    const professionalUserId = req.user.id;
+
+    // Obtener el profesional
+    const professional = await Professional.findOne({ where: { userId: professionalUserId } });
+    if (!professional) {
+      return res.status(404).json({ message: 'Profesional no encontrado' });
+    }
+
+    // Verificar que el paciente existe
+    const patient = await User.findByPk(patientId);
+    if (!patient || patient.role !== 'patient') {
+      return res.status(404).json({ message: 'Paciente no encontrado' });
+    }
+
+    // Verificar disponibilidad del horario
+    const existingAppointment = await Appointment.findOne({
+      where: {
+        professionalId: professional.id,
+        appointmentDate: date,
+        appointmentTime: time,
+        status: { [Op.ne]: 'cancelled' }
+      }
+    });
+
+    if (existingAppointment) {
+      return res.status(400).json({ message: 'El horario ya está ocupado' });
+    }
+
+    // Crear la cita
+    const appointment = await Appointment.create({
+      patientId,
+      professionalId: professional.id,
+      appointmentDate: date,
+      appointmentTime: time,
+      status: 'confirmed', // Confirmado directamente por el profesional
+      paymentStatus: 'paid', // Sin pago requerido
+      notes: notes || null,
+      createdBy: professionalUserId
+    });
+
+    console.log(`📅 Cita creada por profesional para paciente ${patientId}`);
+
+    res.status(201).json({
+      message: 'Cita agendada exitosamente',
+      appointment
+    });
+  } catch (error) {
+    console.error('Error creando cita profesional:', error);
+    res.status(500).json({ message: 'Error interno del servidor' });
+  }
+};
+
 module.exports = {
   getMyAppointments,
   createAppointment,
+  createProfessionalAppointment,
   cancelAppointment,
   rescheduleAppointment
 };

@@ -64,26 +64,33 @@ export class ProfessionalAppointmentComponent implements OnInit {
   selectPatient(patient: any) {
     this.selectedPatient = patient;
     this.step = 2;
+    this.loadAvailableTimes();
   }
 
   loadAvailableTimes() {
-    // En producción, cargar horarios disponibles del profesional
-    // Por ahora usar horarios mock
-    this.availableTimes = [
-      '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
-      '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00'
-    ];
+    if (this.selectedDate) {
+      // Simular horarios disponibles
+      this.availableTimes = [
+        '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
+        '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00'
+      ];
+    }
+  }
+
+  onDateChange() {
+    this.selectedTime = '';
+    this.loadAvailableTimes();
+  }
+
+  selectDateTime() {
+    if (this.selectedDate && this.selectedTime) {
+      this.step = 3;
+    }
   }
 
   confirmAppointment() {
-    if (!this.currentUser?.professional) {
-      this.notificationService.error('Error', 'No se pudo identificar el profesional');
-      return;
-    }
-
     const appointmentData = {
       patientId: this.selectedPatient.id,
-      professionalId: this.currentUser.professional.id,
       date: this.selectedDate,
       time: this.selectedTime,
       notes: this.notes,
@@ -91,7 +98,7 @@ export class ProfessionalAppointmentComponent implements OnInit {
     };
 
     this.loading = true;
-    this.appointmentService.createAppointment(appointmentData).subscribe({
+    this.appointmentService.createProfessionalAppointment(appointmentData).subscribe({
       next: (response) => {
         this.notificationService.success(
           'Turno agendado',

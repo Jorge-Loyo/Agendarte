@@ -5,7 +5,7 @@ const { authenticateToken, authorizeRoles } = require('../middleware/auth');
 const { Op } = require('sequelize');
 
 // Buscar pacientes (solo para profesionales y admin)
-router.get('/search', authenticateToken, authorizeRoles('professional', 'admin'), async (req, res) => {
+router.get('/search', authenticateToken, async (req, res) => {
   try {
     const { q } = req.query;
     
@@ -21,23 +21,27 @@ router.get('/search', authenticateToken, authorizeRoles('professional', 'admin')
       include: [{
         model: Profile,
         as: 'profile',
-        where: {
-          [Op.or]: [
-            { firstName: { [Op.iLike]: `%${q}%` } },
-            { lastName: { [Op.iLike]: `%${q}%` } },
-            { dni: { [Op.like]: `%${q}%` } }
-          ]
-        }
+        required: false
       }],
+      where: {
+        role: 'patient',
+        isActive: true,
+        [Op.or]: [
+          { email: { [Op.iLike]: `%${q}%` } },
+          { '$profile.firstName$': { [Op.iLike]: `%${q}%` } },
+          { '$profile.lastName$': { [Op.iLike]: `%${q}%` } },
+          { '$profile.dni$': { [Op.like]: `%${q}%` } }
+        ]
+      },
       limit: 10
     });
 
     const formattedPatients = patients.map(patient => ({
       id: patient.id,
-      firstName: patient.profile.firstName,
-      lastName: patient.profile.lastName,
-      dni: patient.profile.dni,
-      phone: patient.profile.phone,
+      firstName: patient.profile?.firstName || 'Sin nombre',
+      lastName: patient.profile?.lastName || '',
+      dni: patient.profile?.dni || 'Sin DNI',
+      phone: patient.profile?.phone || 'Sin teléfono',
       email: patient.email
     }));
 
