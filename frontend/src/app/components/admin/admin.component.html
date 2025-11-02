@@ -1,66 +1,17 @@
 <div class="admin-container">
   <h2>Panel de Administración</h2>
   
-  <div class="admin-section">
-    <h3>Gestión de Especialidades</h3>
-    
-    <!-- Formulario para nueva especialidad -->
-    <div class="add-specialty-form">
-      <h4>Agregar Nueva Especialidad</h4>
-      <div class="form-group">
-        <input 
-          type="text" 
-          [(ngModel)]="newSpecialty.name" 
-          placeholder="Nombre de la especialidad"
-          class="form-control">
-      </div>
-      <div class="form-group">
-        <textarea 
-          [(ngModel)]="newSpecialty.description" 
-          placeholder="Descripción (opcional)"
-          class="form-control"
-          rows="3"></textarea>
-      </div>
-      <button (click)="addSpecialty()" class="btn btn-primary">Agregar Especialidad</button>
+  <div class="admin-menu">
+    <div class="menu-card" routerLink="/app/admin/specialties">
+      <div class="menu-icon">🏥</div>
+      <h3>Gestionar Especialidades</h3>
+      <p>Crear, editar y eliminar especialidades médicas</p>
     </div>
-
-    <!-- Lista de especialidades -->
-    <div class="specialties-list">
-      <h4>Especialidades Existentes</h4>
-      <div *ngIf="loading" class="loading">Cargando...</div>
-      
-      <div *ngFor="let specialty of specialties" class="specialty-item">
-        <div *ngIf="editingSpecialty?.id !== specialty.id" class="specialty-view">
-          <div class="specialty-info">
-            <h5>{{specialty.name}}</h5>
-            <p>{{specialty.description}}</p>
-          </div>
-          <div class="specialty-actions">
-            <button (click)="editSpecialty(specialty)" class="btn btn-sm btn-secondary">Editar</button>
-            <button (click)="deleteSpecialty(specialty.id)" class="btn btn-sm btn-danger">Eliminar</button>
-          </div>
-        </div>
-
-        <!-- Formulario de edición -->
-        <div *ngIf="editingSpecialty?.id === specialty.id" class="specialty-edit">
-          <div class="form-group">
-            <input 
-              type="text" 
-              [(ngModel)]="editingSpecialty!.name" 
-              class="form-control">
-          </div>
-          <div class="form-group">
-            <textarea 
-              [(ngModel)]="editingSpecialty!.description" 
-              class="form-control"
-              rows="3"></textarea>
-          </div>
-          <div class="edit-actions">
-            <button (click)="updateSpecialty()" class="btn btn-sm btn-success">Guardar</button>
-            <button (click)="cancelEdit()" class="btn btn-sm btn-secondary">Cancelar</button>
-          </div>
-        </div>
-      </div>
+    
+    <div class="menu-card" routerLink="/app/professionals">
+      <div class="menu-icon">👨⚕️</div>
+      <h3>Ver Profesionales</h3>
+      <p>Lista completa de profesionales registrados</p>
     </div>
   </div>
 </div>

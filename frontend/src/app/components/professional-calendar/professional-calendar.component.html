@@ -1,0 +1,70 @@
+<div class="calendar-container">
+  <!-- Header -->
+  <div class="calendar-header">
+    <div class="professional-info" *ngIf="professional">
+      <h2>{{ professional.name }}</h2>
+      <p>{{ professional.specialty }}</p>
+    </div>
+    
+    <div class="month-navigation">
+      <button class="nav-btn" (click)="previousMonth()">←</button>
+      <h3>{{ monthNames[currentMonth - 1] }} {{ currentYear }}</h3>
+      <button class="nav-btn" (click)="nextMonth()">→</button>
+    </div>
+  </div>
+
+  <!-- Calendar Grid -->
+  <div class="calendar-grid">
+    <div class="day-header" *ngFor="let day of weekDays">{{ day }}</div>
+    
+    <div 
+      class="calendar-day"
+      *ngFor="let day of calendar"
+      [class]="getAvailabilityClass(day)"
+      [class.selected]="selectedDate?.date === day.date"
+      (click)="selectDate(day)">
+      
+      <div class="day-number">{{ day.date.split('-')[2] }}</div>
+      
+      <div class="availability-info" *ngIf="day.hasSchedule">
+        <span class="slots">{{ day.availableSlots }}/{{ day.totalSlots }}</span>
+        <div class="status-indicator"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Selected Date Details -->
+  <div class="date-details" *ngIf="selectedDate">
+    <h4>{{ selectedDate.date | date:'fullDate' }}</h4>
+    
+    <div class="time-slots">
+      <div 
+        class="time-slot"
+        *ngFor="let slot of selectedDate.slots"
+        [class.available]="slot.available"
+        [class.booked]="!slot.available">
+        {{ slot.time }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Legend -->
+  <div class="legend">
+    <div class="legend-item">
+      <div class="legend-color available"></div>
+      <span>Disponible</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color limited-availability"></div>
+      <span>Disponibilidad limitada</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color fully-booked"></div>
+      <span>Completo</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color no-schedule"></div>
+      <span>Sin horario</span>
+    </div>
+  </div>
+</div>

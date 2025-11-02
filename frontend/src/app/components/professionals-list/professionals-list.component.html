@@ -79,6 +79,7 @@
       
       <div class="card-actions">
         <button class="btn-profile" (click)="viewProfile(prof)">Ver Perfil</button>
+        <button class="btn-calendar" [routerLink]="['/app/professional-calendar', prof.id]">Ver Calendario</button>
         <button class="btn-book" (click)="bookAppointment(prof)">Agendar Turno</button>
       </div>
     </div>

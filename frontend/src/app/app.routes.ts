@@ -20,11 +20,18 @@ export const routes: Routes = [
       { path: 'appointments', loadComponent: () => import('./components/appointments/appointments.component').then(m => m.AppointmentsComponent) },
       { path: 'professionals', loadComponent: () => import('./components/professionals/professionals.component').then(m => m.ProfessionalsComponent) },
       { path: 'find-professionals', loadComponent: () => import('./components/professionals-list/professionals-list.component').then(m => m.ProfessionalsListComponent) },
+      { path: 'professional-calendar/:id', loadComponent: () => import('./components/professional-calendar/professional-calendar.component').then(m => m.ProfessionalCalendarComponent) },
       { path: 'my-appointments', loadComponent: () => import('./components/my-appointments/my-appointments.component').then(m => m.MyAppointmentsComponent) },
       { path: 'profile', loadComponent: () => import('./components/profile/profile.component').then(m => m.ProfileComponent) },
       { path: 'medical-history', loadComponent: () => import('./components/medical-history/medical-history.component').then(m => m.MedicalHistoryComponent) },
       { path: 'professional-dashboard', loadComponent: () => import('./components/professional-dashboard/professional-dashboard.component').then(m => m.ProfessionalDashboardComponent) },
-      { path: 'admin', loadComponent: () => import('./components/admin/admin.component').then(m => m.AdminComponent) }
+      { 
+        path: 'admin', 
+        children: [
+          { path: '', loadComponent: () => import('./components/admin/admin.component').then(m => m.AdminComponent) },
+          { path: 'specialties', loadComponent: () => import('./components/admin/specialties/specialties.component').then(m => m.SpecialtiesComponent) }
+        ]
+      }
     ]
   },
   { path: '**', redirectTo: '/home' }

@@ -10,6 +10,7 @@ const { testConnection, syncDatabase } = require('./config/database');
 const { User, Profile, Professional, Appointment, Specialty } = require('./models');
 const { seedProfessionals } = require('./seeders/professionals');
 const seedSpecialties = require('./seeders/specialties');
+const { seedSchedules } = require('./seeders/schedules');
 
 // Importar rutas
 const homeRoutes = require("./routes/home.routes");
@@ -35,6 +36,7 @@ app.use("/api/profile", require("./routes/profile.routes"));
 app.use("/api/appointments", require("./routes/appointment.routes"));
 app.use("/api/professionals", require("./routes/professional.routes"));
 app.use("/api/specialties", require("./routes/specialty.routes"));
+app.use("/api/calendar", require("./routes/calendar.routes"));
 
 // Ruta raíz
 app.get("/", (req, res) => {
@@ -69,6 +71,7 @@ const startServer = async () => {
     // Crear datos de prueba
     await seedSpecialties();
     await seedProfessionals();
+    await seedSchedules();
     
     // Iniciar servidor
     app.listen(PORT, () => {

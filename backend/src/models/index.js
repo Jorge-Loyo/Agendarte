@@ -3,6 +3,7 @@ const Profile = require('./Profile');
 const Professional = require('./Professional');
 const Appointment = require('./Appointment');
 const Specialty = require('./specialty.model');
+const Schedule = require('./Schedule');
 
 // Asociaciones User - Profile
 User.hasOne(Profile, { 
@@ -54,10 +55,21 @@ Appointment.belongsTo(User, {
   as: 'creator' 
 });
 
+// Asociaciones Professional - Schedule
+Professional.hasMany(Schedule, { 
+  foreignKey: 'professionalId', 
+  as: 'schedules' 
+});
+Schedule.belongsTo(Professional, { 
+  foreignKey: 'professionalId', 
+  as: 'professional' 
+});
+
 module.exports = {
   User,
   Profile,
   Professional,
   Appointment,
-  Specialty
+  Specialty,
+  Schedule
 };
