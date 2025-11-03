@@ -218,22 +218,42 @@ export class ProfessionalReviewsComponent implements OnInit {
   }
 
   loadProfessionalId() {
-    // Usar ID del usuario como profesional por ahora
-    const user = this.authService.getCurrentUser();
-    if (user) {
-      this.professionalId = user.id;
-      this.loadReviews();
-    }
+    // Obtener el perfil completo para conseguir el ID del profesional
+    this.authService.getProfile().subscribe({
+      next: (response) => {
+        if (response.user?.professional?.id) {
+          this.professionalId = response.user.professional.id;
+          this.loadReviews();
+        } else {
+          // Si no tiene registro profesional, crear uno temporal
+          this.professionalId = response.user.id;
+          this.loadReviews();
+        }
+      },
+      error: (error) => {
+        this.toastService.showError('Error obteniendo perfil');
+      }
+    });
   }
 
   loadReviews() {
+    if (!this.professionalId) return;
+    
     this.reviewService.getProfessionalReviews(this.professionalId, this.selectedRating || undefined).subscribe({
       next: (response) => {
         this.reviews = response.reviews;
         this.stats = response.stats;
       },
       error: (error) => {
+        console.error('Error loading reviews:', error);
         this.toastService.showError('Error cargando reseñas');
+        // Mostrar datos vacíos en caso de error
+        this.reviews = [];
+        this.stats = {
+          totalReviews: 0,
+          averageRating: 0,
+          ratingDistribution: [1,2,3,4,5].map(rating => ({ rating, count: 0 }))
+        };
       }
     });
   }

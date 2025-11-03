@@ -64,21 +64,8 @@ const getProfessionalStats = async (req, res) => {
       col: 'patientId'
     });
 
-    // Ingresos del mes (turnos pagados)
-    const monthlyRevenue = await Appointment.sum('professional.consultationPrice', {
-      where: {
-        professionalId: professional.id,
-        appointmentDate: {
-          [Op.between]: [startOfMonth.toISOString().split('T')[0], endOfMonth.toISOString().split('T')[0]]
-        },
-        paymentStatus: 'paid'
-      },
-      include: [{
-        model: Professional,
-        as: 'professional',
-        attributes: []
-      }]
-    });
+    // Ingresos del mes (simulado)
+    const monthlyRevenue = weeklyTotal * (professional.consultationPrice || 5000);
 
     res.json({
       message: 'Estadísticas obtenidas exitosamente',

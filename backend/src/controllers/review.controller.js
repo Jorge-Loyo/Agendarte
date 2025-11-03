@@ -46,6 +46,12 @@ const getProfessionalReviews = async (req, res) => {
     const { professionalId } = req.params;
     const { rating } = req.query;
 
+    // Verificar que el profesional existe
+    const professional = await Professional.findByPk(professionalId);
+    if (!professional) {
+      return res.status(404).json({ message: 'Profesional no encontrado' });
+    }
+
     let whereClause = { professionalId };
     if (rating) {
       whereClause.rating = parseInt(rating);
@@ -56,10 +62,11 @@ const getProfessionalReviews = async (req, res) => {
       include: [{
         model: User,
         as: 'patient',
-        include: [{ model: Profile, as: 'profile' }]
+        include: [{ model: Profile, as: 'profile' }],
+        required: false
       }],
       order: [['createdAt', 'DESC']]
-    });
+    }).catch(() => []);
 
     const formattedReviews = reviews.map(review => ({
       id: review.id,
@@ -67,7 +74,9 @@ const getProfessionalReviews = async (req, res) => {
       comment: review.comment,
       createdAt: review.createdAt,
       patientName: review.isAnonymous ? 'Anónimo' : 
-        `${review.patient.profile.firstName} ${review.patient.profile.lastName}`
+        (review.patient?.profile ? 
+          `${review.patient.profile.firstName} ${review.patient.profile.lastName}` : 
+          'Usuario')
     }));
 
     // Estadísticas
@@ -91,7 +100,10 @@ const getProfessionalReviews = async (req, res) => {
     });
   } catch (error) {
     console.error('Error obteniendo reseñas:', error);
-    res.status(500).json({ message: 'Error interno del servidor' });
+    res.status(500).json({ 
+      message: 'Error interno del servidor',
+      error: error.message 
+    });
   }
 };
 

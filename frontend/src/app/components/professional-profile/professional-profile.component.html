@@ -108,15 +108,21 @@
               type="number" 
               id="experience" 
               name="experience"
-              [(ngModel)]="profile.experience">
+              [(ngModel)]="profile.experience"
+              min="0"
+              max="50"
+              placeholder="0">
           </div>
           <div class="form-group">
-            <label for="consultationFee">Precio de Consulta</label>
+            <label for="consultationFee">Precio de Consulta ($)</label>
             <input 
               type="number" 
               id="consultationFee" 
               name="consultationFee"
-              [(ngModel)]="profile.consultationFee">
+              [(ngModel)]="profile.consultationFee"
+              min="0"
+              step="100"
+              placeholder="5000">
           </div>
         </div>
         
@@ -137,7 +143,9 @@
             name="description"
             [(ngModel)]="profile.description" 
             rows="4"
-            placeholder="Describe tu experiencia y enfoque profesional..."></textarea>
+            maxlength="500"
+            placeholder="Describe tu experiencia y enfoque profesional... (máx. 500 caracteres)"></textarea>
+          <small class="char-counter">{{ (profile.description || '').length }}/500 caracteres</small>
         </div>
       </div>
 

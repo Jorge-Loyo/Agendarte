@@ -98,13 +98,12 @@ export class AuthService {
   }
 
   updateProfile(userData: any): Observable<any> {
-    return this.http.put(this.profileUrl, userData, {
+    return this.http.put(`${this.baseUrl}/profile`, userData, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     }).pipe(
       tap((response: any) => {
-        if (response.user) {
-          this.currentUserSubject.next(response.user);
-        }
+        // Recargar perfil después de actualizar
+        this.getProfile().subscribe();
       })
     );
   }
