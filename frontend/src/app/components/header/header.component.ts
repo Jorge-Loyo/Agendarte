@@ -58,6 +58,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
   private updateMenuOptions() {
     if (this.isLoggedIn) {
       this.availableMenuOptions = this.permissionsService.getAvailableMenuOptions();
+      // Debug: mostrar información del usuario y permisos
+      console.log('User logged in:', this.userProfile);
+      console.log('Available menu options:', this.availableMenuOptions);
+      this.permissionsService.debugUserPermissions();
     } else {
       this.availableMenuOptions = [];
     }

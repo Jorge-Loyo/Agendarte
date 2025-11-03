@@ -134,6 +134,14 @@ export class PermissionsService {
       requiredRoles: ['professional']
     },
     {
+      key: 'my_patients',
+      label: 'Mi Cartilla',
+      icon: '👥',
+      route: '/app/my-patients',
+      requiredPermissions: ['view_patient_history'],
+      requiredRoles: ['professional']
+    },
+    {
       key: 'admin_panel',
       label: 'Panel Admin',
       icon: '🛡️',
@@ -191,11 +199,23 @@ export class PermissionsService {
     const rolePermissions = this.getRolePermissions();
     const role = rolePermissions.find(r => r.key === roleKey);
     if (role) {
-      const permission = role.permissions.find(p => p.key === permissionKey);
+      let permission = role.permissions.find(p => p.key === permissionKey);
       if (permission) {
         permission.enabled = enabled;
-        this.updateRolePermissions(rolePermissions);
+      } else {
+        // Si el permiso no existe, lo creamos desde la lista global
+        const allPermissions = this.getAllPermissions();
+        const basePermission = allPermissions.find(p => p.key === permissionKey);
+        if (basePermission) {
+          role.permissions.push({
+            key: permissionKey,
+            name: basePermission.name,
+            description: basePermission.description,
+            enabled: enabled
+          });
+        }
       }
+      this.updateRolePermissions(rolePermissions);
     }
   }
 
@@ -220,17 +240,18 @@ export class PermissionsService {
     if (!user) return [];
 
     return this.menuOptions.filter(option => {
-      // Verificar rol requerido
+      // Verificar rol requerido primero
       if (option.requiredRoles && !option.requiredRoles.includes(user.role)) {
         return false;
       }
 
-      // Verificar permisos requeridos (usar OR en lugar de AND)
-      if (option.requiredPermissions.length > 0) {
-        return this.hasAnyPermission(option.requiredPermissions);
+      // Si no hay permisos requeridos, solo verificar rol
+      if (option.requiredPermissions.length === 0) {
+        return true;
       }
 
-      return true;
+      // Verificar que el usuario tenga AL MENOS UNO de los permisos requeridos
+      return option.requiredPermissions.some(permission => this.hasPermission(permission));
     });
   }
 
@@ -264,6 +285,22 @@ export class PermissionsService {
 
   getAllPermissions(): Permission[] {
     const allPermissions = new Map<string, Permission>();
+    
+    // Obtener todos los permisos de todos los roles por defecto
+    this.defaultRolePermissions.forEach(role => {
+      role.permissions.forEach(permission => {
+        if (!allPermissions.has(permission.key)) {
+          allPermissions.set(permission.key, {
+            key: permission.key,
+            name: permission.name,
+            description: permission.description,
+            enabled: false
+          });
+        }
+      });
+    });
+    
+    // También incluir permisos actuales por si se agregaron nuevos
     this.getRolePermissions().forEach(role => {
       role.permissions.forEach(permission => {
         if (!allPermissions.has(permission.key)) {
@@ -276,6 +313,7 @@ export class PermissionsService {
         }
       });
     });
+    
     return Array.from(allPermissions.values());
   }
 
@@ -310,5 +348,16 @@ export class PermissionsService {
   savePermissions(): void {
     const rolePermissions = this.getRolePermissions();
     localStorage.setItem('rolePermissions', JSON.stringify(rolePermissions));
+  }
+
+  debugUserPermissions(): void {
+    const user = this.authService.getCurrentUser();
+    console.log('Current user:', user);
+    if (user) {
+      const rolePermissions = this.getRolePermissions();
+      const userRole = rolePermissions.find(r => r.key === user.role);
+      console.log('User role permissions:', userRole);
+      console.log('Available menu options:', this.getAvailableMenuOptions());
+    }
   }
 }

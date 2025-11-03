@@ -39,4 +39,28 @@ export class ProfessionalService {
   getProfessionalById(id: number): Observable<any> {
     return this.http.get(`${this.baseUrl}/${id}`);
   }
+
+  getMyPatients(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/my-patients`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    });
+  }
+
+  getAvailablePatients(): Observable<any> {
+    return this.http.get(`http://localhost:3000/api/patients`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    });
+  }
+
+  addPatientToCartilla(patientId: number): Observable<any> {
+    return this.http.post(`${this.baseUrl}/add-patient`, { patientId }, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    });
+  }
+
+  removePatientFromCartilla(patientId: number): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/remove-patient/${patientId}`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    });
+  }
 }

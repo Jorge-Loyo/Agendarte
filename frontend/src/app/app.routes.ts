@@ -69,6 +69,12 @@ export const routes: Routes = [
       { path: 'payment/:id', loadComponent: () => import('./components/payment/payment.component').then(m => m.PaymentComponent) },
       { path: 'professional-reviews/:id', loadComponent: () => import('./components/public-professional-reviews/public-professional-reviews.component').then(m => m.PublicProfessionalReviewsComponent) },
       { 
+        path: 'my-patients', 
+        loadComponent: () => import('./components/professional-patients/professional-patients.component').then(m => m.ProfessionalPatientsComponent),
+        canActivate: [professionalPermissionsGuard],
+        data: { requiredPermissions: ['view_patient_history'] }
+      },
+      { 
         path: 'admin', 
         canActivate: [adminPermissionsGuard],
         children: [

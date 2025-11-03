@@ -47,6 +47,7 @@ export class AdminUsersComponent implements OnInit {
     this.currentUser = this.authService.getCurrentUser();
     this.loadUsers();
     this.loadSpecialties();
+    this.filteredUsers = [...this.users];
   }
 
   loadUsers() {
@@ -54,6 +55,7 @@ export class AdminUsersComponent implements OnInit {
     this.adminService.getUsers().subscribe({
       next: (users: any) => {
         this.users = users.users || users;
+        this.filteredUsers = [...this.users];
         this.loading = false;
       },
       error: (error: any) => {
@@ -115,12 +117,52 @@ export class AdminUsersComponent implements OnInit {
     return this.currentUser?.role === 'master' && user.id !== this.currentUser.id;
   }
 
+  showEditForm = false;
+  editingUser: any = null;
+
   editUser(user: any) {
-    // Implementar edición
+    this.editingUser = {
+      id: user.id,
+      email: user.email,
+      role: user.role,
+      firstName: user.profile?.firstName || '',
+      lastName: user.profile?.lastName || '',
+      dni: user.profile?.dni || '',
+      phone: user.profile?.phone || '',
+      specialty: user.professional?.specialty || '',
+      licenseNumber: user.professional?.licenseNumber || '',
+      password: ''
+    };
+    this.showEditForm = true;
+  }
+
+  updateUser() {
+    this.adminService.updateUser(this.editingUser.id, this.editingUser).subscribe({
+      next: () => {
+        this.loadUsers();
+        this.cancelEdit();
+      },
+      error: (error: any) => {
+        console.error('Error updating user:', error);
+      }
+    });
+  }
+
+  cancelEdit() {
+    this.showEditForm = false;
+    this.editingUser = null;
   }
 
   toggleUserStatus(user: any) {
-    // Implementar toggle de estado
+    const newStatus = !user.isActive;
+    this.adminService.updateUserRole(user.id, { role: user.role, isActive: newStatus }).subscribe({
+      next: () => {
+        this.loadUsers();
+      },
+      error: (error: any) => {
+        console.error('Error updating user status:', error);
+      }
+    });
   }
 
   deleteUser(user: any) {
@@ -140,5 +182,24 @@ export class AdminUsersComponent implements OnInit {
     if (confirm('¿Eliminar todos los usuarios de prueba?')) {
       // Implementar eliminación de usuarios de prueba
     }
+  }
+
+  selectedRole = '';
+  filteredUsers: any[] = [];
+
+  filterUsers() {
+    if (!this.selectedRole) {
+      this.filteredUsers = [...this.users];
+    } else {
+      this.filteredUsers = this.users.filter(user => user.role === this.selectedRole);
+    }
+  }
+
+  getUsersByRole(role: string): any[] {
+    return this.users.filter(user => user.role === role);
+  }
+
+  goBack(): void {
+    window.history.back();
   }
 }

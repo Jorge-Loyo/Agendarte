@@ -1,0 +1,78 @@
+<div class="patients-container">
+  <div class="header">
+    <h1>👥 Mi Cartilla de Pacientes</h1>
+    <button class="btn-add" (click)="showAddPatient = !showAddPatient">
+      {{ showAddPatient ? 'Cancelar' : '+ Agregar Paciente' }}
+    </button>
+  </div>
+
+  <!-- Add Patient Modal -->
+  <div class="add-patient-modal" *ngIf="showAddPatient">
+    <div class="modal-content">
+      <h3>Agregar Paciente a mi Cartilla</h3>
+      
+      <div class="search-bar">
+        <input 
+          type="text" 
+          [(ngModel)]="searchTerm" 
+          placeholder="Buscar por nombre o DNI..."
+          class="search-input">
+      </div>
+
+      <div class="available-patients">
+        <div class="patient-card" *ngFor="let patient of filteredAvailablePatients">
+          <div class="patient-info">
+            <div class="patient-avatar">
+              {{ patient.firstName?.charAt(0) }}{{ patient.lastName?.charAt(0) }}
+            </div>
+            <div class="patient-details">
+              <h4>{{ patient.firstName }} {{ patient.lastName }}</h4>
+              <p>DNI: {{ patient.dni }}</p>
+              <p>Email: {{ patient.email }}</p>
+            </div>
+          </div>
+          <button class="btn-add-small" (click)="addPatientToCartilla(patient)">
+            Agregar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- My Patients List -->
+  <div class="my-patients" *ngIf="!loading">
+    <h2>Mis Pacientes Activos ({{ myPatients.length }})</h2>
+    
+    <div class="patients-grid">
+      <div class="patient-card active" *ngFor="let patient of myPatients">
+        <div class="patient-info">
+          <div class="patient-avatar">
+            {{ patient.firstName?.charAt(0) }}{{ patient.lastName?.charAt(0) }}
+          </div>
+          <div class="patient-details">
+            <h4>{{ patient.firstName }} {{ patient.lastName }}</h4>
+            <p>DNI: {{ patient.dni }}</p>
+            <p>Email: {{ patient.email }}</p>
+            <p *ngIf="patient.phone">Tel: {{ patient.phone }}</p>
+          </div>
+        </div>
+        <div class="patient-actions">
+          <button class="btn-history" title="Ver historial">📋</button>
+          <button class="btn-remove" (click)="removePatientFromCartilla(patient)" title="Remover">🗑️</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="empty-state" *ngIf="myPatients.length === 0">
+      <p>No tienes pacientes en tu cartilla</p>
+      <button class="btn-add" (click)="showAddPatient = true">
+        Agregar tu primer paciente
+      </button>
+    </div>
+  </div>
+
+  <div class="loading" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Cargando pacientes...</p>
+  </div>
+</div>
