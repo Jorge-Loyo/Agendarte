@@ -35,13 +35,18 @@ export class Login {
     this.loading = true;
     this.error = '';
 
-    this.authService.login(this.email.toLowerCase(), this.password).subscribe({
+    console.log('Intentando login con:', { email: this.email, password: '***' });
+
+    this.authService.login(this.email, this.password).subscribe({
       next: (response) => {
+        console.log('Login exitoso:', response);
         this.router.navigate(['/app/dashboard']);
       },
       error: (error) => {
         console.error('Error completo:', error);
-        this.error = error.error?.message || error.message || 'Error de conexión';
+        console.error('Status:', error.status);
+        console.error('Message:', error.error?.message);
+        this.error = error.error?.message || 'Credenciales inválidas';
         this.loading = false;
       },
       complete: () => {

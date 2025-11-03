@@ -1,115 +1,252 @@
-<!-- Header promocional -->
-<header class="promo-header">
+<!-- Header -->
+<header class="medical-header">
   <div class="header-container">
     <div class="logo-brand">
-      <svg width="45" height="45" viewBox="0 0 45 45" fill="none">
-        <circle cx="22.5" cy="22.5" r="20" fill="var(--primary-color)" opacity="0.1"/>
-        <path d="M22.5 9v27M13.5 18l9 9 9-9" stroke="var(--primary-color)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-        <circle cx="22.5" cy="13.5" r="2.5" fill="var(--primary-color)"/>
-        <path d="M15 30h15" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round"/>
-      </svg>
+      <div class="logo-icon">🏥</div>
       <h1>Agendarte</h1>
     </div>
     <div class="header-actions">
-      <a routerLink="/login" class="btn-login">Iniciar Sesión Usuario</a>
-      <a routerLink="/login" class="btn-professional">Iniciar Sesión Profesional</a>
+      <a routerLink="/login" class="btn-login">Iniciar Sesión</a>
       <a routerLink="/register" class="btn-register">Registrarse</a>
     </div>
   </div>
 </header>
 
 <!-- Hero Section -->
-<section class="hero">
-  <div class="hero-card">
+<section class="hero-medical">
+  <div class="hero-container">
     <div class="hero-content">
-      <h1>Gestiona tus citas médicas de forma inteligente</h1>
-      <p>La plataforma que conecta pacientes y profesionales de la salud para una experiencia médica más eficiente</p>
+      <div class="hero-badge">👨‍⚕️ Diseñado para Profesionales de la Salud</div>
+      <h1>Transforma tu <span class="highlight">consulta médica</span> en una experiencia digital</h1>
+      <p>Gestiona tus pacientes, horarios y pagos desde una sola plataforma. Más tiempo para lo que realmente importa: cuidar a tus pacientes.</p>
+      <div class="hero-benefits">
+        <div class="benefit">
+          <span class="benefit-icon">⏰</span>
+          <span>Ahorra 3+ horas diarias</span>
+        </div>
+        <div class="benefit">
+          <span class="benefit-icon">💰</span>
+          <span>Aumenta tus ingresos</span>
+        </div>
+        <div class="benefit">
+          <span class="benefit-icon">📱</span>
+          <span>Acceso desde cualquier lugar</span>
+        </div>
+      </div>
       <div class="hero-buttons">
-        <a routerLink="/register" class="btn-primary">Comenzar Gratis</a>
-        <a href="#features" class="btn-secondary">Conocer Más</a>
+        <a routerLink="/register" class="btn-hero-primary">Comenzar Gratis</a>
+        <a href="#benefits" class="btn-hero-secondary">Ver Beneficios</a>
       </div>
     </div>
-    <div class="hero-image">
-      <div class="medical-illustration">
-        <div class="pulse-circle"></div>
-        <svg width="300" height="300" viewBox="0 0 300 300">
-          <circle cx="150" cy="150" r="120" fill="var(--primary-color)" opacity="0.1"/>
-          <path d="M150 80v140M100 120l50 50 50-50" stroke="var(--primary-color)" stroke-width="4" stroke-linecap="round"/>
-          <circle cx="150" cy="100" r="8" fill="var(--primary-color)"/>
-        </svg>
+    <div class="hero-visual">
+      <div class="medical-dashboard">
+        <div class="dashboard-card">
+          <h4>📅 Tu Agenda Hoy</h4>
+          <div class="appointment-item">
+            <span class="time">09:00</span>
+            <span class="patient">María González - Control</span>
+          </div>
+          <div class="appointment-item">
+            <span class="time">10:30</span>
+            <span class="patient">Carlos Ruiz - Consulta</span>
+          </div>
+          <div class="appointment-item">
+            <span class="time">14:00</span>
+            <span class="patient">Ana López - Seguimiento</span>
+          </div>
+        </div>
+        <div class="stats-card">
+          <h4>📊 Tus Estadísticas</h4>
+          <div class="stat-item">
+            <span class="stat-value">24</span>
+            <span class="stat-label">Pacientes esta semana</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value">4.9⭐</span>
+            <span class="stat-label">Calificación promedio</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Features Section -->
-<section id="features" class="features">
+<!-- Problemas que Resuelve -->
+<section class="problems-section">
   <div class="container">
-    <h2>Para Pacientes y Profesionales</h2>
+    <div class="section-header">
+      <h2>¿Cansado de estos problemas diarios?</h2>
+    </div>
+    <div class="problems-grid">
+      <div class="problem-card">
+        <div class="problem-icon">📞</div>
+        <h3>Llamadas constantes</h3>
+        <p>Pacientes llamando a toda hora para agendar, cancelar o reprogramar citas</p>
+      </div>
+      <div class="problem-card">
+        <div class="problem-icon">📅</div>
+        <h3>Agenda desorganizada</h3>
+        <p>Cuadernos, hojas sueltas y sistemas que no se sincronizan</p>
+      </div>
+      <div class="problem-card">
+        <div class="problem-icon">💰</div>
+        <h3>Pagos complicados</h3>
+        <p>Manejar efectivo, transferencias y comprobantes manualmente</p>
+      </div>
+      <div class="problem-card">
+        <div class="problem-icon">📄</div>
+        <h3>Historial disperso</h3>
+        <p>Notas de pacientes en diferentes lugares, difíciles de encontrar</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Solución -->
+<section id="benefits" class="solution-section">
+  <div class="container">
+    <div class="section-header">
+      <h2>Agendarte soluciona todo esto por ti</h2>
+      <p>Una plataforma completa que automatiza tu consulta</p>
+    </div>
     
-    <div class="features-grid">
-      <!-- Para Pacientes -->
-      <div class="feature-card patient-card">
-        <div class="card-icon">
-          <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
-            <circle cx="30" cy="20" r="8" stroke="var(--primary-color)" stroke-width="2"/>
-            <path d="M18 50c0-8 5.4-14 12-14s12 6 12 14" stroke="var(--primary-color)" stroke-width="2"/>
-          </svg>
-        </div>
-        <h3>Para Pacientes</h3>
+    <div class="solutions-grid">
+      <div class="solution-card">
+        <div class="solution-icon">🔄</div>
+        <h3>Agenda Automatizada</h3>
+        <p>Tus pacientes agendan online 24/7. Tú solo te enfocas en atender.</p>
         <ul>
-          <li>Agenda citas 24/7</li>
-          <li>Encuentra especialistas</li>
-          <li>Historial médico digital</li>
-          <li>Recordatorios automáticos</li>
+          <li>Configuración flexible de horarios</li>
+          <li>Bloqueo automático de horarios ocupados</li>
+          <li>Recordatorios automáticos por email y WhatsApp</li>
         </ul>
       </div>
 
-      <!-- Para Profesionales -->
-      <div class="feature-card professional-card">
-        <div class="card-icon">
-          <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
-            <rect x="15" y="10" width="30" height="40" rx="3" stroke="var(--primary-color)" stroke-width="2"/>
-            <path d="M25 20h10M25 30h10M25 40h6" stroke="var(--primary-color)" stroke-width="2"/>
-          </svg>
-        </div>
-        <h3>Para Profesionales</h3>
+      <div class="solution-card">
+        <div class="solution-icon">💳</div>
+        <h3>Pagos Digitales</h3>
+        <p>Cobra automáticamente con MercadoPago. Sin efectivo, sin complicaciones.</p>
         <ul>
-          <li>Gestión de agenda inteligente</li>
+          <li>Pagos seguros con tarjeta</li>
+          <li>Confirmación automática de turnos</li>
+          <li>Control total de tus ingresos</li>
+        </ul>
+      </div>
+
+      <div class="solution-card">
+        <div class="solution-icon">📊</div>
+        <h3>Historial Digital</h3>
+        <p>Toda la información de tus pacientes organizada y accesible al instante.</p>
+        <ul>
+          <li>Notas de consulta con auto-guardado</li>
+          <li>Historial completo por paciente</li>
+          <li>Búsqueda rápida y filtros</li>
+        </ul>
+      </div>
+
+      <div class="solution-card">
+        <div class="solution-icon">⭐</div>
+        <h3>Reputación Online</h3>
+        <p>Construye tu prestigio con reseñas de pacientes satisfechos.</p>
+        <ul>
+          <li>Sistema de calificaciones</li>
           <li>Perfil profesional completo</li>
-          <li>Sistema de valoraciones</li>
-          <li>Reportes y estadísticas</li>
+          <li>Mayor visibilidad para nuevos pacientes</li>
         </ul>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Benefits Section -->
-<section class="benefits">
+<!-- Beneficios Económicos -->
+<section class="roi-section">
   <div class="container">
-    <div class="benefits-content">
-      <h2>¿Por qué elegir Agendarte?</h2>
-      <div class="benefits-list">
-        <div class="benefit-item">
-          <div class="benefit-icon">✓</div>
-          <div>
-            <h4>Fácil de usar</h4>
-            <p>Interfaz intuitiva diseñada para todos</p>
+    <div class="roi-content">
+      <div class="roi-info">
+        <h2>Invierte en tu crecimiento profesional</h2>
+        <div class="roi-calculation">
+          <div class="roi-item">
+            <span class="roi-icon">⏰</span>
+            <div>
+              <h4>Ahorra 15+ horas semanales</h4>
+              <p>Menos tiempo en tareas administrativas, más tiempo para pacientes</p>
+            </div>
+          </div>
+          <div class="roi-item">
+            <span class="roi-icon">📈</span>
+            <div>
+              <h4>Aumenta 30% tus consultas</h4>
+              <p>Agenda optimizada y mayor visibilidad online</p>
+            </div>
+          </div>
+          <div class="roi-item">
+            <span class="roi-icon">💰</span>
+            <div>
+              <h4>Reduce 90% pagos perdidos</h4>
+              <p>Cobro automático antes de la consulta</p>
+            </div>
           </div>
         </div>
-        <div class="benefit-item">
-          <div class="benefit-icon">✓</div>
+      </div>
+      <div class="roi-visual">
+        <div class="roi-card">
+          <h3>Tu ROI en 30 días</h3>
+          <div class="roi-numbers">
+            <div class="roi-before">
+              <span class="label">Antes</span>
+              <span class="value">$50,000/mes</span>
+            </div>
+            <div class="roi-arrow">→</div>
+            <div class="roi-after">
+              <span class="label">Con Agendarte</span>
+              <span class="value">$65,000/mes</span>
+            </div>
+          </div>
+          <p class="roi-note">*Basado en promedio de profesionales que usan la plataforma</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Testimonios -->
+<section class="testimonials-section">
+  <div class="container">
+    <h2>Lo que dicen los profesionales</h2>
+    <div class="testimonials-grid">
+      <div class="testimonial-card">
+        <div class="testimonial-content">
+          <p>"Agendarte transformó mi consulta. Ahora mis pacientes agendan solos y yo me enfoco en lo importante: atenderlos bien."</p>
+        </div>
+        <div class="testimonial-author">
+          <div class="author-avatar">👨‍⚕️</div>
           <div>
-            <h4>Seguro y confiable</h4>
-            <p>Protección de datos médicos garantizada</p>
+            <h4>Dr. Carlos Méndez</h4>
+            <span>Cardiología</span>
           </div>
         </div>
-        <div class="benefit-item">
-          <div class="benefit-icon">✓</div>
+      </div>
+      <div class="testimonial-card">
+        <div class="testimonial-content">
+          <p>"El sistema de pagos es increíble. Ya no tengo que preocuparme por cobrar, todo es automático y seguro."</p>
+        </div>
+        <div class="testimonial-author">
+          <div class="author-avatar">👩‍⚕️</div>
           <div>
-            <h4>Disponible siempre</h4>
-            <p>Acceso 24/7 desde cualquier dispositivo</p>
+            <h4>Dra. Ana Rodríguez</h4>
+            <span>Dermatología</span>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <div class="testimonial-content">
+          <p>"Mis pacientes están más satisfechos y yo tengo toda su información organizada. Es el futuro de la medicina."</p>
+        </div>
+        <div class="testimonial-author">
+          <div class="author-avatar">👨‍⚕️</div>
+          <div>
+            <h4>Dr. Luis García</h4>
+            <span>Medicina General</span>
           </div>
         </div>
       </div>
@@ -117,18 +254,53 @@
   </div>
 </section>
 
-<!-- CTA Section -->
-<section class="cta">
+<!-- CTA Final -->
+<section class="final-cta">
   <div class="container">
-    <h2>Comienza hoy mismo</h2>
-    <p>Únete a miles de usuarios que ya confían en Agendarte</p>
-    <a routerLink="/register" class="btn-cta">Crear Cuenta Gratis</a>
+    <div class="cta-content">
+      <h2>¿Listo para modernizar tu consulta?</h2>
+      <p>Comienza gratis hoy y transforma tu práctica médica</p>
+      <div class="cta-buttons">
+        <a routerLink="/register" class="btn-cta-primary">Comenzar Gratis</a>
+        <a routerLink="/login" class="btn-cta-secondary">Ya tengo cuenta</a>
+      </div>
+      <div class="cta-guarantee">
+        <small>✨ Sin permanencia • Configuración en 5 minutos • Soporte personalizado</small>
+      </div>
+    </div>
   </div>
 </section>
 
 <!-- Footer -->
-<footer class="footer">
+<footer class="medical-footer">
   <div class="container">
-    <p>&copy; 2024 Agendarte. Todos los derechos reservados.</p>
+    <div class="footer-content">
+      <div class="footer-brand">
+        <div class="logo-icon">🏥</div>
+        <h3>Agendarte</h3>
+        <p>Modernizando la atención médica</p>
+      </div>
+      <div class="footer-links">
+        <div class="footer-section">
+          <h4>Contacto</h4>
+          <p>📧 administrador@agilizesoluciones.com</p>
+          <p>📞 +54 9 11 6168-2555</p>
+        </div>
+        <div class="footer-section">
+          <h4>Soporte</h4>
+          <p>Lunes a Viernes</p>
+          <p>9:00 - 18:00 hs</p>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copyright">
+        <p>&copy; 2024 Agendarte. Todos los derechos reservados.</p>
+        <p>Desarrollado por <strong>Agilize Soluciones</strong></p>
+      </div>
+      <div class="footer-tech">
+        <span class="tech-badge">Hecho con ❤️ para profesionales de la salud</span>
+      </div>
+    </div>
   </div>
 </footer>

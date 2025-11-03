@@ -4,7 +4,7 @@ const { User } = require('../models');
 const authenticateToken = async (req, res, next) => {
   try {
     const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+    const token = authHeader && authHeader.split(' ')[1];
 
     if (!token) {
       return res.status(401).json({ 
@@ -12,8 +12,16 @@ const authenticateToken = async (req, res, next) => {
       });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findByPk(decoded.userId);
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      console.error('JWT_SECRET no configurado');
+      return res.status(500).json({ message: 'Error de configuración del servidor' });
+    }
+
+    const decoded = jwt.verify(token, secret);
+    const user = await User.findByPk(decoded.userId, {
+      attributes: { exclude: ['password'] }
+    });
 
     if (!user || !user.isActive) {
       return res.status(401).json({ 
@@ -24,9 +32,14 @@ const authenticateToken = async (req, res, next) => {
     req.user = user;
     next();
   } catch (error) {
-    return res.status(403).json({ 
-      message: 'Token inválido' 
-    });
+    if (error.name === 'TokenExpiredError') {
+      return res.status(401).json({ message: 'Token expirado' });
+    }
+    if (error.name === 'JsonWebTokenError') {
+      return res.status(403).json({ message: 'Token inválido' });
+    }
+    console.error('Error en autenticación:', error.message);
+    return res.status(500).json({ message: 'Error interno del servidor' });
   }
 };
 

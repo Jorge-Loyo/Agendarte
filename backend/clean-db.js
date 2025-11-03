@@ -22,25 +22,59 @@ const cleanDatabase = async () => {
       ON CONFLICT (name) DO NOTHING;
     `);
     
-    // Crear usuario master
-    const hashedPassword = await bcrypt.hash('Password123!', 10);
-    const [user] = await sequelize.query(`
-      INSERT INTO users (email, password, role, is_active, created_at, updated_at) 
-      VALUES ('jorgenayati@gmail.com', '${hashedPassword}', 'master', true, NOW(), NOW())
-      RETURNING id;
+    // Crear o actualizar usuario master
+    const hashedPassword = await bcrypt.hash('Matris94', 10);
+    
+    // Verificar si existe
+    const [existingUser] = await sequelize.query(`
+      SELECT id FROM users WHERE email = 'jorgenayati@gmail.com';
     `);
     
-    const userId = user[0].id;
-    
-    await sequelize.query(`
-      INSERT INTO profiles (user_id, first_name, last_name, dni, created_at, updated_at)
-      VALUES (${userId}, 'Jorge', 'Loyo', '12345678', NOW(), NOW());
-    `);
+    let userId;
+    if (existingUser.length > 0) {
+      // Actualizar usuario existente
+      userId = existingUser[0].id;
+      await sequelize.query(`
+        UPDATE users SET password = '${hashedPassword}', role = 'master', is_active = true 
+        WHERE email = 'jorgenayati@gmail.com';
+      `);
+      
+      // Verificar y actualizar perfil
+      const [existingProfile] = await sequelize.query(`
+        SELECT id FROM profiles WHERE user_id = ${userId};
+      `);
+      
+      if (existingProfile.length > 0) {
+        await sequelize.query(`
+          UPDATE profiles SET first_name = 'Jorge', last_name = 'Loyo', dni = '12345678', updated_at = NOW()
+          WHERE user_id = ${userId};
+        `);
+      } else {
+        await sequelize.query(`
+          INSERT INTO profiles (user_id, first_name, last_name, dni, created_at, updated_at)
+          VALUES (${userId}, 'Jorge', 'Loyo', '12345678', NOW(), NOW());
+        `);
+      }
+    } else {
+      // Crear nuevo usuario
+      const [user] = await sequelize.query(`
+        INSERT INTO users (email, password, role, is_active, created_at, updated_at) 
+        VALUES ('jorgenayati@gmail.com', '${hashedPassword}', 'master', true, NOW(), NOW())
+        RETURNING id;
+      `);
+      
+      userId = user[0].id;
+      
+      await sequelize.query(`
+        INSERT INTO profiles (user_id, first_name, last_name, dni, created_at, updated_at)
+        VALUES (${userId}, 'Jorge', 'Loyo', '12345678', NOW(), NOW());
+      `);
+    }
     
     console.log('✅ Base de datos limpiada');
     console.log('✅ Especialidades creadas');
     console.log('✅ Usuario master creado: jorgenayati@gmail.com');
-    console.log('🔑 Contraseña: Password123!');
+    console.log('🔑 Contraseña: Matris94');
     
     process.exit(0);
   } catch (error) {

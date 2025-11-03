@@ -12,7 +12,11 @@ const sendConfirmationEmail = async (email, firstName) => {
 };
 
 const generateToken = (userId) => {
-  return jwt.sign({ userId }, process.env.JWT_SECRET, {
+  const secret = process.env.JWT_SECRET;
+  if (!secret || secret.length < 32) {
+    throw new Error('JWT_SECRET debe tener al menos 32 caracteres');
+  }
+  return jwt.sign({ userId }, secret, {
     expiresIn: process.env.JWT_EXPIRES_IN || '24h'
   });
 };
@@ -101,7 +105,7 @@ const login = async (req, res) => {
 
     // Buscar usuario
     const user = await User.findOne({ 
-      where: { email },
+      where: { email: email.toLowerCase() },
       include: [{
         model: Profile,
         as: 'profile'

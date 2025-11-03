@@ -2,11 +2,12 @@ const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/auth.controller');
 const { authenticateToken } = require('../middleware/auth');
-const { validateRegister, validateLogin } = require('../middleware/validation');
+const { validateRegisterSecure, validateLoginSecure } = require('../middleware/validation');
+const { loginLimiter, registerLimiter } = require('../middleware/security');
 
-// Rutas públicas
-router.post('/register', validateRegister, authController.register);
-router.post('/login', validateLogin, authController.login);
+// Rutas públicas con rate limiting
+router.post('/register', registerLimiter, validateRegisterSecure, authController.register);
+router.post('/login', loginLimiter, validateLoginSecure, authController.login);
 
 // Rutas protegidas
 router.get('/profile', authenticateToken, authController.getProfile);

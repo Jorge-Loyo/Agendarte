@@ -1,4 +1,56 @@
 const Joi = require('joi');
+const { body, validationResult } = require('express-validator');
+
+// Middleware para manejar errores de validación
+const handleValidationErrors = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({
+      message: 'Datos inválidos',
+      errors: errors.array().map(error => error.msg)
+    });
+  }
+  next();
+};
+
+// Validadores con express-validator (más seguros)
+const validateRegisterSecure = [
+  body('email')
+    .isEmail()
+    .normalizeEmail()
+    .withMessage('Email debe ser válido'),
+  body('password')
+    .isLength({ min: 8 })
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)
+    .withMessage('Contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial'),
+  body('firstName')
+    .trim()
+    .isLength({ min: 2, max: 50 })
+    .matches(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/)
+    .withMessage('Nombre debe tener entre 2-50 caracteres y solo letras'),
+  body('lastName')
+    .trim()
+    .isLength({ min: 2, max: 50 })
+    .matches(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/)
+    .withMessage('Apellido debe tener entre 2-50 caracteres y solo letras'),
+  body('dni')
+    .trim()
+    .isLength({ min: 7, max: 20 })
+    .matches(/^[0-9]+$/)
+    .withMessage('DNI debe tener entre 7-20 dígitos'),
+  handleValidationErrors
+];
+
+const validateLoginSecure = [
+  body('email')
+    .isEmail()
+    .normalizeEmail()
+    .withMessage('Email debe ser válido'),
+  body('password')
+    .notEmpty()
+    .withMessage('Contraseña es requerida'),
+  handleValidationErrors
+];
 
 const validateRegister = (req, res, next) => {
   const schema = Joi.object({
@@ -77,5 +129,8 @@ const validateLogin = (req, res, next) => {
 
 module.exports = {
   validateRegister,
-  validateLogin
+  validateLogin,
+  validateRegisterSecure,
+  validateLoginSecure,
+  handleValidationErrors
 };

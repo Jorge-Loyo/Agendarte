@@ -3,6 +3,9 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 require('dotenv').config();
 
+// Importar middleware de seguridad
+const { apiLimiter, debugOnly, helmetConfig } = require('./middleware/security');
+
 // Importar configuración de base de datos
 const { testConnection, syncDatabase } = require('./config/database');
 
@@ -16,11 +19,19 @@ const createMasterUser = async () => {
     const bcrypt = require('bcryptjs');
     const { User, Profile } = require('./models');
     
-    const email = 'jorgenayati@gmail.com';
+    const email = process.env.MASTER_EMAIL || 'admin@agendarte.com';
+    const password = process.env.MASTER_PASSWORD;
+    
+    if (!password) {
+      console.warn('⚠️ MASTER_PASSWORD no configurado en variables de entorno');
+      return;
+    }
+    
     let user = await User.findOne({ where: { email } });
     
     if (!user) {
-      const hashedPassword = await bcrypt.hash('Password123!', 10);
+      const saltRounds = parseInt(process.env.BCRYPT_ROUNDS) || 12;
+      const hashedPassword = await bcrypt.hash(password, saltRounds);
       user = await User.create({
         email,
         password: hashedPassword,
@@ -30,9 +41,9 @@ const createMasterUser = async () => {
       
       await Profile.create({
         userId: user.id,
-        firstName: 'Jorge',
-        lastName: 'Loyo',
-        dni: '12345678'
+        firstName: 'Admin',
+        lastName: 'Master',
+        dni: 'ADMIN001'
       });
       
       console.log('✅ Usuario master creado:', email);
@@ -41,7 +52,7 @@ const createMasterUser = async () => {
       console.log('✅ Usuario master actualizado:', email);
     }
   } catch (error) {
-    console.error('❌ Error creando usuario master:', error);
+    console.error('❌ Error creando usuario master:', error.message);
   }
 };
 
@@ -53,14 +64,22 @@ const authRoutes = require("./routes/auth.routes");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
+// Middleware de seguridad
+app.use(helmetConfig);
+app.use(apiLimiter);
+
+// CORS
 app.use(cors({
-  origin: ['http://localhost:4200', 'http://localhost:52632'],
+  origin: process.env.NODE_ENV === 'production' 
+    ? process.env.FRONTEND_URL?.split(',') || []
+    : ['http://localhost:4200', 'http://[::1]:4200', 'http://127.0.0.1:4200', 'http://localhost:52632'],
   credentials: true
 }));
-app.use(express.json());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+
+// Body parsing
+app.use(express.json({ limit: '10mb' }));
+app.use(bodyParser.json({ limit: '10mb' }));
+app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 
 // Rutas
 app.use("/api/home", homeRoutes);
@@ -104,8 +123,8 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-// Ruta para verificar citas en BD
-app.get("/api/debug/appointments", async (req, res) => {
+// Ruta para verificar citas en BD (solo desarrollo)
+app.get("/api/debug/appointments", debugOnly, async (req, res) => {
   try {
     const appointments = await Appointment.findAll({
       include: [{
@@ -131,8 +150,8 @@ app.get("/api/debug/appointments", async (req, res) => {
   }
 });
 
-// Ruta para verificar usuarios
-app.get("/api/debug/users", async (req, res) => {
+// Ruta para verificar usuarios (solo desarrollo)
+app.get("/api/debug/users", debugOnly, async (req, res) => {
   try {
     const users = await User.findAll({
       include: [{ model: Profile, as: 'profile' }],
@@ -152,8 +171,8 @@ app.get("/api/debug/users", async (req, res) => {
   }
 });
 
-// Crear cita de prueba para historial
-app.post("/api/debug/create-history", async (req, res) => {
+// Crear cita de prueba para historial (solo desarrollo)
+app.post("/api/debug/create-history", debugOnly, async (req, res) => {
   try {
     const appointment = await Appointment.create({
       patientId: 3, // Ana García
@@ -171,8 +190,8 @@ app.post("/api/debug/create-history", async (req, res) => {
   }
 });
 
-// Crear múltiples citas para estadísticas
-app.post("/api/debug/create-stats-data", async (req, res) => {
+// Crear múltiples citas para estadísticas (solo desarrollo)
+app.post("/api/debug/create-stats-data", debugOnly, async (req, res) => {
   try {
     const today = new Date().toISOString().split('T')[0];
     const professional = await Professional.findOne({ where: { userId: 7 } });
@@ -211,8 +230,8 @@ app.post("/api/debug/create-stats-data", async (req, res) => {
   }
 });
 
-// Obtener turnos del profesional
-app.get("/api/debug/professional-appointments/:userId", async (req, res) => {
+// Obtener turnos del profesional (solo desarrollo)
+app.get("/api/debug/professional-appointments/:userId", debugOnly, async (req, res) => {
   try {
     const { userId } = req.params;
     const professional = await Professional.findOne({ where: { userId } });
@@ -248,8 +267,8 @@ app.get("/api/debug/professional-appointments/:userId", async (req, res) => {
   }
 });
 
-// Debug: Verificar usuario específico
-app.get("/api/debug/user/:email", async (req, res) => {
+// Debug: Verificar usuario específico (solo desarrollo)
+app.get("/api/debug/user/:email", debugOnly, async (req, res) => {
   try {
     const { email } = req.params;
     const user = await User.findOne({
@@ -274,7 +293,7 @@ app.get("/api/debug/user/:email", async (req, res) => {
 });
 
 // Limpiar base de datos (solo para desarrollo)
-app.post("/api/debug/clean-database", async (req, res) => {
+app.post("/api/debug/clean-database", debugOnly, async (req, res) => {
   try {
     const { User, Profile, Professional, Appointment, Schedule, Notification, UserPreference, Review } = require('./models');
     
