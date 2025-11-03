@@ -22,6 +22,12 @@ router.put('/users/:userId',
   adminController.updateUserRole
 );
 
+router.put('/users/:userId/full', 
+  authenticateToken, 
+  authorizeRoles('admin', 'master'), 
+  adminController.updateUserFull
+);
+
 router.delete('/users/:userId', 
   authenticateToken, 
   authorizeRoles('master'), 

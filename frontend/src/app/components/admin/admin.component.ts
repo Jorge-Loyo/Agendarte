@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { AdminService } from '../../services/admin.service';
 import { NotificationService } from '../../services/notification.service';
 import { AuthService } from '../../services/auth.service';
+import { SpecialtyService } from '../../services/specialty.service';
 
 @Component({
   selector: 'app-admin',
@@ -14,9 +15,14 @@ import { AuthService } from '../../services/auth.service';
 })
 export class AdminComponent implements OnInit {
   users: any[] = [];
+  specialties: any[] = [];
   loading = false;
   showCreateForm = false;
+  showCreateSpecialty = false;
+  showEditForm = false;
   currentUser: any = null;
+  activeTab: 'users' | 'specialties' = 'users';
+  editingUser: any = null;
 
   // Formulario de creación
   newUser = {
@@ -31,6 +37,11 @@ export class AdminComponent implements OnInit {
     licenseNumber: ''
   };
 
+  newSpecialty = {
+    name: '',
+    description: ''
+  };
+
   roles = [
     { value: 'patient', label: 'Paciente' },
     { value: 'professional', label: 'Profesional' },
@@ -41,7 +52,8 @@ export class AdminComponent implements OnInit {
   constructor(
     private adminService: AdminService,
     private notificationService: NotificationService,
-    private authService: AuthService
+    private authService: AuthService,
+    private specialtyService: SpecialtyService
   ) {}
 
   ngOnInit(): void {
@@ -49,18 +61,83 @@ export class AdminComponent implements OnInit {
       this.currentUser = user;
     });
     this.loadUsers();
+    this.loadSpecialties();
+  }
+
+  loadSpecialties(): void {
+    this.specialtyService.getSpecialties().subscribe({
+      next: (specialties) => {
+        this.specialties = specialties;
+      },
+      error: (error) => {
+        console.error('Error cargando especialidades:', error);
+        this.notificationService.error('Error', 'No se pudieron cargar las especialidades');
+      }
+    });
+  }
+
+  createSpecialty(): void {
+    if (!this.newSpecialty.name) {
+      this.notificationService.error('Error', 'El nombre es requerido');
+      return;
+    }
+
+    this.specialtyService.createSpecialty(this.newSpecialty).subscribe({
+      next: (response) => {
+        this.notificationService.success('Éxito', 'Especialidad creada exitosamente');
+        this.loadSpecialties();
+        this.resetSpecialtyForm();
+        this.showCreateSpecialty = false;
+      },
+      error: (error) => {
+        console.error('Error creando especialidad:', error);
+        this.notificationService.error('Error', error.error?.message || 'No se pudo crear la especialidad');
+      }
+    });
+  }
+
+  toggleSpecialtyStatus(specialty: any): void {
+    const newStatus = !specialty.isActive;
+    this.specialtyService.updateSpecialty(specialty.id, { isActive: newStatus }).subscribe({
+      next: (response) => {
+        this.notificationService.success('Éxito', `Especialidad ${newStatus ? 'activada' : 'desactivada'}`);
+        this.loadSpecialties();
+      },
+      error: (error) => {
+        console.error('Error actualizando especialidad:', error);
+        this.notificationService.error('Error', 'No se pudo actualizar la especialidad');
+      }
+    });
+  }
+
+  resetSpecialtyForm(): void {
+    this.newSpecialty = {
+      name: '',
+      description: ''
+    };
   }
 
   loadUsers(): void {
     this.loading = true;
+    console.log('Cargando usuarios...');
+    console.log('Token existe:', !!localStorage.getItem('token'));
+    console.log('Usuario actual:', this.currentUser);
+    
     this.adminService.getAllUsers().subscribe({
       next: (response) => {
+        console.log('Respuesta del servidor:', response);
         this.users = response.users;
         this.loading = false;
       },
       error: (error) => {
         console.error('Error cargando usuarios:', error);
-        this.notificationService.error('Error', 'No se pudieron cargar los usuarios');
+        if (error.status === 401) {
+          this.notificationService.error('Error', 'Sesión expirada. Por favor, inicia sesión nuevamente.');
+        } else if (error.status === 403) {
+          this.notificationService.error('Error', 'No tienes permisos para acceder a esta sección.');
+        } else {
+          this.notificationService.error('Error', 'No se pudieron cargar los usuarios');
+        }
         this.loading = false;
       }
     });
@@ -84,6 +161,12 @@ export class AdminComponent implements OnInit {
         this.notificationService.error('Error', error.error?.message || 'No se pudo crear el usuario');
       }
     });
+  }
+
+  onRoleChange(user: any, event: Event): void {
+    const target = event.target as HTMLSelectElement;
+    const newRole = target.value;
+    this.updateUserRole(user, newRole);
   }
 
   updateUserRole(user: any, newRole: string): void {
@@ -114,15 +197,18 @@ export class AdminComponent implements OnInit {
   }
 
   deleteUser(user: any): void {
-    if (confirm(`¿Está seguro de desactivar al usuario ${user.email}?`)) {
+    const hasImportantData = user.profile && (user.profile.dni || user.profile.phone);
+    const action = hasImportantData ? 'desactivar' : 'eliminar';
+    
+    if (confirm(`¿Está seguro de ${action} al usuario ${user.email}?`)) {
       this.adminService.deleteUser(user.id).subscribe({
         next: (response) => {
-          this.notificationService.success('Éxito', 'Usuario desactivado exitosamente');
+          this.notificationService.success('Éxito', response.message);
           this.loadUsers();
         },
         error: (error) => {
-          console.error('Error desactivando usuario:', error);
-          this.notificationService.error('Error', 'No se pudo desactivar el usuario');
+          console.error('Error eliminando usuario:', error);
+          this.notificationService.error('Error', 'No se pudo eliminar el usuario');
         }
       });
     }
@@ -142,6 +228,70 @@ export class AdminComponent implements OnInit {
     };
   }
 
+  editUser(user: any): void {
+    this.editingUser = {
+      id: user.id,
+      email: user.email,
+      role: user.role,
+      firstName: user.profile?.firstName || '',
+      lastName: user.profile?.lastName || '',
+      dni: user.profile?.dni || '',
+      phone: user.profile?.phone || '',
+      password: '',
+      specialty: user.professional?.specialty || '',
+      licenseNumber: user.professional?.licenseNumber || ''
+    };
+    this.showEditForm = true;
+  }
+
+  updateUser(): void {
+    if (!this.editingUser.email || !this.editingUser.firstName || !this.editingUser.lastName) {
+      this.notificationService.error('Error', 'Complete los campos obligatorios');
+      return;
+    }
+
+    this.adminService.updateUser(this.editingUser.id, this.editingUser).subscribe({
+      next: (response) => {
+        this.notificationService.success('Éxito', 'Usuario actualizado exitosamente');
+        this.loadUsers();
+        this.cancelEdit();
+      },
+      error: (error) => {
+        console.error('Error actualizando usuario:', error);
+        this.notificationService.error('Error', error.error?.message || 'No se pudo actualizar el usuario');
+      }
+    });
+  }
+
+  cancelEdit(): void {
+    this.showEditForm = false;
+    this.editingUser = null;
+  }
+
+  deleteTestUsers(): void {
+    const testEmails = [
+      'Prueba@test.com',
+      'jorgenayaticmi@gmail.com',
+      'prueba@prueba.com',
+      'paciente@agendarte.com',
+      'admin@test.com'
+    ];
+    
+    if (confirm('¿Eliminar todos los usuarios de prueba?')) {
+      testEmails.forEach(email => {
+        const user = this.users.find(u => u.email.toLowerCase() === email.toLowerCase());
+        if (user) {
+          this.adminService.deleteUser(user.id).subscribe({
+            next: () => console.log(`Usuario ${email} eliminado`),
+            error: (error) => console.error(`Error eliminando ${email}:`, error)
+          });
+        }
+      });
+      
+      setTimeout(() => this.loadUsers(), 1000);
+    }
+  }
+
   getRoleLabel(role: string): string {
     const roleObj = this.roles.find(r => r.value === role);
     return roleObj ? roleObj.label : role;
@@ -154,6 +304,10 @@ export class AdminComponent implements OnInit {
   }
 
   canDeleteUser(user: any): boolean {
-    return this.currentUser?.role === 'master' && user.id !== this.currentUser.id;
+    if (this.currentUser?.role !== 'master' || user.id === this.currentUser.id) {
+      return false;
+    }
+    // Permitir eliminar usuarios sin perfil o con perfil básico
+    return !user.profile || (!user.profile.dni && !user.profile.phone);
   }
 }

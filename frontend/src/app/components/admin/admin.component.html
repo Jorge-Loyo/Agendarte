@@ -2,13 +2,40 @@
   <!-- Header -->
   <div class="header">
     <h1>🛡️ Panel de Administración</h1>
-    <button class="btn-create" (click)="showCreateForm = !showCreateForm">
-      {{ showCreateForm ? 'Cancelar' : '+ Crear Usuario' }}
+  </div>
+
+  <!-- Menu Tabs -->
+  <div class="menu-tabs">
+    <button 
+      class="tab-btn" 
+      [class.active]="activeTab === 'users'"
+      (click)="activeTab = 'users'">
+      👥 Usuarios
+    </button>
+    <button 
+      class="tab-btn" 
+      [class.active]="activeTab === 'specialties'"
+      (click)="activeTab = 'specialties'">
+      🏥 Especialidades
     </button>
   </div>
 
-  <!-- Create User Form -->
-  <div class="create-form" *ngIf="showCreateForm">
+  <!-- Users Section -->
+  <div class="section-content" *ngIf="activeTab === 'users'">
+    <div class="section-header">
+      <h2>Gestión de Usuarios</h2>
+      <div class="header-actions">
+        <button class="btn-danger" (click)="deleteTestUsers()" *ngIf="currentUser?.role === 'master'">
+          🗑️ Limpiar Pruebas
+        </button>
+        <button class="btn-create" (click)="showCreateForm = !showCreateForm">
+          {{ showCreateForm ? 'Cancelar' : '+ Crear Usuario' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Create User Form -->
+    <div class="create-form" *ngIf="showCreateForm">
     <div class="form-card">
       <h3>Crear Nuevo Usuario</h3>
       
@@ -52,7 +79,10 @@
         
         <div class="form-group" *ngIf="newUser.role === 'professional'">
           <label>Especialidad</label>
-          <input type="text" [(ngModel)]="newUser.specialty" placeholder="Cardiología">
+          <select [(ngModel)]="newUser.specialty">
+            <option value="">Seleccionar especialidad</option>
+            <option *ngFor="let specialty of specialties" [value]="specialty.name">{{ specialty.name }}</option>
+          </select>
         </div>
         
         <div class="form-group" *ngIf="newUser.role === 'professional'">
@@ -106,13 +136,9 @@
               </td>
               
               <td>
-                <select 
-                  [value]="user.role" 
-                  (change)="updateUserRole(user, ($event.target as HTMLSelectElement).value)"
-                  [disabled]="!canManageUser(user)"
-                  class="role-select">
-                  <option *ngFor="let role of roles" [value]="role.value">{{ role.label }}</option>
-                </select>
+                <span class="role-badge" [class]="user.role">
+                  {{ getRoleLabel(user.role) }}
+                </span>
               </td>
               
               <td>
@@ -137,6 +163,14 @@
               <td>
                 <div class="actions">
                   <button 
+                    class="btn-edit" 
+                    (click)="editUser(user)"
+                    [disabled]="!canManageUser(user)"
+                    title="Editar">
+                    ✏️
+                  </button>
+                  
+                  <button 
                     class="btn-toggle" 
                     (click)="toggleUserStatus(user)"
                     [disabled]="!canManageUser(user)"
@@ -160,4 +194,140 @@
       </div>
     </div>
   </div>
+  </div>
+
+  <!-- Specialties Section -->
+  <div class="section-content" *ngIf="activeTab === 'specialties'">
+    <div class="section-header">
+      <h2>Gestión de Especialidades</h2>
+      <button class="btn-create" (click)="showCreateSpecialty = !showCreateSpecialty">
+        {{ showCreateSpecialty ? 'Cancelar' : '+ Crear Especialidad' }}
+      </button>
+    </div>
+
+    <!-- Create Specialty Form -->
+    <div class="create-form" *ngIf="showCreateSpecialty">
+      <div class="form-card">
+        <h3>Crear Nueva Especialidad</h3>
+        
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Nombre *</label>
+            <input type="text" [(ngModel)]="newSpecialty.name" placeholder="Cardiología">
+          </div>
+          
+          <div class="form-group">
+            <label>Descripción</label>
+            <textarea [(ngModel)]="newSpecialty.description" placeholder="Descripción de la especialidad" rows="3"></textarea>
+          </div>
+        </div>
+        
+        <div class="form-actions">
+          <button class="btn-save" (click)="createSpecialty()">Crear Especialidad</button>
+          <button class="btn-cancel" (click)="showCreateSpecialty = false; resetSpecialtyForm()">Cancelar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Specialties List -->
+    <div class="specialties-section" *ngIf="!loading">
+      <div class="table-card">
+        <h3>Especialidades ({{ specialties.length }})</h3>
+        
+        <div class="table-container">
+          <table class="specialties-table">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let specialty of specialties">
+                <td><strong>{{ specialty.name }}</strong></td>
+                <td>{{ specialty.description || 'Sin descripción' }}</td>
+                <td>
+                  <span class="status" [class]="specialty.isActive ? 'active' : 'inactive'">
+                    {{ specialty.isActive ? 'Activa' : 'Inactiva' }}
+                  </span>
+                </td>
+                <td>
+                  <div class="actions">
+                    <button class="btn-toggle" (click)="toggleSpecialtyStatus(specialty)">
+                      {{ specialty.isActive ? '🔒' : '🔓' }}
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
+    <!-- Edit User Form -->
+    <div class="create-form" *ngIf="showEditForm">
+      <div class="form-card">
+        <h3>Editar Usuario</h3>
+        
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Email *</label>
+            <input type="email" [(ngModel)]="editingUser.email" placeholder="usuario@ejemplo.com">
+          </div>
+          
+          <div class="form-group">
+            <label>Nueva Contraseña</label>
+            <input type="password" [(ngModel)]="editingUser.password" placeholder="Dejar vacío para no cambiar">
+          </div>
+          
+          <div class="form-group">
+            <label>Rol *</label>
+            <select [(ngModel)]="editingUser.role">
+              <option *ngFor="let role of roles" [value]="role.value">{{ role.label }}</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label>Nombre *</label>
+            <input type="text" [(ngModel)]="editingUser.firstName" placeholder="Nombre">
+          </div>
+          
+          <div class="form-group">
+            <label>Apellido *</label>
+            <input type="text" [(ngModel)]="editingUser.lastName" placeholder="Apellido">
+          </div>
+          
+          <div class="form-group">
+            <label>DNI</label>
+            <input type="text" [(ngModel)]="editingUser.dni" placeholder="12345678">
+          </div>
+          
+          <div class="form-group">
+            <label>Teléfono</label>
+            <input type="text" [(ngModel)]="editingUser.phone" placeholder="+54911123456">
+          </div>
+          
+          <div class="form-group" *ngIf="editingUser.role === 'professional'">
+            <label>Especialidad</label>
+            <select [(ngModel)]="editingUser.specialty">
+              <option value="">Seleccionar especialidad</option>
+              <option *ngFor="let specialty of specialties" [value]="specialty.name">{{ specialty.name }}</option>
+            </select>
+          </div>
+          
+          <div class="form-group" *ngIf="editingUser.role === 'professional'">
+            <label>Matrícula</label>
+            <input type="text" [(ngModel)]="editingUser.licenseNumber" placeholder="MP12345">
+          </div>
+        </div>
+        
+        <div class="form-actions">
+          <button class="btn-save" (click)="updateUser()">Actualizar Usuario</button>
+          <button class="btn-cancel" (click)="cancelEdit()">Cancelar</button>
+        </div>
+      </div>
+    </div>

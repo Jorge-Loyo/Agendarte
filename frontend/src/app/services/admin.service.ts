@@ -11,8 +11,12 @@ export class AdminService {
   constructor(private http: HttpClient) {}
 
   getAllUsers(): Observable<any> {
+    const token = localStorage.getItem('token');
+    console.log('Token:', token ? 'Existe' : 'No existe');
+    console.log('URL:', `${this.baseUrl}/users`);
+    
     return this.http.get(`${this.baseUrl}/users`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      headers: { Authorization: `Bearer ${token}` }
     });
   }
 
@@ -24,6 +28,12 @@ export class AdminService {
 
   updateUserRole(userId: number, roleData: any): Observable<any> {
     return this.http.put(`${this.baseUrl}/users/${userId}`, roleData, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    });
+  }
+
+  updateUser(userId: number, userData: any): Observable<any> {
+    return this.http.put(`${this.baseUrl}/users/${userId}/full`, userData, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     });
   }

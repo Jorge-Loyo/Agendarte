@@ -4,31 +4,37 @@ const { Op } = require('sequelize');
 
 const getAllUsers = async (req, res) => {
   try {
+    // Obtener usuarios básicos primero
     const users = await User.findAll({
-      include: [
-        { model: Profile, as: 'profile' },
-        { model: Professional, as: 'professional' }
-      ],
-      order: [['createdAt', 'DESC']]
+      order: [['created_at', 'DESC']]
     });
 
-    const formattedUsers = users.map(user => ({
-      id: user.id,
-      email: user.email,
-      role: user.role,
-      isActive: user.isActive,
-      createdAt: user.createdAt,
-      profile: user.profile ? {
-        firstName: user.profile.firstName,
-        lastName: user.profile.lastName,
-        dni: user.profile.dni,
-        phone: user.profile.phone
-      } : null,
-      professional: user.professional ? {
-        specialty: user.professional.specialty,
-        licenseNumber: user.professional.licenseNumber
-      } : null
-    }));
+    // Obtener perfiles y profesionales por separado
+    const formattedUsers = [];
+    
+    for (const user of users) {
+      const profile = await Profile.findOne({ where: { userId: user.id } });
+      const professional = user.role === 'professional' ? 
+        await Professional.findOne({ where: { userId: user.id } }) : null;
+      
+      formattedUsers.push({
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        isActive: user.isActive,
+        createdAt: user.createdAt,
+        profile: profile ? {
+          firstName: profile.firstName,
+          lastName: profile.lastName,
+          dni: profile.dni,
+          phone: profile.phone
+        } : null,
+        professional: professional ? {
+          specialty: professional.specialty,
+          licenseNumber: professional.licenseNumber
+        } : null
+      });
+    }
 
     res.json({
       message: 'Usuarios obtenidos exitosamente',
@@ -36,7 +42,11 @@ const getAllUsers = async (req, res) => {
     });
   } catch (error) {
     console.error('Error obteniendo usuarios:', error);
-    res.status(500).json({ message: 'Error interno del servidor' });
+    console.error('Stack trace:', error.stack);
+    res.status(500).json({ 
+      message: 'Error interno del servidor',
+      error: error.message 
+    });
   }
 };
 
@@ -104,7 +114,11 @@ const createUser = async (req, res) => {
     });
   } catch (error) {
     console.error('Error creando usuario:', error);
-    res.status(500).json({ message: 'Error interno del servidor' });
+    console.error('Stack trace:', error.stack);
+    res.status(500).json({ 
+      message: 'Error interno del servidor',
+      error: error.message 
+    });
   }
 };
 
@@ -158,9 +172,53 @@ const deleteUser = async (req, res) => {
   }
 };
 
+const updateUserFull = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { email, password, role, firstName, lastName, dni, phone, specialty, licenseNumber } = req.body;
+
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    // Actualizar usuario
+    const updateData = { email, role };
+    if (password) {
+      updateData.password = await bcrypt.hash(password, 10);
+    }
+    await user.update(updateData);
+
+    // Actualizar perfil
+    let profile = await Profile.findOne({ where: { userId } });
+    if (profile) {
+      await profile.update({ firstName, lastName, dni, phone });
+    } else {
+      profile = await Profile.create({ userId, firstName, lastName, dni, phone });
+    }
+
+    // Actualizar profesional si es necesario
+    if (role === 'professional') {
+      let professional = await Professional.findOne({ where: { userId } });
+      if (professional) {
+        await professional.update({ specialty, licenseNumber });
+      } else {
+        await Professional.create({ userId, specialty, licenseNumber, consultationPrice: 5000 });
+      }
+    }
+
+    console.log(`🔄 Usuario ${userId} actualizado completamente`);
+    res.json({ message: 'Usuario actualizado exitosamente' });
+  } catch (error) {
+    console.error('Error actualizando usuario:', error);
+    res.status(500).json({ message: 'Error interno del servidor', error: error.message });
+  }
+};
+
 module.exports = {
   getAllUsers,
   createUser,
   updateUserRole,
+  updateUserFull,
   deleteUser
 };

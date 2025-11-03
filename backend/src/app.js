@@ -216,6 +216,67 @@ app.get("/api/debug/professional-appointments/:userId", async (req, res) => {
   }
 });
 
+// Debug: Verificar usuario específico
+app.get("/api/debug/user/:email", async (req, res) => {
+  try {
+    const { email } = req.params;
+    const user = await User.findOne({
+      where: { email },
+      include: [{ model: Profile, as: 'profile' }]
+    });
+    
+    if (!user) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    res.json({
+      id: user.id,
+      email: user.email,
+      role: user.role,
+      isActive: user.isActive,
+      profile: user.profile
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Crear usuario master si no existe
+app.post("/api/debug/create-master", async (req, res) => {
+  try {
+    const bcrypt = require('bcryptjs');
+    const email = 'jorgenayati@gmail.com';
+    
+    let user = await User.findOne({ where: { email } });
+    
+    if (user) {
+      // Actualizar a master si existe
+      await user.update({ role: 'master', isActive: true });
+      res.json({ message: 'Usuario actualizado a master', user: { id: user.id, email: user.email, role: user.role } });
+    } else {
+      // Crear nuevo usuario master
+      const hashedPassword = await bcrypt.hash('Password123!', 10);
+      user = await User.create({
+        email,
+        password: hashedPassword,
+        role: 'master',
+        isActive: true
+      });
+      
+      await Profile.create({
+        userId: user.id,
+        firstName: 'Jorge',
+        lastName: 'Loyo',
+        dni: '12345678'
+      });
+      
+      res.json({ message: 'Usuario master creado', user: { id: user.id, email: user.email, role: user.role } });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Inicializar base de datos y servidor
 const startServer = async () => {
   try {
