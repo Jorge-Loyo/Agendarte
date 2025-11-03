@@ -26,12 +26,7 @@ export class ProfessionalDashboardComponent implements OnInit {
   weekDays: any[] = [];
   monthDays: any[] = [];
   
-  todayAppointments = [
-    { id: 1, time: '09:00', patient: 'María García', patientName: 'María García', reason: 'Control rutinario', status: 'confirmed', duration: 30 },
-    { id: 2, time: '10:30', patient: 'Juan Pérez', patientName: 'Juan Pérez', reason: 'Consulta inicial', status: 'confirmed', duration: 60 },
-    { id: 3, time: '14:00', patient: 'Ana López', patientName: 'Ana López', reason: 'Seguimiento', status: 'pending', duration: 30 },
-    { id: 4, time: '15:30', patient: 'Carlos Ruiz', patientName: 'Carlos Ruiz', reason: 'Control post-operatorio', status: 'confirmed', duration: 30 }
-  ];
+  todayAppointments: any[] = [];
 
   weeklyStats = {
     todayAppointments: 0,
@@ -41,11 +36,7 @@ export class ProfessionalDashboardComponent implements OnInit {
     monthlyRevenue: 0
   };
 
-  recentPatients = [
-    { id: 3, name: 'Ana García', lastVisit: '2024-11-01', condition: 'Hipertensión', status: 'Estable' },
-    { id: 4, name: 'Prueba Perez', lastVisit: '2024-10-28', condition: 'Diabetes tipo 2', status: 'En tratamiento' },
-    { id: 5, name: 'Usuario Prueba', lastVisit: '2024-10-25', condition: 'Control rutinario', status: 'Saludable' }
-  ];
+  recentPatients: any[] = [];
 
   constructor(
     private authService: AuthService,
@@ -61,6 +52,8 @@ export class ProfessionalDashboardComponent implements OnInit {
       this.currentUser = user;
       if (user?.role === 'professional') {
         this.loadStats();
+        this.loadAppointments();
+        this.loadRecentPatients();
       }
     });
     this.generateCalendarData();
@@ -73,6 +66,32 @@ export class ProfessionalDashboardComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error cargando estadísticas:', error);
+      }
+    });
+  }
+
+  loadAppointments(): void {
+    this.appointmentService.getProfessionalAppointments().subscribe({
+      next: (response) => {
+        this.todayAppointments = response.appointments || [];
+        this.generateCalendarData();
+      },
+      error: (error) => {
+        console.error('Error cargando citas:', error);
+        this.todayAppointments = [];
+        this.generateCalendarData();
+      }
+    });
+  }
+
+  loadRecentPatients(): void {
+    this.appointmentService.getRecentPatients().subscribe({
+      next: (response) => {
+        this.recentPatients = response.patients || [];
+      },
+      error: (error) => {
+        console.error('Error cargando pacientes recientes:', error);
+        this.recentPatients = [];
       }
     });
   }
@@ -213,6 +232,10 @@ export class ProfessionalDashboardComponent implements OnInit {
 
   scheduleAppointment(time: string) {
     this.notificationService.info('Agendar', `Nuevo turno a las ${time}`);
+  }
+
+  openScheduleModal() {
+    this.router.navigate(['/app/professional-appointment']);
   }
 
   getFormattedDate(): string {

@@ -432,6 +432,90 @@ const rescheduleProfessionalAppointment = async (req, res) => {
   }
 };
 
+const getProfessionalAppointments = async (req, res) => {
+  try {
+    const professionalUserId = req.user.id;
+    
+    const professional = await Professional.findOne({ where: { userId: professionalUserId } });
+    if (!professional) {
+      return res.status(404).json({ message: 'Profesional no encontrado' });
+    }
+
+    const appointments = await Appointment.findAll({
+      where: { 
+        professionalId: professional.id,
+        status: { [Op.ne]: 'cancelled' }
+      },
+      include: [{
+        model: User,
+        as: 'patient',
+        include: [{ model: Profile, as: 'profile' }]
+      }],
+      order: [['appointmentDate', 'ASC'], ['appointmentTime', 'ASC']]
+    });
+
+    const formattedAppointments = appointments.map(apt => ({
+      id: apt.id,
+      time: apt.appointmentTime,
+      patient: `${apt.patient.profile.firstName} ${apt.patient.profile.lastName}`,
+      patientName: `${apt.patient.profile.firstName} ${apt.patient.profile.lastName}`,
+      reason: apt.notes || 'Consulta',
+      status: apt.status,
+      duration: 30,
+      appointmentDate: apt.appointmentDate
+    }));
+
+    res.json({
+      message: 'Citas obtenidas exitosamente',
+      appointments: formattedAppointments
+    });
+  } catch (error) {
+    console.error('Error obteniendo citas del profesional:', error);
+    res.status(500).json({ message: 'Error interno del servidor' });
+  }
+};
+
+const getRecentPatients = async (req, res) => {
+  try {
+    const professionalUserId = req.user.id;
+    
+    const professional = await Professional.findOne({ where: { userId: professionalUserId } });
+    if (!professional) {
+      return res.status(404).json({ message: 'Profesional no encontrado' });
+    }
+
+    const recentAppointments = await Appointment.findAll({
+      where: { 
+        professionalId: professional.id,
+        status: 'completed'
+      },
+      include: [{
+        model: User,
+        as: 'patient',
+        include: [{ model: Profile, as: 'profile' }]
+      }],
+      order: [['appointmentDate', 'DESC']],
+      limit: 5
+    });
+
+    const patients = recentAppointments.map(apt => ({
+      id: apt.patient.id,
+      name: `${apt.patient.profile.firstName} ${apt.patient.profile.lastName}`,
+      lastVisit: apt.appointmentDate,
+      condition: apt.notes || 'Consulta general',
+      status: 'Atendido'
+    }));
+
+    res.json({
+      message: 'Pacientes recientes obtenidos exitosamente',
+      patients
+    });
+  } catch (error) {
+    console.error('Error obteniendo pacientes recientes:', error);
+    res.status(500).json({ message: 'Error interno del servidor', patients: [] });
+  }
+};
+
 module.exports = {
   getMyAppointments,
   createAppointment,
@@ -439,5 +523,7 @@ module.exports = {
   cancelAppointment,
   rescheduleAppointment,
   cancelProfessionalAppointment,
-  rescheduleProfessionalAppointment
+  rescheduleProfessionalAppointment,
+  getProfessionalAppointments,
+  getRecentPatients
 };

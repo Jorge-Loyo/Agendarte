@@ -10,5 +10,7 @@ router.put('/:id/cancel', authenticateToken, appointmentController.cancelAppoint
 router.put('/:id/reschedule', authenticateToken, appointmentController.rescheduleAppointment);
 router.put('/:id/professional-cancel', authenticateToken, appointmentController.cancelProfessionalAppointment);
 router.put('/:id/professional-reschedule', authenticateToken, appointmentController.rescheduleProfessionalAppointment);
+router.get('/professional/appointments', authenticateToken, appointmentController.getProfessionalAppointments);
+router.get('/professional/recent-patients', authenticateToken, appointmentController.getRecentPatients);
 
 module.exports = router;

@@ -26,7 +26,7 @@
           <span>Nueva Cita</span>
         </button>
         
-        <button class="action-btn patient-search">
+        <button class="action-btn patient-search" routerLink="/app/my-patients">
           <div class="action-icon">🔍</div>
           <span>Buscar Paciente</span>
         </button>
@@ -51,6 +51,7 @@
       <div class="section-header">
         <h2>📅 Mi Agenda</h2>
         <div class="calendar-controls">
+          <button class="btn-schedule" (click)="openScheduleModal()">+ Agendar</button>
           <select [(ngModel)]="currentView" class="view-selector">
             <option value="day">Vista Diaria</option>
             <option value="week">Vista Semanal</option>
@@ -84,8 +85,8 @@
               </div>
             </div>
             <ng-template #emptySlot>
-              <div class="empty-slot" (click)="scheduleAppointment(slot.time)">
-                <span>+ Agendar</span>
+              <div class="empty-slot">
+                <span class="slot-available">Disponible</span>
               </div>
             </ng-template>
           </div>

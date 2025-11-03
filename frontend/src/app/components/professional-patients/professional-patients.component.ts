@@ -1,13 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { ProfessionalService } from '../../services/professional.service';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-professional-patients',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './professional-patients.component.html',
   styleUrls: ['./professional-patients.component.css']
 })
@@ -18,6 +19,18 @@ export class ProfessionalPatientsComponent implements OnInit {
   showAddPatient = false;
   searchTerm = '';
   currentUser: any;
+  whatsappLink = '';
+  
+  newPatient = {
+    firstName: '',
+    lastName: '',
+    dni: '',
+    email: '',
+    phone: '',
+    birthDate: '',
+    gender: '',
+    address: ''
+  };
 
   constructor(
     private professionalService: ProfessionalService,
@@ -84,6 +97,56 @@ export class ProfessionalPatientsComponent implements OnInit {
     }
   }
 
+  createPatient() {
+    this.loading = true;
+    this.professionalService.createPatient(this.newPatient).subscribe({
+      next: (response: any) => {
+        this.loadMyPatients();
+        this.resetForm();
+        this.showAddPatient = false;
+        this.loading = false;
+      },
+      error: (error: any) => {
+        console.error('Error creating patient:', error);
+        this.loading = false;
+      }
+    });
+  }
+  
+  generateWhatsAppLink() {
+    const baseUrl = window.location.origin;
+    const registrationToken = this.generateToken();
+    const registrationUrl = `${baseUrl}/register?token=${registrationToken}&phone=${this.newPatient.phone}`;
+    
+    const message = `Hola ${this.newPatient.firstName}, soy ${this.currentUser?.profile?.firstName} ${this.currentUser?.profile?.lastName}. Te invito a completar tu registro como paciente en nuestro sistema: ${registrationUrl}`;
+    
+    this.whatsappLink = `https://wa.me/${this.newPatient.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`;
+  }
+  
+  generateToken(): string {
+    return Math.random().toString(36).substring(2) + Date.now().toString(36);
+  }
+  
+  copyLink() {
+    navigator.clipboard.writeText(this.whatsappLink).then(() => {
+      alert('Enlace copiado al portapapeles');
+    });
+  }
+  
+  resetForm() {
+    this.newPatient = {
+      firstName: '',
+      lastName: '',
+      dni: '',
+      email: '',
+      phone: '',
+      birthDate: '',
+      gender: '',
+      address: ''
+    };
+    this.whatsappLink = '';
+  }
+  
   get filteredAvailablePatients() {
     if (!this.searchTerm) return this.availablePatients;
     return this.availablePatients.filter(patient =>

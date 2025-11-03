@@ -1,6 +1,9 @@
 <div class="patients-container">
   <div class="header">
-    <h1>👥 Mi Cartilla de Pacientes</h1>
+    <div class="header-left">
+      <button class="btn-back" routerLink="/app/professional-dashboard">← Volver al Dashboard</button>
+      <h1>👥 Mi Cartilla de Pacientes</h1>
+    </div>
     <button class="btn-add" (click)="showAddPatient = !showAddPatient">
       {{ showAddPatient ? 'Cancelar' : '+ Agregar Paciente' }}
     </button>
@@ -9,32 +12,73 @@
   <!-- Add Patient Modal -->
   <div class="add-patient-modal" *ngIf="showAddPatient">
     <div class="modal-content">
-      <h3>Agregar Paciente a mi Cartilla</h3>
+      <h3>Agregar Nuevo Paciente</h3>
       
-      <div class="search-bar">
-        <input 
-          type="text" 
-          [(ngModel)]="searchTerm" 
-          placeholder="Buscar por nombre o DNI..."
-          class="search-input">
-      </div>
-
-      <div class="available-patients">
-        <div class="patient-card" *ngFor="let patient of filteredAvailablePatients">
-          <div class="patient-info">
-            <div class="patient-avatar">
-              {{ patient.firstName?.charAt(0) }}{{ patient.lastName?.charAt(0) }}
-            </div>
-            <div class="patient-details">
-              <h4>{{ patient.firstName }} {{ patient.lastName }}</h4>
-              <p>DNI: {{ patient.dni }}</p>
-              <p>Email: {{ patient.email }}</p>
-            </div>
+      <form (ngSubmit)="createPatient()" #patientForm="ngForm">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Nombre *</label>
+            <input type="text" [(ngModel)]="newPatient.firstName" name="firstName" required class="form-input">
           </div>
-          <button class="btn-add-small" (click)="addPatientToCartilla(patient)">
-            Agregar
+          
+          <div class="form-group">
+            <label>Apellido *</label>
+            <input type="text" [(ngModel)]="newPatient.lastName" name="lastName" required class="form-input">
+          </div>
+          
+          <div class="form-group">
+            <label>DNI *</label>
+            <input type="text" [(ngModel)]="newPatient.dni" name="dni" required class="form-input">
+          </div>
+          
+          <div class="form-group">
+            <label>Email *</label>
+            <input type="email" [(ngModel)]="newPatient.email" name="email" required class="form-input">
+          </div>
+          
+          <div class="form-group">
+            <label>Teléfono *</label>
+            <input type="tel" [(ngModel)]="newPatient.phone" name="phone" required class="form-input">
+          </div>
+          
+          <div class="form-group">
+            <label>Fecha de Nacimiento</label>
+            <input type="date" [(ngModel)]="newPatient.birthDate" name="birthDate" class="form-input">
+          </div>
+          
+          <div class="form-group">
+            <label>Género</label>
+            <select [(ngModel)]="newPatient.gender" name="gender" class="form-input">
+              <option value="">Seleccionar</option>
+              <option value="M">Masculino</option>
+              <option value="F">Femenino</option>
+              <option value="Other">Otro</option>
+            </select>
+          </div>
+          
+          <div class="form-group full-width">
+            <label>Dirección</label>
+            <input type="text" [(ngModel)]="newPatient.address" name="address" class="form-input">
+          </div>
+        </div>
+        
+        <div class="form-actions">
+          <button type="button" class="btn-cancel" (click)="showAddPatient = false">Cancelar</button>
+          <button type="submit" class="btn-create" [disabled]="!patientForm.valid">Crear Paciente</button>
+          <button type="button" class="btn-whatsapp" (click)="generateWhatsAppLink()" [disabled]="!newPatient.phone">
+            📱 Enviar por WhatsApp
           </button>
         </div>
+      </form>
+      
+      <!-- WhatsApp Link Generated -->
+      <div class="whatsapp-link" *ngIf="whatsappLink">
+        <h4>Enlace generado:</h4>
+        <div class="link-container">
+          <input type="text" [value]="whatsappLink" readonly class="link-input">
+          <button class="btn-copy" (click)="copyLink()">Copiar</button>
+        </div>
+        <p class="link-info">Envía este enlace al paciente para que complete su registro</p>
       </div>
     </div>
   </div>
