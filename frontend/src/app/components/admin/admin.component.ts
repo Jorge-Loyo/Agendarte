@@ -19,16 +19,26 @@ export class AdminComponent implements OnInit {
   specialties: any[] = [];
   patients: any[] = [];
   filteredPatients: any[] = [];
+  professionals: any[] = [];
   loading = false;
   showCreateForm = false;
   showCreateSpecialty = false;
   showCreatePatient = false;
   showEditForm = false;
   currentUser: any = null;
-  activeTab: 'users' | 'patients' | 'appointments' | 'specialties' = 'users';
+  activeTab: 'users' | 'patients' | 'appointments' | 'specialties' | 'reports' = 'users';
   editingUser: any = null;
   patientSearchTerm = '';
   createAndSchedule = false;
+
+  // Reportes
+  reportData: any = null;
+  reportFilters = {
+    period: 'month',
+    startDate: '',
+    endDate: '',
+    professionalId: ''
+  };
 
   // Formulario de creación
   newUser = {
@@ -80,6 +90,7 @@ export class AdminComponent implements OnInit {
     this.loadUsers();
     this.loadSpecialties();
     this.loadPatients();
+    this.loadProfessionals();
   }
 
   loadSpecialties(): void {
@@ -145,6 +156,7 @@ export class AdminComponent implements OnInit {
       next: (response) => {
         console.log('Respuesta del servidor:', response);
         this.users = response.users;
+        this.loadProfessionals();
         this.loading = false;
       },
       error: (error) => {
@@ -413,5 +425,64 @@ export class AdminComponent implements OnInit {
   editPatient(patient: any): void {
     // Implementar edición de paciente
     this.notificationService.success('Info', 'Función de edición en desarrollo');
+  }
+
+  loadProfessionals(): void {
+    // Cargar profesionales desde los usuarios con rol professional
+    this.professionals = this.users.filter(user => user.role === 'professional')
+      .map(user => ({
+        id: user.professional?.id || user.id,
+        name: `${user.profile?.firstName || ''} ${user.profile?.lastName || ''}`.trim(),
+        specialty: user.professional?.specialty || 'General'
+      }));
+  }
+
+  // Métodos para reportes
+  generateReport(): void {
+    const filters = { ...this.reportFilters };
+    
+    // Configurar fechas según el período
+    const today = new Date();
+    switch (filters.period) {
+      case 'day':
+        filters.startDate = today.toISOString().split('T')[0];
+        filters.endDate = today.toISOString().split('T')[0];
+        break;
+      case 'week':
+        const weekStart = new Date(today);
+        weekStart.setDate(today.getDate() - today.getDay());
+        const weekEnd = new Date(weekStart);
+        weekEnd.setDate(weekStart.getDate() + 6);
+        filters.startDate = weekStart.toISOString().split('T')[0];
+        filters.endDate = weekEnd.toISOString().split('T')[0];
+        break;
+      case 'month':
+        const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+        const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+        filters.startDate = monthStart.toISOString().split('T')[0];
+        filters.endDate = monthEnd.toISOString().split('T')[0];
+        break;
+    }
+
+    this.adminService.generateReport(filters).subscribe({
+      next: (response) => {
+        this.reportData = response.report;
+        this.notificationService.success('Éxito', 'Reporte generado exitosamente');
+      },
+      error: (error) => {
+        console.error('Error generando reporte:', error);
+        this.notificationService.error('Error', 'No se pudo generar el reporte');
+      }
+    });
+  }
+
+  exportToPDF(): void {
+    this.notificationService.success('Info', 'Exportación a PDF en desarrollo');
+    // Implementar exportación a PDF
+  }
+
+  exportToExcel(): void {
+    this.notificationService.success('Info', 'Exportación a Excel en desarrollo');
+    // Implementar exportación a Excel
   }
 }

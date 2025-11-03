@@ -93,4 +93,11 @@ export class AdminService {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     });
   }
+
+  // Reportes
+  generateReport(filters: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/reports`, filters, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    });
+  }
 }

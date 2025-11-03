@@ -30,6 +30,12 @@
       (click)="activeTab = 'specialties'">
       🏥 Especialidades
     </button>
+    <button 
+      class="tab-btn" 
+      [class.active]="activeTab === 'reports'"
+      (click)="activeTab = 'reports'">
+      📊 Reportes
+    </button>
   </div>
 
   <!-- Users Section -->
@@ -358,6 +364,126 @@
   <!-- Appointments Section -->
   <div class="section-content" *ngIf="activeTab === 'appointments'">
     <app-admin-appointments></app-admin-appointments>
+  </div>
+
+  <!-- Reports Section -->
+  <div class="section-content" *ngIf="activeTab === 'reports'">
+    <div class="section-header">
+      <h2>Reportes y Analytics</h2>
+      <button class="btn-create" (click)="generateReport()">
+        📈 Generar Reporte
+      </button>
+    </div>
+
+    <!-- Filtros de Reporte -->
+    <div class="report-filters">
+      <div class="filter-row">
+        <div class="filter-group">
+          <label>Período</label>
+          <select [(ngModel)]="reportFilters.period" class="filter-select">
+            <option value="day">Día</option>
+            <option value="week">Semana</option>
+            <option value="month">Mes</option>
+            <option value="custom">Personalizado</option>
+          </select>
+        </div>
+        
+        <div class="filter-group" *ngIf="reportFilters.period === 'custom'">
+          <label>Fecha Inicio</label>
+          <input type="date" [(ngModel)]="reportFilters.startDate" class="filter-input">
+        </div>
+        
+        <div class="filter-group" *ngIf="reportFilters.period === 'custom'">
+          <label>Fecha Fin</label>
+          <input type="date" [(ngModel)]="reportFilters.endDate" class="filter-input">
+        </div>
+        
+        <div class="filter-group">
+          <label>Profesional</label>
+          <select [(ngModel)]="reportFilters.professionalId" class="filter-select">
+            <option value="">Todos los profesionales</option>
+            <option *ngFor="let prof of professionals" [value]="prof.id">
+              {{prof.name}} - {{prof.specialty}}
+            </option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Métricas Principales -->
+    <div class="metrics-grid" *ngIf="reportData">
+      <div class="metric-card">
+        <div class="metric-icon">📅</div>
+        <div class="metric-content">
+          <h3>{{reportData.totalAppointments}}</h3>
+          <p>Total Turnos</p>
+        </div>
+      </div>
+      
+      <div class="metric-card">
+        <div class="metric-icon">✅</div>
+        <div class="metric-content">
+          <h3>{{reportData.completedAppointments}}</h3>
+          <p>Completados</p>
+        </div>
+      </div>
+      
+      <div class="metric-card">
+        <div class="metric-icon">❌</div>
+        <div class="metric-content">
+          <h3>{{reportData.cancelledAppointments}}</h3>
+          <p>Cancelados</p>
+        </div>
+      </div>
+      
+      <div class="metric-card">
+        <div class="metric-icon">💰</div>
+        <div class="metric-content">
+          <h3>${{reportData.totalRevenue | number:'1.0-0'}}</h3>
+          <p>Ingresos</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Gráficos y Detalles -->
+    <div class="report-details" *ngIf="reportData">
+      <div class="chart-section">
+        <h3>Distribución de Turnos</h3>
+        <div class="chart-placeholder">
+          <div class="chart-bar" 
+               *ngFor="let item of reportData.appointmentsByStatus" 
+               [style.height.%]="(item.count / reportData.totalAppointments) * 100">
+            <span class="bar-label">{{item.status}}: {{item.count}}</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="summary-section">
+        <h3>Resumen Financiero</h3>
+        <div class="summary-item">
+          <span>Ingresos Totales:</span>
+          <strong>${{reportData.totalRevenue | number:'1.0-0'}}</strong>
+        </div>
+        <div class="summary-item">
+          <span>Pagos Pendientes:</span>
+          <strong>${{reportData.pendingPayments | number:'1.0-0'}}</strong>
+        </div>
+        <div class="summary-item">
+          <span>Reembolsos:</span>
+          <strong>${{reportData.refunds | number:'1.0-0'}}</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- Acciones de Exportación -->
+    <div class="export-actions" *ngIf="reportData">
+      <button class="btn-export" (click)="exportToPDF()">
+        📄 Exportar PDF
+      </button>
+      <button class="btn-export" (click)="exportToExcel()">
+        📊 Exportar Excel
+      </button>
+    </div>
   </div>
 
   <!-- Specialties Section -->

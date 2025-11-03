@@ -78,4 +78,11 @@ router.post('/patients',
   adminController.createPatient
 );
 
+// Rutas para reportes
+router.post('/reports', 
+  authenticateToken, 
+  authorizeRoles('admin', 'master'), 
+  adminController.generateReport
+);
+
 module.exports = router;

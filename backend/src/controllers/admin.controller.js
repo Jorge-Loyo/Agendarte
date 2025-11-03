@@ -485,6 +485,88 @@ const generateTempPassword = () => {
   return password + '!';
 };
 
+const generateReport = async (req, res) => {
+  try {
+    const { startDate, endDate, professionalId } = req.body;
+
+    // Construir filtros
+    let whereClause = {
+      appointmentDate: {
+        [Op.between]: [startDate, endDate]
+      }
+    };
+
+    if (professionalId) {
+      whereClause.professionalId = professionalId;
+    }
+
+    // Obtener todas las citas del período
+    const appointments = await Appointment.findAll({
+      where: whereClause,
+      include: [
+        {
+          model: Professional,
+          as: 'professional',
+          include: [{
+            model: User,
+            as: 'user',
+            include: [{ model: Profile, as: 'profile' }]
+          }]
+        }
+      ]
+    });
+
+    // Calcular métricas
+    const totalAppointments = appointments.length;
+    const completedAppointments = appointments.filter(apt => apt.status === 'completed').length;
+    const cancelledAppointments = appointments.filter(apt => apt.status === 'cancelled').length;
+    const confirmedAppointments = appointments.filter(apt => apt.status === 'confirmed').length;
+
+    // Calcular ingresos
+    const paidAppointments = appointments.filter(apt => apt.paymentStatus === 'paid');
+    const totalRevenue = paidAppointments.reduce((sum, apt) => {
+      return sum + (apt.professional?.consultationPrice || 0);
+    }, 0);
+
+    const pendingPayments = appointments
+      .filter(apt => apt.paymentStatus === 'pending')
+      .reduce((sum, apt) => sum + (apt.professional?.consultationPrice || 0), 0);
+
+    const refunds = appointments
+      .filter(apt => apt.paymentStatus === 'refunded')
+      .reduce((sum, apt) => sum + (apt.professional?.consultationPrice || 0), 0);
+
+    // Distribución por estado
+    const appointmentsByStatus = [
+      { status: 'Confirmados', count: confirmedAppointments },
+      { status: 'Completados', count: completedAppointments },
+      { status: 'Cancelados', count: cancelledAppointments }
+    ];
+
+    const report = {
+      period: `${startDate} - ${endDate}`,
+      totalAppointments,
+      completedAppointments,
+      cancelledAppointments,
+      confirmedAppointments,
+      totalRevenue,
+      pendingPayments,
+      refunds,
+      appointmentsByStatus
+    };
+
+    console.log(`📊 Reporte generado para período ${startDate} - ${endDate}`);
+
+    res.json({
+      message: 'Reporte generado exitosamente',
+      report
+    });
+  } catch (error) {
+    console.error('Error generando reporte:', error);
+    res.status(500).json({ message: 'Error interno del servidor' });
+  }
+};
+
 module.exports = {
   getAllUsers,
   createUser,
@@ -497,5 +579,6 @@ module.exports = {
   rescheduleAppointment: rescheduleAppointmentAdmin,
   processPayment: processPaymentAdmin,
   getPatients,
-  createPatient
+  createPatient,
+  generateReport
 };
