@@ -85,4 +85,11 @@ router.post('/reports',
   adminController.generateReport
 );
 
+// Rutas para gestión de permisos
+router.post('/users/:userId/reset-password', 
+  authenticateToken, 
+  authorizeRoles('master'), 
+  adminController.resetUserPassword
+);
+
 module.exports = router;

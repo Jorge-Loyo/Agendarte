@@ -26,7 +26,7 @@ export class AdminComponent implements OnInit {
   showCreatePatient = false;
   showEditForm = false;
   currentUser: any = null;
-  activeTab: 'users' | 'patients' | 'appointments' | 'specialties' | 'reports' = 'users';
+  activeTab: 'users' | 'patients' | 'appointments' | 'specialties' | 'reports' | 'permissions' = 'users';
   editingUser: any = null;
   patientSearchTerm = '';
   createAndSchedule = false;
@@ -39,6 +39,54 @@ export class AdminComponent implements OnInit {
     endDate: '',
     professionalId: ''
   };
+
+  // Permisos y logs
+  showUserLogs = false;
+  systemLogs: any[] = [];
+  rolePermissions = [
+    {
+      key: 'patient',
+      name: 'Paciente',
+      permissions: [
+        { key: 'view_appointments', name: 'Ver turnos', enabled: true },
+        { key: 'create_appointments', name: 'Crear turnos', enabled: true },
+        { key: 'cancel_appointments', name: 'Cancelar turnos', enabled: true },
+        { key: 'view_professionals', name: 'Ver profesionales', enabled: true }
+      ]
+    },
+    {
+      key: 'professional',
+      name: 'Profesional',
+      permissions: [
+        { key: 'manage_schedule', name: 'Gestionar horarios', enabled: true },
+        { key: 'view_patient_history', name: 'Ver historial pacientes', enabled: true },
+        { key: 'manage_appointments', name: 'Gestionar turnos', enabled: true },
+        { key: 'add_notes', name: 'Agregar notas', enabled: true },
+        { key: 'view_statistics', name: 'Ver estadísticas', enabled: true }
+      ]
+    },
+    {
+      key: 'admin',
+      name: 'Administrativo',
+      permissions: [
+        { key: 'manage_all_appointments', name: 'Gestionar todos los turnos', enabled: true },
+        { key: 'register_patients', name: 'Registrar pacientes', enabled: true },
+        { key: 'view_reports', name: 'Ver reportes', enabled: true },
+        { key: 'process_payments', name: 'Procesar pagos', enabled: true }
+      ]
+    },
+    {
+      key: 'master',
+      name: 'Master',
+      permissions: [
+        { key: 'manage_users', name: 'Gestionar usuarios', enabled: true },
+        { key: 'manage_permissions', name: 'Gestionar permisos', enabled: true },
+        { key: 'view_system_logs', name: 'Ver logs del sistema', enabled: true },
+        { key: 'reset_passwords', name: 'Resetear contraseñas', enabled: true },
+        { key: 'full_system_access', name: 'Acceso completo al sistema', enabled: true }
+      ]
+    }
+  ];
 
   // Formulario de creación
   newUser = {
@@ -91,6 +139,7 @@ export class AdminComponent implements OnInit {
     this.loadSpecialties();
     this.loadPatients();
     this.loadProfessionals();
+    this.loadSystemLogs();
   }
 
   loadSpecialties(): void {
@@ -174,17 +223,32 @@ export class AdminComponent implements OnInit {
   }
 
   createUser(): void {
-    if (!this.newUser.email || !this.newUser.password || !this.newUser.firstName || !this.newUser.lastName) {
+    if (!this.newUser.email || !this.newUser.firstName || !this.newUser.lastName) {
       this.notificationService.error('Error', 'Complete los campos obligatorios');
       return;
     }
 
-    this.adminService.createUser(this.newUser).subscribe({
+    // Generar contraseña temporal si no se proporcionó
+    if (!this.newUser.password) {
+      this.newUser.password = this.generateTempPassword();
+    }
+
+    const userData = {
+      ...this.newUser,
+      generatePassword: !this.newUser.password,
+      sendCredentials: true
+    };
+
+    this.adminService.createUser(userData).subscribe({
       next: (response) => {
-        this.notificationService.success('Éxito', 'Usuario creado exitosamente');
+        const message = response.tempPassword ? 
+          `Usuario creado. Contraseña temporal: ${response.tempPassword}` :
+          'Usuario creado exitosamente. Credenciales enviadas por email.';
+        this.notificationService.success('Éxito', message);
         this.loadUsers();
         this.resetForm();
         this.showCreateForm = false;
+        this.logActivity('user_created', `Usuario ${this.newUser.email} creado con rol ${this.newUser.role}`);
       },
       error: (error) => {
         console.error('Error creando usuario:', error);
@@ -484,5 +548,91 @@ export class AdminComponent implements OnInit {
   exportToExcel(): void {
     this.notificationService.success('Info', 'Exportación a Excel en desarrollo');
     // Implementar exportación a Excel
+  }
+
+  // Métodos para gestión de permisos
+  togglePermission(roleKey: string, permissionKey: string, event: any): void {
+    const role = this.rolePermissions.find(r => r.key === roleKey);
+    if (role) {
+      const permission = role.permissions.find(p => p.key === permissionKey);
+      if (permission) {
+        permission.enabled = event.target.checked;
+        this.notificationService.success('Éxito', `Permiso ${permission.name} ${permission.enabled ? 'activado' : 'desactivado'} para ${role.name}`);
+        this.logActivity('permission_change', `Permiso ${permissionKey} ${permission.enabled ? 'activado' : 'desactivado'} para rol ${roleKey}`);
+      }
+    }
+  }
+
+  resetUserPassword(user: any): void {
+    if (confirm(`¿Resetear la contraseña de ${user.email}?`)) {
+      this.adminService.resetUserPassword(user.id).subscribe({
+        next: (response) => {
+          this.notificationService.success('Éxito', `Contraseña reseteada. Nueva contraseña: ${response.tempPassword}`);
+          this.logActivity('password_reset', `Contraseña reseteada para usuario ${user.email}`);
+        },
+        error: (error) => {
+          this.notificationService.error('Error', 'No se pudo resetear la contraseña');
+        }
+      });
+    }
+  }
+
+  viewUserActivity(user: any): void {
+    this.notificationService.success('Info', `Mostrando actividad de ${user.email}`);
+    // Implementar vista de actividad específica del usuario
+  }
+
+  loadSystemLogs(): void {
+    // Simular logs del sistema
+    this.systemLogs = [
+      {
+        timestamp: new Date(Date.now() - 3600000),
+        user: 'admin@agendarte.com',
+        action: 'Login exitoso',
+        type: 'success',
+        details: 'Acceso desde IP 192.168.1.100'
+      },
+      {
+        timestamp: new Date(Date.now() - 7200000),
+        user: 'dr.garcia@agendarte.com',
+        action: 'Turno creado',
+        type: 'info',
+        details: 'Turno creado para paciente Juan Pérez'
+      },
+      {
+        timestamp: new Date(Date.now() - 10800000),
+        user: 'master@agendarte.com',
+        action: 'Usuario creado',
+        type: 'info',
+        details: 'Nuevo usuario profesional registrado'
+      },
+      {
+        timestamp: new Date(Date.now() - 14400000),
+        user: 'paciente@agendarte.com',
+        action: 'Intento de login fallido',
+        type: 'warning',
+        details: 'Contraseña incorrecta'
+      }
+    ];
+  }
+
+  logActivity(action: string, details: string): void {
+    const newLog = {
+      timestamp: new Date(),
+      user: this.currentUser?.email || 'Sistema',
+      action: action,
+      type: 'info',
+      details: details
+    };
+    this.systemLogs.unshift(newLog);
+  }
+
+  generateTempPassword(): string {
+    const chars = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
+    let password = '';
+    for (let i = 0; i < 8; i++) {
+      password += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return password + '!';
   }
 }

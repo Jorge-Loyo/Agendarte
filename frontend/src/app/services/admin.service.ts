@@ -100,4 +100,11 @@ export class AdminService {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     });
   }
+
+  // Gestión de permisos
+  resetUserPassword(userId: number): Observable<any> {
+    return this.http.post(`${this.baseUrl}/users/${userId}/reset-password`, {}, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    });
+  }
 }

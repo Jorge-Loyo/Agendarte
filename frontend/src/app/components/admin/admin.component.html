@@ -36,6 +36,13 @@
       (click)="activeTab = 'reports'">
       📊 Reportes
     </button>
+    <button 
+      class="tab-btn" 
+      [class.active]="activeTab === 'permissions'"
+      (click)="activeTab = 'permissions'"
+      *ngIf="currentUser?.role === 'master'">
+      🔐 Permisos
+    </button>
   </div>
 
   <!-- Users Section -->
@@ -483,6 +490,103 @@
       <button class="btn-export" (click)="exportToExcel()">
         📊 Exportar Excel
       </button>
+    </div>
+  </div>
+
+  <!-- Permissions Section -->
+  <div class="section-content" *ngIf="activeTab === 'permissions'">
+    <div class="section-header">
+      <h2>Gestión de Permisos y Roles</h2>
+      <button class="btn-create" (click)="showUserLogs = !showUserLogs">
+        {{ showUserLogs ? 'Ocultar Logs' : '📄 Ver Logs' }}
+      </button>
+    </div>
+
+    <!-- Configuración de Roles -->
+    <div class="permissions-grid">
+      <div class="role-config-section">
+        <h3>Configuración de Roles</h3>
+        <div class="role-cards">
+          <div class="role-card" *ngFor="let role of rolePermissions">
+            <div class="role-header">
+              <h4>{{ role.name }}</h4>
+              <span class="role-badge" [ngClass]="role.key">{{ role.key }}</span>
+            </div>
+            <div class="permissions-list">
+              <div class="permission-item" *ngFor="let permission of role.permissions">
+                <label class="permission-label">
+                  <input 
+                    type="checkbox" 
+                    [checked]="permission.enabled"
+                    (change)="togglePermission(role.key, permission.key, $event)">
+                  <span>{{ permission.name }}</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gestión de Usuarios Avanzada -->
+      <div class="user-management-section">
+        <h3>Gestión Avanzada de Usuarios</h3>
+        
+        <div class="user-actions-grid">
+          <div class="action-card" *ngFor="let user of users">
+            <div class="user-summary">
+              <div class="user-avatar-small">
+                {{ (user.profile?.firstName || 'U').charAt(0) }}
+              </div>
+              <div class="user-info-compact">
+                <strong>{{ user.profile?.firstName }} {{ user.profile?.lastName }}</strong>
+                <small>{{ user.email }}</small>
+                <span class="role-badge-small" [ngClass]="user.role">{{ getRoleLabel(user.role) }}</span>
+              </div>
+            </div>
+            
+            <div class="user-controls">
+              <button 
+                class="btn-control"
+                [class.active]="user.isActive"
+                (click)="toggleUserStatus(user)"
+                title="{{ user.isActive ? 'Desactivar' : 'Activar' }} usuario">
+                {{ user.isActive ? '🔒' : '🔓' }}
+              </button>
+              
+              <button 
+                class="btn-control btn-reset"
+                (click)="resetUserPassword(user)"
+                title="Resetear contraseña">
+                🔄
+              </button>
+              
+              <button 
+                class="btn-control btn-logs"
+                (click)="viewUserActivity(user)"
+                title="Ver actividad">
+                📄
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Logs de Actividad -->
+    <div class="logs-section" *ngIf="showUserLogs">
+      <h3>Logs de Actividad del Sistema</h3>
+      <div class="logs-container">
+        <div class="log-entry" *ngFor="let log of systemLogs">
+          <div class="log-timestamp">{{ log.timestamp | date:'dd/MM/yyyy HH:mm:ss' }}</div>
+          <div class="log-user">{{ log.user }}</div>
+          <div class="log-action" [ngClass]="log.type">{{ log.action }}</div>
+          <div class="log-details">{{ log.details }}</div>
+        </div>
+        
+        <div class="no-logs" *ngIf="systemLogs.length === 0">
+          <p>No hay logs de actividad disponibles</p>
+        </div>
+      </div>
     </div>
   </div>
 

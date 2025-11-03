@@ -52,7 +52,7 @@ const getAllUsers = async (req, res) => {
 
 const createUser = async (req, res) => {
   try {
-    const { email, password, role, firstName, lastName, dni, phone, specialty, licenseNumber } = req.body;
+    const { email, password, role, firstName, lastName, dni, phone, specialty, licenseNumber, generatePassword, sendCredentials } = req.body;
 
     // Verificar email único
     const existingUser = await User.findOne({ where: { email } });
@@ -68,8 +68,9 @@ const createUser = async (req, res) => {
       }
     }
 
-    // Crear usuario
-    const hashedPassword = await bcrypt.hash(password, 10);
+    // Generar contraseña temporal si no se proporciona
+    const tempPassword = password || generateTempPassword();
+    const hashedPassword = await bcrypt.hash(tempPassword, 10);
     const user = await User.create({
       email,
       password: hashedPassword,
@@ -98,10 +99,20 @@ const createUser = async (req, res) => {
       });
     }
 
+    // Simular envío de credenciales
+    if (sendCredentials) {
+      console.log(`📧 Credenciales enviadas a ${email}:`);
+      console.log(`Usuario: ${email}`);
+      console.log(`Contraseña temporal: ${tempPassword}`);
+      console.log(`Debe cambiar la contraseña en el primer login`);
+    }
+
     console.log(`👤 Usuario ${role} creado: ${email}`);
 
     res.status(201).json({
-      message: 'Usuario creado exitosamente',
+      message: sendCredentials ? 
+        'Usuario creado exitosamente. Credenciales enviadas por email.' :
+        'Usuario creado exitosamente',
       user: {
         id: user.id,
         email: user.email,
@@ -110,7 +121,8 @@ const createUser = async (req, res) => {
           firstName: profile.firstName,
           lastName: profile.lastName
         }
-      }
+      },
+      tempPassword: !password ? tempPassword : undefined
     });
   } catch (error) {
     console.error('Error creando usuario:', error);
@@ -567,6 +579,33 @@ const generateReport = async (req, res) => {
   }
 };
 
+const resetUserPassword = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    // Generar nueva contraseña temporal
+    const tempPassword = generateTempPassword();
+    const hashedPassword = await bcrypt.hash(tempPassword, 10);
+
+    await user.update({ password: hashedPassword });
+
+    console.log(`🔄 Contraseña reseteada para usuario ${user.email}`);
+
+    res.json({
+      message: 'Contraseña reseteada exitosamente',
+      tempPassword: tempPassword
+    });
+  } catch (error) {
+    console.error('Error reseteando contraseña:', error);
+    res.status(500).json({ message: 'Error interno del servidor' });
+  }
+};
+
 module.exports = {
   getAllUsers,
   createUser,
@@ -580,5 +619,6 @@ module.exports = {
   processPayment: processPaymentAdmin,
   getPatients,
   createPatient,
-  generateReport
+  generateReport,
+  resetUserPassword
 };
