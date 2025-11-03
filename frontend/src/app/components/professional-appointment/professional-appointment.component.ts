@@ -1,16 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { AppointmentService } from '../../services/appointment.service';
 import { NotificationService } from '../../services/notification.service';
 import { AuthService } from '../../services/auth.service';
-import { PatientService } from '../../services/patient.service';
+import { ProfessionalService } from '../../services/professional.service';
 
 @Component({
   selector: 'app-professional-appointment',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './professional-appointment.component.html',
   styleUrls: ['./professional-appointment.component.css']
 })
@@ -35,30 +35,37 @@ export class ProfessionalAppointmentComponent implements OnInit {
     private appointmentService: AppointmentService,
     private notificationService: NotificationService,
     private authService: AuthService,
-    private patientService: PatientService
+    private professionalService: ProfessionalService
   ) {}
 
   ngOnInit() {
     this.authService.currentUser$.subscribe(user => {
       this.currentUser = user;
     });
+    this.loadMyPatients();
   }
-
-  searchPatients() {
-    if (this.searchTerm.length < 2) {
-      this.patients = [];
-      return;
-    }
-
-    this.patientService.searchPatients(this.searchTerm).subscribe({
-      next: (response) => {
-        this.patients = response.patients;
+  
+  loadMyPatients() {
+    this.loading = true;
+    this.professionalService.getMyPatients().subscribe({
+      next: (response: any) => {
+        this.patients = Array.isArray(response) ? response : response.patients || [];
+        this.loading = false;
       },
-      error: (error) => {
-        console.error('Error searching patients:', error);
+      error: (error: any) => {
+        console.error('Error loading patients:', error);
         this.patients = [];
+        this.loading = false;
       }
     });
+  }
+
+  get filteredPatients() {
+    if (!this.searchTerm) return this.patients;
+    return this.patients.filter(patient =>
+      `${patient.firstName} ${patient.lastName}`.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+      patient.dni?.includes(this.searchTerm)
+    );
   }
 
   selectPatient(patient: any) {

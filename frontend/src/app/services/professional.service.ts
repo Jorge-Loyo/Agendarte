@@ -65,7 +65,13 @@ export class ProfessionalService {
   }
 
   createPatient(patientData: any): Observable<any> {
-    return this.http.post(`http://localhost:3000/api/admin/patients`, patientData, {
+    return this.http.post(`http://localhost:3000/api/patients/create`, patientData, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    });
+  }
+
+  checkDNI(dni: string): Observable<any> {
+    return this.http.get(`http://localhost:3000/api/admin/check-dni/${dni}`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     });
   }

@@ -46,12 +46,14 @@ export class ProfessionalPatientsComponent implements OnInit {
   loadMyPatients() {
     this.loading = true;
     this.professionalService.getMyPatients().subscribe({
-      next: (patients: any) => {
-        this.myPatients = patients;
+      next: (response: any) => {
+        console.log('Respuesta del servidor:', response);
+        this.myPatients = Array.isArray(response) ? response : response.patients || [];
         this.loading = false;
       },
       error: (error: any) => {
         console.error('Error loading patients:', error);
+        this.myPatients = [];
         this.loading = false;
       }
     });
@@ -87,20 +89,33 @@ export class ProfessionalPatientsComponent implements OnInit {
     if (confirm(`¿Remover a ${patient.firstName} ${patient.lastName} de tu cartilla?`)) {
       this.professionalService.removePatientFromCartilla(patient.id).subscribe({
         next: () => {
-          this.loadMyPatients();
-          this.loadAvailablePatients();
+          this.myPatients = this.myPatients.filter(p => p.id !== patient.id);
+          alert('Paciente removido de tu cartilla');
         },
         error: (error: any) => {
           console.error('Error removing patient:', error);
+          alert('Error al remover paciente');
         }
       });
     }
   }
+  
+  viewPatientHistory(patientId: number) {
+    // Navegar al historial del paciente
+    console.log('Ver historial del paciente:', patientId);
+    alert('Funcionalidad de historial - próximamente');
+  }
 
   createPatient() {
+    // Crear paciente directamente (el backend maneja si ya existe)
     this.loading = true;
     this.professionalService.createPatient(this.newPatient).subscribe({
       next: (response: any) => {
+        if (response.existed) {
+          alert('Paciente ya registrado - agregado a tu cartilla');
+        } else {
+          alert('Paciente creado exitosamente');
+        }
         this.loadMyPatients();
         this.resetForm();
         this.showAddPatient = false;
@@ -108,9 +123,32 @@ export class ProfessionalPatientsComponent implements OnInit {
       },
       error: (error: any) => {
         console.error('Error creating patient:', error);
+        alert(error.error?.message || 'Error al crear paciente');
         this.loading = false;
       }
     });
+        
+        // Si DNI no existe, crear paciente
+        this.loading = true;
+        this.professionalService.createPatient(this.newPatient).subscribe({
+          next: (response: any) => {
+            if (response.existed) {
+              alert('Paciente ya registrado - agregado a tu cartilla');
+            } else {
+              alert('Paciente creado exitosamente');
+            }
+            this.loadMyPatients();
+            this.resetForm();
+            this.showAddPatient = false;
+            this.loading = false;
+          },
+          error: (error: any) => {
+            console.error('Error creating patient:', error);
+            alert(error.error?.message || 'Error al crear paciente');
+            this.loading = false;
+          }
+        });
+
   }
   
   generateWhatsAppLink() {

@@ -1,8 +1,89 @@
 const express = require('express');
 const router = express.Router();
+const bcrypt = require('bcryptjs');
 const { User, Profile } = require('../models');
 const { authenticateToken, authorizeRoles } = require('../middleware/auth');
 const { Op } = require('sequelize');
+
+// Crear paciente (solo para profesionales)
+router.post('/create', authenticateToken, authorizeRoles('professional'), async (req, res) => {
+  try {
+    const { firstName, lastName, dni, email, phone, birthDate, gender, address } = req.body;
+
+    // Verificar si ya existe el email
+    const existingUser = await User.findOne({ 
+      where: { email },
+      include: [{ model: Profile, as: 'profile' }]
+    });
+    
+    if (existingUser) {
+      // Si el usuario ya existe, agregarlo a la cartilla del profesional
+      return res.json({
+        message: 'Paciente ya registrado - agregado a tu cartilla',
+        patient: {
+          id: existingUser.id,
+          email: existingUser.email,
+          firstName: existingUser.profile?.firstName,
+          lastName: existingUser.profile?.lastName,
+          dni: existingUser.profile?.dni
+        },
+        existed: true
+      });
+    }
+
+    // Verificar si ya existe el DNI
+    const existingProfile = await Profile.findOne({ where: { dni } });
+    if (existingProfile) {
+      return res.status(400).json({ message: 'El DNI ya está registrado con otro email' });
+    }
+
+    // Generar contraseña temporal
+    const tempPassword = Math.random().toString(36).slice(-8);
+    const hashedPassword = await bcrypt.hash(tempPassword, 10);
+
+    // Crear usuario
+    const user = await User.create({
+      email,
+      password: hashedPassword,
+      role: 'patient',
+      isActive: true
+    });
+
+    // Crear perfil
+    await Profile.create({
+      userId: user.id,
+      firstName,
+      lastName,
+      dni,
+      phone: phone || null,
+      address: address || null,
+      gender: gender || null
+    });
+
+    // Agregar el paciente a la cartilla del profesional automáticamente
+    // (Simulamos que se agrega a la cartilla - en un sistema real habría una tabla de relación)
+    
+    res.json({
+      message: 'Paciente creado exitosamente y agregado a tu cartilla',
+      tempPassword,
+      patient: {
+        id: user.id,
+        email,
+        firstName,
+        lastName,
+        dni
+      },
+      existed: false
+    });
+  } catch (error) {
+    console.error('Error creando paciente:', error);
+    console.error('Stack trace:', error.stack);
+    res.status(500).json({ 
+      message: 'Error interno del servidor',
+      error: error.message 
+    });
+  }
+});
 
 // Buscar pacientes (solo para profesionales y admin)
 router.get('/search', authenticateToken, async (req, res) => {

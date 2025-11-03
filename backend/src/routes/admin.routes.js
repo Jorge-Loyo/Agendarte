@@ -92,4 +92,10 @@ router.post('/users/:userId/reset-password',
   adminController.resetUserPassword
 );
 
+router.get('/check-dni/:dni', 
+  authenticateToken, 
+  authorizeRoles('admin', 'master', 'professional'), 
+  adminController.checkDNI
+);
+
 module.exports = router;

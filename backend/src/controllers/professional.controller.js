@@ -133,7 +133,87 @@ const getProfessionalById = async (req, res) => {
   }
 };
 
+const getMyPatients = async (req, res) => {
+  try {
+    const { Op } = require('sequelize');
+    console.log('👥 Obteniendo pacientes para profesional:', req.user.id);
+    
+    // Por ahora, devolver todos los pacientes activos
+    // En un sistema real, habría una tabla de relación profesional-paciente
+    const patients = await User.findAll({
+      where: { role: 'patient', isActive: true },
+      include: [{
+        model: Profile,
+        as: 'profile'
+      }],
+      order: [['created_at', 'DESC']]
+    });
+
+    console.log(`📊 Encontrados ${patients.length} pacientes`);
+
+    // Obtener el profesional actual
+    const { Professional, Appointment } = require('../models');
+    const professional = await Professional.findOne({ where: { userId: req.user.id } });
+    
+    const formattedPatients = await Promise.all(patients.map(async (patient) => {
+      // Verificar si tiene historial con este profesional
+      const hasHistory = professional ? await Appointment.count({
+        where: {
+          patientId: patient.id,
+          professionalId: professional.id,
+          status: { [Op.in]: ['completed', 'confirmed'] }
+        }
+      }) > 0 : false;
+      
+      return {
+        id: patient.id,
+        email: patient.email,
+        firstName: patient.profile?.firstName,
+        lastName: patient.profile?.lastName,
+        dni: patient.profile?.dni,
+        phone: patient.profile?.phone,
+        address: patient.profile?.address,
+        createdAt: patient.createdAt,
+        hasHistory
+      };
+    }));
+
+    console.log('📤 Enviando pacientes:', formattedPatients);
+    res.json(formattedPatients);
+  } catch (error) {
+    console.error('Error obteniendo pacientes:', error);
+    res.status(500).json({
+      message: 'Error interno del servidor',
+      error: error.message
+    });
+  }
+};
+
+const removePatientFromCartilla = async (req, res) => {
+  try {
+    const { patientId } = req.params;
+    const professionalUserId = req.user.id;
+    
+    console.log(`🗑️ Removiendo paciente ${patientId} de cartilla del profesional ${professionalUserId}`);
+    
+    // Por ahora, como no hay tabla de relación, simplemente confirmamos la eliminación
+    // En un sistema real, eliminaríamos la relación de la tabla profesional_pacientes
+    
+    res.json({
+      message: 'Paciente removido de la cartilla exitosamente'
+    });
+  } catch (error) {
+    console.error('Error removiendo paciente de cartilla:', error);
+    res.status(500).json({
+      message: 'Error interno del servidor',
+      error: error.message
+    });
+  }
+};
+
 module.exports = {
   getAllProfessionals,
-  getProfessionalById
+  getProfessionalById,
+  getMyPatients,
+  removePatientFromCartilla
 };

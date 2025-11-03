@@ -4,22 +4,25 @@
     <h1>Agendar Turno para Paciente</h1>
   </div>
 
-  <!-- Buscar Paciente -->
+  <!-- Seleccionar Paciente de la Cartilla -->
   <div class="search-section" *ngIf="step === 1">
-    <h2>Buscar Paciente</h2>
+    <h2>Seleccionar Paciente de tu Cartilla</h2>
     <div class="search-box">
       <input 
         type="text" 
         [(ngModel)]="searchTerm"
-        (input)="searchPatients()"
-        placeholder="Buscar por nombre, apellido o DNI..."
+        placeholder="Filtrar por nombre, apellido o DNI..."
         class="search-input">
     </div>
 
-    <div class="patients-list" *ngIf="patients.length > 0">
+    <div class="loading" *ngIf="loading">
+      <p>Cargando pacientes...</p>
+    </div>
+
+    <div class="patients-list" *ngIf="!loading && filteredPatients.length > 0">
       <div 
         class="patient-card" 
-        *ngFor="let patient of patients"
+        *ngFor="let patient of filteredPatients"
         (click)="selectPatient(patient)">
         <div class="patient-avatar">{{ patient.firstName?.charAt(0) }}{{ patient.lastName?.charAt(0) }}</div>
         <div class="patient-info">
@@ -31,8 +34,13 @@
       </div>
     </div>
 
-    <div class="no-results" *ngIf="searchTerm && patients.length === 0">
-      <p>No se encontraron pacientes</p>
+    <div class="no-results" *ngIf="!loading && patients.length === 0">
+      <p>No tienes pacientes en tu cartilla</p>
+      <button class="btn-add-patient" routerLink="/app/my-patients">Agregar Pacientes</button>
+    </div>
+
+    <div class="no-results" *ngIf="!loading && searchTerm && filteredPatients.length === 0 && patients.length > 0">
+      <p>No se encontraron pacientes con ese criterio</p>
     </div>
   </div>
 

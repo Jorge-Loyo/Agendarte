@@ -611,6 +611,22 @@ const resetUserPassword = async (req, res) => {
   }
 };
 
+const checkDNI = async (req, res) => {
+  try {
+    const { dni } = req.params;
+    
+    const existingProfile = await Profile.findOne({ where: { dni } });
+    
+    res.json({
+      exists: !!existingProfile,
+      dni: dni
+    });
+  } catch (error) {
+    console.error('Error verificando DNI:', error);
+    res.status(500).json({ message: 'Error interno del servidor' });
+  }
+};
+
 module.exports = {
   getAllUsers,
   createUser,
@@ -625,5 +641,6 @@ module.exports = {
   getPatients,
   createPatient,
   generateReport,
-  resetUserPassword
+  resetUserPassword,
+  checkDNI
 };
