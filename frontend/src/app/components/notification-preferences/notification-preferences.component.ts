@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NotificationPreferencesService } from '../../services/notification-preferences.service';
-import { NotificationService } from '../../services/notification.service';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-notification-preferences',
@@ -16,7 +16,11 @@ export class NotificationPreferencesComponent implements OnInit {
   preferences = {
     emailReminders: true,
     whatsappReminders: false,
-    reminderHours: 24
+    reminderHours: 24,
+    whatsappHours: 2,
+    emailSubject: 'Recordatorio de Consulta - Agendarte',
+    emailBody: 'Estimado/a profesional, le recordamos que tiene una consulta programada para mañana. Por favor, confirme su asistencia.',
+    whatsappMessage: 'Hola! Le recordamos su consulta programada. Confirme su asistencia por favor.'
   };
   
   loading = false;
@@ -25,7 +29,7 @@ export class NotificationPreferencesComponent implements OnInit {
   constructor(
     private router: Router,
     private preferencesService: NotificationPreferencesService,
-    private notificationService: NotificationService
+    private toastService: ToastService
   ) {}
 
   ngOnInit() {
@@ -50,11 +54,11 @@ export class NotificationPreferencesComponent implements OnInit {
     this.saving = true;
     this.preferencesService.updatePreferences(this.preferences).subscribe({
       next: (response) => {
-        this.notificationService.success('Éxito', 'Preferencias guardadas correctamente');
+        this.toastService.showSuccess('✅ Configuración guardada correctamente');
         this.saving = false;
       },
       error: (error) => {
-        this.notificationService.error('Error', 'No se pudieron guardar las preferencias');
+        this.toastService.showError('❌ Error al guardar la configuración');
         this.saving = false;
       }
     });

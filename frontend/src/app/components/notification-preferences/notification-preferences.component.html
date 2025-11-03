@@ -1,61 +1,113 @@
 <div class="preferences-container">
   <div class="header">
-    <button class="btn-back" (click)="goBack()">← Volver</button>
-    <h1>Preferencias de Recordatorios</h1>
+    <div class="header-content">
+      <h1>🔔 Configuración de Notificaciones</h1>
+      <p>Personaliza cómo y cuándo recibir notificaciones sobre tus consultas</p>
+    </div>
   </div>
 
-  <div class="preferences-card" *ngIf="!loading">
-    <div class="section">
-      <h2>Recordatorios por Email</h2>
-      <div class="preference-item">
-        <label class="switch">
-          <input type="checkbox" [(ngModel)]="preferences.emailReminders">
-          <span class="slider"></span>
-        </label>
-        <div class="preference-info">
-          <h3>Recordatorios por correo electrónico</h3>
-          <p>Recibe recordatorios de tus citas por email 24 horas antes</p>
+  <div class="preferences-grid" *ngIf="!loading">
+    <!-- Notificaciones de Consultas -->
+    <div class="preference-card">
+      <div class="card-header">
+        <div class="icon">📧</div>
+        <h2>Recordatorios por Email</h2>
+      </div>
+      <div class="card-content">
+        <div class="preference-item">
+          <label class="modern-switch">
+            <input type="checkbox" [(ngModel)]="preferences.emailReminders">
+            <span class="switch-slider"></span>
+          </label>
+          <div class="preference-info">
+            <h3>Notificaciones de consultas</h3>
+            <p>Recibe recordatorios automáticos sobre las consultas programadas con tus pacientes</p>
+          </div>
+        </div>
+        
+        <div class="message-config" *ngIf="preferences.emailReminders">
+          <div class="form-group">
+            <label>Asunto del email:</label>
+            <input type="text" [(ngModel)]="preferences.emailSubject" class="modern-input" placeholder="Asunto del recordatorio">
+          </div>
+          <div class="form-group">
+            <label>Mensaje del email:</label>
+            <textarea [(ngModel)]="preferences.emailBody" class="modern-textarea" rows="4" placeholder="Contenido del mensaje de recordatorio"></textarea>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="section">
-      <h2>Recordatorios por WhatsApp</h2>
-      <div class="preference-item">
-        <label class="switch">
-          <input type="checkbox" [(ngModel)]="preferences.whatsappReminders">
-          <span class="slider"></span>
-        </label>
-        <div class="preference-info">
-          <h3>Recordatorios por WhatsApp</h3>
-          <p>Recibe recordatorios de tus citas por WhatsApp 2 horas antes</p>
+    <!-- Notificaciones WhatsApp -->
+    <div class="preference-card">
+      <div class="card-header">
+        <div class="icon">💬</div>
+        <h2>Recordatorios por WhatsApp</h2>
+      </div>
+      <div class="card-content">
+        <div class="preference-item">
+          <label class="modern-switch">
+            <input type="checkbox" [(ngModel)]="preferences.whatsappReminders">
+            <span class="switch-slider"></span>
+          </label>
+          <div class="preference-info">
+            <h3>Alertas instantáneas</h3>
+            <p>Recibe notificaciones inmediatas sobre cambios en tu agenda y nuevas citas</p>
+          </div>
+        </div>
+        
+        <div class="message-config" *ngIf="preferences.whatsappReminders">
+          <div class="form-group">
+            <label>Anticipación para WhatsApp:</label>
+            <select [(ngModel)]="preferences.whatsappHours" class="modern-select">
+              <option value="1">1 hora antes</option>
+              <option value="2">2 horas antes</option>
+              <option value="4">4 horas antes</option>
+              <option value="6">6 horas antes</option>
+              <option value="12">12 horas antes</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Mensaje de WhatsApp:</label>
+            <textarea [(ngModel)]="preferences.whatsappMessage" class="modern-textarea" rows="3" placeholder="Mensaje de recordatorio por WhatsApp"></textarea>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="section">
-      <h2>Configuración de Tiempo</h2>
-      <div class="time-config">
-        <label for="reminderHours">Horas de anticipación para email:</label>
-        <select id="reminderHours" [(ngModel)]="preferences.reminderHours" class="time-select">
-          <option value="1">1 hora</option>
-          <option value="2">2 horas</option>
-          <option value="6">6 horas</option>
-          <option value="12">12 horas</option>
-          <option value="24">24 horas</option>
-          <option value="48">48 horas</option>
-        </select>
+    <!-- Configuración de Tiempo -->
+    <div class="preference-card full-width">
+      <div class="card-header">
+        <div class="icon">⏰</div>
+        <h2>Configuración de Tiempo</h2>
+      </div>
+      <div class="card-content">
+        <div class="time-config">
+          <div class="time-option">
+            <label>Anticipación para recordatorios:</label>
+            <select [(ngModel)]="preferences.reminderHours" class="modern-select">
+              <option value="1">1 hora antes</option>
+              <option value="2">2 horas antes</option>
+              <option value="6">6 horas antes</option>
+              <option value="12">12 horas antes</option>
+              <option value="24">24 horas antes</option>
+              <option value="48">48 horas antes</option>
+            </select>
+          </div>
+        </div>
       </div>
     </div>
+  </div>
 
-    <div class="actions">
-      <button class="btn-save" (click)="savePreferences()" [disabled]="saving">
-        {{ saving ? 'Guardando...' : 'Guardar Preferencias' }}
-      </button>
-    </div>
+  <div class="actions" *ngIf="!loading">
+    <button class="btn-save" (click)="savePreferences()" [disabled]="saving">
+      <span class="btn-icon">💾</span>
+      {{ saving ? 'Guardando...' : 'Guardar Configuración' }}
+    </button>
   </div>
 
   <div class="loading-state" *ngIf="loading">
-    <p>Cargando preferencias...</p>
+    <div class="loading-spinner"></div>
+    <p>Cargando configuración...</p>
   </div>
 </div>
