@@ -36,8 +36,8 @@ const getAllProfessionals = async (req, res) => {
       name: `${prof.user.profile.firstName} ${prof.user.profile.lastName}`,
       specialty: prof.specialty,
       bio: prof.bio,
-      rating: prof.averageRating,
-      totalReviews: prof.totalReviews,
+      rating: prof.averageRating || 0,
+      totalReviews: prof.totalReviews || 0,
       consultationPrice: prof.consultationPrice,
       licenseNumber: prof.licenseNumber,
       email: prof.user.email,
@@ -61,6 +61,7 @@ const getAllProfessionals = async (req, res) => {
 const getProfessionalById = async (req, res) => {
   try {
     const { id } = req.params;
+    const { Review } = require('../models');
     
     const professional = await Professional.findByPk(id, {
       include: [
@@ -83,6 +84,27 @@ const getProfessionalById = async (req, res) => {
       });
     }
 
+    // Obtener reseñas recientes
+    const recentReviews = await Review.findAll({
+      where: { professionalId: id },
+      include: [{
+        model: User,
+        as: 'patient',
+        include: [{ model: Profile, as: 'profile' }]
+      }],
+      order: [['createdAt', 'DESC']],
+      limit: 5
+    });
+
+    const formattedReviews = recentReviews.map(review => ({
+      id: review.id,
+      rating: review.rating,
+      comment: review.comment,
+      createdAt: review.createdAt,
+      patientName: review.isAnonymous ? 'Anónimo' : 
+        `${review.patient.profile.firstName} ${review.patient.profile.lastName}`
+    }));
+
     const formattedProfessional = {
       id: professional.id,
       name: `${professional.user.profile.firstName} ${professional.user.profile.lastName}`,
@@ -94,7 +116,8 @@ const getProfessionalById = async (req, res) => {
       licenseNumber: professional.licenseNumber,
       email: professional.user.email,
       phone: professional.user.profile.phone,
-      address: professional.user.profile.address
+      address: professional.user.profile.address,
+      recentReviews: formattedReviews
     };
 
     res.json({

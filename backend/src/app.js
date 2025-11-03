@@ -10,9 +10,40 @@ const { testConnection, syncDatabase } = require('./config/database');
 const { User, Profile, Professional, Appointment, Specialty } = require('./models');
 const { seedProfessionals } = require('./seeders/professionals');
 const seedSpecialties = require('./seeders/specialties');
-const { seedSchedules } = require('./seeders/schedules');
-const { seedAppointments } = require('./seeders/appointments');
-const { seedPatients } = require('./seeders/patients');
+// Función para crear usuario master
+const createMasterUser = async () => {
+  try {
+    const bcrypt = require('bcryptjs');
+    const { User, Profile } = require('./models');
+    
+    const email = 'jorgenayati@gmail.com';
+    let user = await User.findOne({ where: { email } });
+    
+    if (!user) {
+      const hashedPassword = await bcrypt.hash('Password123!', 10);
+      user = await User.create({
+        email,
+        password: hashedPassword,
+        role: 'master',
+        isActive: true
+      });
+      
+      await Profile.create({
+        userId: user.id,
+        firstName: 'Jorge',
+        lastName: 'Loyo',
+        dni: '12345678'
+      });
+      
+      console.log('✅ Usuario master creado:', email);
+    } else {
+      await user.update({ role: 'master', isActive: true });
+      console.log('✅ Usuario master actualizado:', email);
+    }
+  } catch (error) {
+    console.error('❌ Error creando usuario master:', error);
+  }
+};
 
 // Importar rutas
 const homeRoutes = require("./routes/home.routes");
@@ -46,6 +77,7 @@ app.use("/api/patient-history", require("./routes/patient-history.routes"));
 app.use("/api/stats", require("./routes/stats.routes"));
 app.use("/api/notes", require("./routes/notes.routes"));
 app.use("/api/admin", require("./routes/admin.routes"));
+app.use("/api/reviews", require("./routes/review.routes"));
 // Debug: Cargar rutas de horarios
 console.log('Cargando rutas de schedules...');
 app.use("/api/schedules", require("./routes/schedule.routes"));
@@ -241,38 +273,30 @@ app.get("/api/debug/user/:email", async (req, res) => {
   }
 });
 
-// Crear usuario master si no existe
-app.post("/api/debug/create-master", async (req, res) => {
+// Limpiar base de datos (solo para desarrollo)
+app.post("/api/debug/clean-database", async (req, res) => {
   try {
-    const bcrypt = require('bcryptjs');
-    const email = 'jorgenayati@gmail.com';
+    const { User, Profile, Professional, Appointment, Schedule, Notification, UserPreference, Review } = require('./models');
     
-    let user = await User.findOne({ where: { email } });
+    // Eliminar todos los datos excepto el usuario master
+    await Review.destroy({ where: {} });
+    await Notification.destroy({ where: {} });
+    await UserPreference.destroy({ where: {} });
+    await Appointment.destroy({ where: {} });
+    await Schedule.destroy({ where: {} });
+    await Professional.destroy({ where: {} });
     
-    if (user) {
-      // Actualizar a master si existe
-      await user.update({ role: 'master', isActive: true });
-      res.json({ message: 'Usuario actualizado a master', user: { id: user.id, email: user.email, role: user.role } });
-    } else {
-      // Crear nuevo usuario master
-      const hashedPassword = await bcrypt.hash('Password123!', 10);
-      user = await User.create({
-        email,
-        password: hashedPassword,
-        role: 'master',
-        isActive: true
-      });
-      
-      await Profile.create({
-        userId: user.id,
-        firstName: 'Jorge',
-        lastName: 'Loyo',
-        dni: '12345678'
-      });
-      
-      res.json({ message: 'Usuario master creado', user: { id: user.id, email: user.email, role: user.role } });
+    // Eliminar usuarios que no sean master
+    const masterUser = await User.findOne({ where: { email: 'jorgenayati@gmail.com' } });
+    if (masterUser) {
+      await Profile.destroy({ where: { userId: { [Op.ne]: masterUser.id } } });
+      await User.destroy({ where: { id: { [Op.ne]: masterUser.id } } });
     }
+    
+    console.log('🧹 Base de datos limpiada');
+    res.json({ message: 'Base de datos limpiada exitosamente' });
   } catch (error) {
+    console.error('Error limpiando BD:', error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -286,12 +310,9 @@ const startServer = async () => {
     // Sincronizar modelos
     await syncDatabase();
     
-    // Crear datos de prueba
+    // Crear solo especialidades y usuario master
     await seedSpecialties();
-    await seedPatients();
-    await seedProfessionals();
-    await seedSchedules();
-    await seedAppointments();
+    await createMasterUser();
     
     // Iniciar procesador de notificaciones
     const notificationService = require('./services/notification.service');

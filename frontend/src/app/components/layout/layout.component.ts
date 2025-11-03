@@ -18,85 +18,77 @@ import { AuthService } from '../../services/auth.service';
         </div>
         
         <div class="sidebar-menu">
-          <div class="menu-item" routerLink="/app/dashboard">
-            <div class="menu-icon">🏠</div>
-            <div class="menu-text">
+          <!-- Sección General -->
+          <div class="menu-section">
+            <h4>General</h4>
+            <div class="menu-item" routerLink="/app/dashboard">
+              <span class="menu-icon">🏠</span>
               <span class="menu-title">Dashboard</span>
-              <span class="menu-desc">Panel principal</span>
+            </div>
+            <div class="menu-item" routerLink="/app/profile">
+              <span class="menu-icon">👤</span>
+              <span class="menu-title">Mi Perfil</span>
             </div>
           </div>
 
-          <div class="menu-item" routerLink="/app/appointments">
-            <div class="menu-icon">📅</div>
-            <div class="menu-text">
-              <span class="menu-title">Citas</span>
-              <span class="menu-desc">Gestionar citas</span>
+          <!-- Sección Pacientes -->
+          <div class="menu-section">
+            <h4>Pacientes</h4>
+            <div class="menu-item" routerLink="/app/find-professionals">
+              <span class="menu-icon">🔍</span>
+              <span class="menu-title">Buscar Profesionales</span>
             </div>
-          </div>
-
-          <div class="menu-item" routerLink="/app/find-professionals">
-            <div class="menu-icon">👨⚕️</div>
-            <div class="menu-text">
-              <span class="menu-title">Buscar profesionales</span>
-              <span class="menu-desc">Encuentra especialistas</span>
-            </div>
-          </div>
-
-          <div class="menu-item" routerLink="/app/profile">
-            <div class="menu-icon">👤</div>
-            <div class="menu-text">
-              <span class="menu-title">Mi perfil</span>
-              <span class="menu-desc">Actualizar información</span>
-            </div>
-          </div>
-
-          <div class="menu-item" routerLink="/app/my-appointments">
-            <div class="menu-icon">📋</div>
-            <div class="menu-text">
+            <div class="menu-item" routerLink="/app/my-appointments">
+              <span class="menu-icon">📋</span>
               <span class="menu-title">Mis Turnos</span>
-              <span class="menu-desc">Ver citas agendadas</span>
+            </div>
+            <div class="menu-item" routerLink="/app/leave-review">
+              <span class="menu-icon">⭐</span>
+              <span class="menu-title">Dejar Reseña</span>
+            </div>
+            <div class="menu-item" routerLink="/app/notification-preferences">
+              <span class="menu-icon">🔔</span>
+              <span class="menu-title">Notificaciones</span>
             </div>
           </div>
 
-          <div class="menu-item" routerLink="/app/professional-dashboard">
-            <div class="menu-icon">👨⚕️</div>
-            <div class="menu-text">
-              <span class="menu-title">Dashboard Profesional</span>
-              <span class="menu-desc">Panel de profesional</span>
+          <!-- Sección Profesionales -->
+          <div class="menu-section">
+            <h4>Profesionales</h4>
+            <div class="menu-item" routerLink="/app/professional-dashboard">
+              <span class="menu-icon">📊</span>
+              <span class="menu-title">Mi Agenda</span>
             </div>
-          </div>
-
-          <div class="menu-item" routerLink="/app/schedule-config">
-            <div class="menu-icon">🕰️</div>
-            <div class="menu-text">
+            <div class="menu-item" routerLink="/app/professional-appointment">
+              <span class="menu-icon">📝</span>
+              <span class="menu-title">Agendar Turno</span>
+            </div>
+            <div class="menu-item" routerLink="/app/my-reviews">
+              <span class="menu-icon">⭐</span>
+              <span class="menu-title">Mis Reseñas</span>
+            </div>
+            <div class="menu-item" routerLink="/app/schedule-config">
+              <span class="menu-icon">⏰</span>
               <span class="menu-title">Configurar Horarios</span>
-              <span class="menu-desc">Definir disponibilidad</span>
             </div>
           </div>
 
-          <div class="menu-item" routerLink="/app/professional-appointment">
-            <div class="menu-icon">📝</div>
-            <div class="menu-text">
-              <span class="menu-title">Agendar para Paciente</span>
-              <span class="menu-desc">Crear turno profesional</span>
-            </div>
-          </div>
-
-          <div class="menu-item" routerLink="/app/admin">
-            <div class="menu-icon">⚙️</div>
-            <div class="menu-text">
-              <span class="menu-title">Administración</span>
-              <span class="menu-desc">Panel de admin</span>
+          <!-- Sección Administración -->
+          <div class="menu-section">
+            <h4>Administración</h4>
+            <div class="menu-item" routerLink="/app/admin">
+              <span class="menu-icon">⚙️</span>
+              <span class="menu-title">Panel Admin</span>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Global Hamburger Button -->
-      <button class="hamburger-btn" (click)="toggleSidebar()">
-        <span></span>
-        <span></span>
-        <span></span>
+      <button class="hamburger-btn" [class.active]="sidebarOpen" (click)="toggleSidebar()">
+        <span [class.rotate1]="sidebarOpen"></span>
+        <span [class.fade]="sidebarOpen"></span>
+        <span [class.rotate2]="sidebarOpen"></span>
       </button>
 
       <!-- Sidebar Overlay -->
@@ -129,14 +121,15 @@ import { AuthService } from '../../services/auth.service';
     .sidebar {
       position: fixed;
       top: 0;
-      left: -300px;
-      width: 300px;
+      left: -320px;
+      width: 320px;
       height: 100vh;
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(15px);
-      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(20px);
+      box-shadow: 2px 0 20px rgba(0, 0, 0, 0.15);
       transition: left 0.3s ease;
       z-index: 1000;
+      overflow-y: auto;
     }
 
     .sidebar.open {
@@ -166,52 +159,71 @@ import { AuthService } from '../../services/auth.service';
     }
 
     .sidebar-menu {
-      padding: 20px 0;
+      padding: 10px 0;
+    }
+
+    .menu-section {
+      margin-bottom: 25px;
+    }
+
+    .menu-section h4 {
+      color: var(--primary-color);
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin: 0 0 10px 20px;
+      padding-bottom: 5px;
+      border-bottom: 1px solid rgba(74, 144, 164, 0.2);
     }
 
     .menu-item {
       display: flex;
       align-items: center;
-      gap: 15px;
-      padding: 15px 20px;
+      gap: 12px;
+      padding: 12px 20px;
       cursor: pointer;
       transition: all 0.3s ease;
       text-decoration: none;
       color: inherit;
+      border-radius: 0 25px 25px 0;
+      margin-right: 10px;
     }
 
     .menu-item:hover {
-      background: rgba(74, 144, 164, 0.1);
+      background: linear-gradient(90deg, rgba(74, 144, 164, 0.1), rgba(74, 144, 164, 0.05));
+      transform: translateX(5px);
+    }
+
+    .menu-item.active {
+      background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+      color: white;
     }
 
     .menu-icon {
-      font-size: 1.5rem;
-      width: 30px;
+      font-size: 1.3rem;
+      width: 24px;
       text-align: center;
     }
 
-    .menu-text {
-      display: flex;
-      flex-direction: column;
-    }
-
     .menu-title {
-      font-weight: 600;
+      font-weight: 500;
+      font-size: 0.95rem;
       color: var(--primary-dark);
     }
 
-    .menu-desc {
-      font-size: 0.9rem;
-      color: var(--text-secondary);
+    .menu-item:hover .menu-title,
+    .menu-item.active .menu-title {
+      color: inherit;
     }
 
     .hamburger-btn {
       position: fixed;
       top: 20px;
       left: 20px;
-      width: 50px;
-      height: 50px;
-      background: var(--primary-color);
+      width: 55px;
+      height: 55px;
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
       border: none;
       border-radius: 50%;
       cursor: pointer;
@@ -222,6 +234,7 @@ import { AuthService } from '../../services/auth.service';
       gap: 4px;
       z-index: 1001;
       transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(74, 144, 164, 0.3);
     }
 
     .hamburger-btn span {
@@ -232,8 +245,39 @@ import { AuthService } from '../../services/auth.service';
     }
 
     .hamburger-btn:hover {
-      background: var(--primary-light);
       transform: scale(1.1);
+      box-shadow: 0 6px 20px rgba(74, 144, 164, 0.4);
+    }
+
+    .hamburger-btn.active {
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+    }
+
+    .hamburger-btn span.rotate1 {
+      transform: rotate(45deg) translate(5px, 5px);
+    }
+
+    .hamburger-btn span.fade {
+      opacity: 0;
+    }
+
+    .hamburger-btn span.rotate2 {
+      transform: rotate(-45deg) translate(7px, -6px);
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 280px;
+        left: -280px;
+      }
+      
+      .menu-section h4 {
+        font-size: 0.8rem;
+      }
+      
+      .menu-title {
+        font-size: 0.9rem;
+      }
     }
 
     .sidebar-overlay {

@@ -115,6 +115,10 @@ export class ProfessionalsListComponent implements OnInit {
     });
   }
 
+  viewReviews(professionalId: number) {
+    this.router.navigate(['/app/professional-reviews', professionalId]);
+  }
+
   private loadFavorites() {
     const saved = localStorage.getItem('favorites');
     this.favorites = saved ? JSON.parse(saved) : [];

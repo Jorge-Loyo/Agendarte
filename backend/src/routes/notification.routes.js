@@ -11,12 +11,11 @@ router.get('/preferences', authenticateToken, async (req, res) => {
     let preferences = await UserPreference.findOne({ where: { userId } });
     
     if (!preferences) {
-      preferences = await UserPreference.create({
-        userId,
+      preferences = {
         emailReminders: true,
         whatsappReminders: false,
         reminderHours: 24
-      });
+      };
     }
 
     res.json({

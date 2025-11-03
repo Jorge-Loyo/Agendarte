@@ -24,6 +24,8 @@ export const routes: Routes = [
       { path: 'find-professionals', loadComponent: () => import('./components/professionals-list/professionals-list.component').then(m => m.ProfessionalsListComponent) },
       { path: 'professional-calendar/:id', loadComponent: () => import('./components/professional-calendar/professional-calendar.component').then(m => m.ProfessionalCalendarComponent) },
       { path: 'my-appointments', loadComponent: () => import('./components/my-appointments/my-appointments.component').then(m => m.MyAppointmentsComponent) },
+      { path: 'leave-review', loadComponent: () => import('./components/leave-review/leave-review.component').then(m => m.LeaveReviewComponent) },
+      { path: 'my-reviews', loadComponent: () => import('./components/professional-reviews/professional-reviews.component').then(m => m.ProfessionalReviewsComponent) },
       { path: 'profile', loadComponent: () => import('./components/profile/profile.component').then(m => m.ProfileComponent) },
       { path: 'notification-preferences', loadComponent: () => import('./components/notification-preferences/notification-preferences.component').then(m => m.NotificationPreferencesComponent) },
       { path: 'medical-history', loadComponent: () => import('./components/medical-history/medical-history.component').then(m => m.MedicalHistoryComponent) },
@@ -33,6 +35,7 @@ export const routes: Routes = [
       { path: 'patient-history/:id', loadComponent: () => import('./components/patient-history/patient-history.component').then(m => m.PatientHistoryComponent) },
       { path: 'appointment-notes/:id', loadComponent: () => import('./components/appointment-notes/appointment-notes.component').then(m => m.AppointmentNotesComponent) },
       { path: 'payment/:id', loadComponent: () => import('./components/payment/payment.component').then(m => m.PaymentComponent) },
+      { path: 'professional-reviews/:id', loadComponent: () => import('./components/public-professional-reviews/public-professional-reviews.component').then(m => m.PublicProfessionalReviewsComponent) },
       { 
         path: 'admin', 
         canActivate: [(route, state) => {

@@ -6,6 +6,7 @@ const Specialty = require('./specialty.model');
 const Schedule = require('./Schedule');
 const Notification = require('./Notification');
 const UserPreference = require('./UserPreference');
+const Review = require('./Review');
 
 // Asociaciones User - Profile
 User.hasOne(Profile, { 
@@ -97,6 +98,34 @@ Notification.belongsTo(User, {
   as: 'user' 
 });
 
+// Asociaciones Review
+Appointment.hasOne(Review, { 
+  foreignKey: 'appointmentId', 
+  as: 'review' 
+});
+Review.belongsTo(Appointment, { 
+  foreignKey: 'appointmentId', 
+  as: 'appointment' 
+});
+
+User.hasMany(Review, { 
+  foreignKey: 'patientId', 
+  as: 'patientReviews' 
+});
+Review.belongsTo(User, { 
+  foreignKey: 'patientId', 
+  as: 'patient' 
+});
+
+Professional.hasMany(Review, { 
+  foreignKey: 'professionalId', 
+  as: 'reviews' 
+});
+Review.belongsTo(Professional, { 
+  foreignKey: 'professionalId', 
+  as: 'professional' 
+});
+
 module.exports = {
   User,
   Profile,
@@ -105,5 +134,6 @@ module.exports = {
   Specialty,
   Schedule,
   Notification,
-  UserPreference
+  UserPreference,
+  Review
 };

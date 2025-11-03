@@ -230,49 +230,12 @@ const updateUserFull = async (req, res) => {
 const getAllAppointments = async (req, res) => {
   try {
     const appointments = await Appointment.findAll({
-      include: [
-        {
-          model: User,
-          as: 'patient',
-          include: [{ model: Profile, as: 'profile' }]
-        },
-        {
-          model: Professional,
-          as: 'professional',
-          include: [{
-            model: User,
-            as: 'user',
-            include: [{ model: Profile, as: 'profile' }]
-          }]
-        }
-      ],
       order: [['appointmentDate', 'DESC'], ['appointmentTime', 'DESC']]
     });
 
-    const formattedAppointments = appointments.map(apt => ({
-      id: apt.id,
-      appointmentDate: apt.appointmentDate,
-      appointmentTime: apt.appointmentTime,
-      status: apt.status,
-      paymentStatus: apt.paymentStatus,
-      notes: apt.notes,
-      patient: {
-        id: apt.patient?.id,
-        name: apt.patient?.profile ? `${apt.patient.profile.firstName} ${apt.patient.profile.lastName}` : 'Sin nombre',
-        dni: apt.patient?.profile?.dni,
-        email: apt.patient?.email
-      },
-      professional: {
-        id: apt.professional?.id,
-        name: apt.professional?.user?.profile ? `${apt.professional.user.profile.firstName} ${apt.professional.user.profile.lastName}` : 'Sin nombre',
-        specialty: apt.professional?.specialty
-      },
-      professionalId: apt.professionalId
-    }));
-
     res.json({
       message: 'Turnos obtenidos exitosamente',
-      appointments: formattedAppointments
+      appointments: appointments || []
     });
   } catch (error) {
     console.error('Error obteniendo turnos:', error);
@@ -405,13 +368,12 @@ const getPatients = async (req, res) => {
   try {
     const patients = await User.findAll({
       where: { role: 'patient', isActive: true },
-      include: [{ model: Profile, as: 'profile' }],
       order: [['createdAt', 'DESC']]
     });
 
     res.json({
       message: 'Pacientes obtenidos exitosamente',
-      patients
+      patients: patients || []
     });
   } catch (error) {
     console.error('Error obteniendo pacientes:', error);
