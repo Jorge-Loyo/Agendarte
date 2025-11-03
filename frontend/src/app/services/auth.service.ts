@@ -101,4 +101,13 @@ export class AuthService {
       })
     );
   }
+
+  changePassword(currentPassword: string, newPassword: string): Observable<any> {
+    return this.http.put(`${this.baseUrl}/change-password`, 
+      { currentPassword, newPassword }, 
+      {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      }
+    );
+  }
 }

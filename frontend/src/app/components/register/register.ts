@@ -18,7 +18,7 @@ export class Register {
   firstName = '';
   lastName = '';
   dni = '';
-  age: number | null = null;
+  birthDate = '';
   gender = '';
   address = '';
   phone = '';
@@ -50,7 +50,7 @@ export class Register {
       firstName: this.firstName,
       lastName: this.lastName,
       dni: this.dni || undefined,
-      age: this.age || undefined,
+      birthDate: this.birthDate || undefined,
       gender: this.gender || undefined,
       address: this.address || undefined,
       phone: this.phone || undefined
@@ -63,7 +63,7 @@ export class Register {
         console.log('Registro exitoso:', response);
         this.success = 'Usuario registrado exitosamente. Redirigiendo...';
         setTimeout(() => {
-          this.router.navigate(['/dashboard']);
+          this.router.navigate(['/app/dashboard']);
         }, 2000);
       },
       error: (error) => {
@@ -88,7 +88,7 @@ export class Register {
 
   // Validación de contraseña segura
   isPasswordSecure(password: string): boolean {
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.])[A-Za-z\d@$!%*?&.]{8,}$/;
     return passwordRegex.test(password);
   }
 
@@ -107,7 +107,7 @@ export class Register {
     if (/[a-z]/.test(this.password)) strength++;
     if (/[A-Z]/.test(this.password)) strength++;
     if (/\d/.test(this.password)) strength++;
-    if (/[@$!%*?&]/.test(this.password)) strength++;
+    if (/[@$!%*?&.]/.test(this.password)) strength++;
     
     if (strength < 3) return 'Débil';
     if (strength < 5) return 'Media';
@@ -160,7 +160,7 @@ export class Register {
       this.fieldErrors['password'] = 'Contraseña es requerida';
       isValid = false;
     } else if (!this.isPasswordSecure(this.password)) {
-      this.fieldErrors['password'] = 'Contraseña debe tener 8+ caracteres, mayúscula, minúscula y número';
+      this.fieldErrors['password'] = 'Contraseña debe tener 8+ caracteres, mayúscula, minúscula, número y carácter especial (@$!%*?&.)';
       isValid = false;
     }
 

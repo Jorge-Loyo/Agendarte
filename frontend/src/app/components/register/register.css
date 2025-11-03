@@ -306,6 +306,27 @@ textarea.form-control {
   font-weight: 500;
 }
 
+.password-help {
+  margin-top: 8px;
+  padding: 10px 12px;
+  background: rgba(59, 130, 246, 0.1);
+  border-radius: 8px;
+  border-left: 3px solid #3b82f6;
+  backdrop-filter: blur(10px);
+}
+
+.password-help small {
+  color: #1e40af;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.password-help strong {
+  color: #1d4ed8;
+  font-weight: 700;
+}
+
 .form-control.error {
   border-color: #dc2626;
   box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);

@@ -18,6 +18,8 @@ export class AdminPermissionsComponent implements OnInit {
   constructor(private permissionsService: PermissionsService) {}
 
   ngOnInit() {
+    // Forzar recarga de permisos para obtener los últimos cambios
+    this.permissionsService.forceReloadPermissions();
     this.loadPermissions();
   }
 

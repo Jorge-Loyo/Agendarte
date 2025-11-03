@@ -21,7 +21,7 @@ const validateRegisterSecure = [
     .withMessage('Email debe ser válido'),
   body('password')
     .isLength({ min: 8 })
-    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.])[A-Za-z\d@$!%*?&.]/)
     .withMessage('Contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial'),
   body('firstName')
     .trim()
@@ -82,11 +82,10 @@ const validateRegister = (req, res, next) => {
       'string.max': 'DNI no puede exceder 20 caracteres',
       'any.required': 'DNI es requerido'
     }),
-    age: Joi.number().integer().min(1).max(120).optional().messages({
-      'number.min': 'Edad debe ser mayor a 0',
-      'number.max': 'Edad no puede ser mayor a 120'
+    birthDate: Joi.date().optional().messages({
+      'date.base': 'Fecha de nacimiento debe ser una fecha válida'
     }),
-    gender: Joi.string().valid('M', 'F', 'Other').optional(),
+    gender: Joi.string().valid('M', 'F', 'NB').optional(),
     address: Joi.string().max(500).optional().messages({
       'string.max': 'Dirección no puede exceder 500 caracteres'
     }),

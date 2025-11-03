@@ -38,6 +38,12 @@ export const routes: Routes = [
       { path: 'leave-review', loadComponent: () => import('./components/leave-review/leave-review.component').then(m => m.LeaveReviewComponent) },
       { path: 'my-reviews', loadComponent: () => import('./components/professional-reviews/professional-reviews.component').then(m => m.ProfessionalReviewsComponent) },
       { path: 'profile', loadComponent: () => import('./components/profile/profile.component').then(m => m.ProfileComponent) },
+      { 
+        path: 'professional-profile', 
+        loadComponent: () => import('./components/professional-profile/professional-profile.component').then(m => m.ProfessionalProfileComponent),
+        canActivate: [professionalPermissionsGuard],
+        data: { requiredPermissions: ['view_profile'] }
+      },
       { path: 'notification-preferences', loadComponent: () => import('./components/notification-preferences/notification-preferences.component').then(m => m.NotificationPreferencesComponent) },
       { path: 'permissions-demo', loadComponent: () => import('./components/permissions-demo/permissions-demo.component').then(m => m.PermissionsDemoComponent) },
       { path: 'medical-history', loadComponent: () => import('./components/medical-history/medical-history.component').then(m => m.MedicalHistoryComponent) },

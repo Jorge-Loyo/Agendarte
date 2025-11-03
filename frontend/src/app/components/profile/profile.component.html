@@ -63,9 +63,43 @@
     <div class="profile-form">
       <form (ngSubmit)="onSubmit()" #profileForm="ngForm" *ngIf="editMode; else viewMode">
         <div class="form-sections">
+          <!-- Change Password Section -->
+          <div class="form-section">
+            <h3>🔐 Cambiar Contraseña</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Contraseña Actual *</label>
+                <input 
+                  type="password" 
+                  [(ngModel)]="passwordData.currentPassword"
+                  name="currentPassword"
+                  class="form-control">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Nueva Contraseña *</label>
+                <input 
+                  type="password" 
+                  [(ngModel)]="passwordData.newPassword"
+                  name="newPassword"
+                  class="form-control">
+              </div>
+              <div class="form-group">
+                <label>Confirmar Nueva Contraseña *</label>
+                <input 
+                  type="password" 
+                  [(ngModel)]="passwordData.confirmPassword"
+                  name="confirmPassword"
+                  class="form-control">
+              </div>
+            </div>
+            <button type="button" class="btn-password" (click)="changePassword()">Cambiar Contraseña</button>
+          </div>
+
           <!-- Personal Information -->
           <div class="form-section">
-            <h3>Información Personal</h3>
+            <h3>👤 Información Personal</h3>
             <div class="form-row">
               <div class="form-group">
                 <label>Nombre *</label>
@@ -164,8 +198,8 @@
       <!-- View Mode -->
       <ng-template #viewMode>
         <div class="profile-view">
-          <div class="view-section">
-            <h3>Información Personal</h3>
+          <div class="form-section">
+            <h3>👤 Información Personal</h3>
             <div class="form-row">
               <div class="form-group">
                 <label>Nombre</label>

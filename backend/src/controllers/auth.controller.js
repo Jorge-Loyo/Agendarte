@@ -23,7 +23,7 @@ const generateToken = (userId) => {
 
 const register = async (req, res) => {
   try {
-    const { email, password, firstName, lastName, dni, age, gender, address, phone } = req.body;
+    const { email, password, firstName, lastName, dni, birthDate, gender, address, phone } = req.body;
 
     // Verificar si el email ya existe
     const existingUser = await User.findOne({ where: { email: email.toLowerCase() } });
@@ -66,7 +66,7 @@ const register = async (req, res) => {
       firstName,
       lastName,
       dni,
-      age: age || null,
+      birthDate: birthDate || null,
       gender: gender || null,
       address: address || null,
       phone: phone || null
@@ -175,8 +175,47 @@ const getProfile = async (req, res) => {
   }
 };
 
+const changePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const userId = req.user.id;
+
+    // Buscar usuario con contraseña
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return res.status(404).json({
+        message: 'Usuario no encontrado'
+      });
+    }
+
+    // Verificar contraseña actual
+    const isValidPassword = await bcrypt.compare(currentPassword, user.password);
+    if (!isValidPassword) {
+      return res.status(400).json({
+        message: 'Contraseña actual incorrecta'
+      });
+    }
+
+    // Encriptar nueva contraseña
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+    // Actualizar contraseña
+    await user.update({ password: hashedNewPassword });
+
+    res.json({
+      message: 'Contraseña actualizada correctamente'
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: 'Error en el servidor',
+      error: error.message
+    });
+  }
+};
+
 module.exports = {
   register,
   login,
-  getProfile
+  getProfile,
+  changePassword
 };

@@ -11,5 +11,6 @@ router.post('/login', loginLimiter, validateLoginSecure, authController.login);
 
 // Rutas protegidas
 router.get('/profile', authenticateToken, authController.getProfile);
+router.put('/change-password', authenticateToken, authController.changePassword);
 
 module.exports = router;

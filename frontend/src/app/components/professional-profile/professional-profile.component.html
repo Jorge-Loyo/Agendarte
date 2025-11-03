@@ -1,0 +1,128 @@
+<div class="professional-profile-container">
+  <div class="profile-header">
+    <h1>Perfil Profesional</h1>
+    <p>Gestiona tu información profesional y configuraciones</p>
+  </div>
+
+  <div class="profile-content" *ngIf="!isLoading">
+    <!-- Mensaje de estado -->
+    <div *ngIf="message" class="message" [ngClass]="messageType">
+      {{ message }}
+    </div>
+
+    <form (ngSubmit)="updateProfile()" #profileForm="ngForm">
+      <!-- Información Personal -->
+      <div class="form-section">
+        <h2>Información Personal</h2>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="firstName">Nombre</label>
+            <input 
+              type="text" 
+              id="firstName" 
+              name="firstName"
+              [(ngModel)]="profile.firstName" 
+              required>
+          </div>
+          <div class="form-group">
+            <label for="lastName">Apellido</label>
+            <input 
+              type="text" 
+              id="lastName" 
+              name="lastName"
+              [(ngModel)]="profile.lastName" 
+              required>
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input 
+              type="email" 
+              id="email" 
+              name="email"
+              [(ngModel)]="profile.email" 
+              required>
+          </div>
+          <div class="form-group">
+            <label for="phone">Teléfono</label>
+            <input 
+              type="tel" 
+              id="phone" 
+              name="phone"
+              [(ngModel)]="profile.phone">
+          </div>
+        </div>
+      </div>
+
+      <!-- Información Profesional -->
+      <div class="form-section">
+        <h2>Información Profesional</h2>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="specialty">Especialidad</label>
+            <input 
+              type="text" 
+              id="specialty" 
+              name="specialty"
+              [(ngModel)]="profile.specialty" 
+              required>
+          </div>
+          <div class="form-group">
+            <label for="licenseNumber">Número de Matrícula</label>
+            <input 
+              type="text" 
+              id="licenseNumber" 
+              name="licenseNumber"
+              [(ngModel)]="profile.licenseNumber">
+          </div>
+          <div class="form-group">
+            <label for="experience">Años de Experiencia</label>
+            <input 
+              type="number" 
+              id="experience" 
+              name="experience"
+              [(ngModel)]="profile.experience">
+          </div>
+          <div class="form-group">
+            <label for="consultationFee">Precio de Consulta</label>
+            <input 
+              type="number" 
+              id="consultationFee" 
+              name="consultationFee"
+              [(ngModel)]="profile.consultationFee">
+          </div>
+        </div>
+        
+        <div class="form-group full-width">
+          <label for="education">Formación Académica</label>
+          <textarea 
+            id="education" 
+            name="education"
+            [(ngModel)]="profile.education" 
+            rows="3"
+            placeholder="Describe tu formación académica..."></textarea>
+        </div>
+        
+        <div class="form-group full-width">
+          <label for="description">Descripción Profesional</label>
+          <textarea 
+            id="description" 
+            name="description"
+            [(ngModel)]="profile.description" 
+            rows="4"
+            placeholder="Describe tu experiencia y enfoque profesional..."></textarea>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-primary" [disabled]="isLoading || !profileForm.form.valid">
+          {{ isLoading ? 'Guardando...' : 'Guardar Cambios' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div class="loading-container" *ngIf="isLoading">
+    <div class="loading-spinner"></div>
+    <p>Cargando perfil...</p>
+  </div>
+</div>

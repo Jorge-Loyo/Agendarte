@@ -41,8 +41,7 @@ export class PermissionsService {
         { key: 'cancel_appointments', name: 'Cancelar turnos', description: 'Cancelar mis turnos', enabled: true },
         { key: 'view_professionals', name: 'Ver profesionales', description: 'Ver lista de profesionales', enabled: true },
         { key: 'leave_reviews', name: 'Dejar reseñas', description: 'Dejar reseñas de profesionales', enabled: true },
-        { key: 'view_profile', name: 'Ver perfil', description: 'Ver y editar mi perfil', enabled: true },
-        { key: 'notification_preferences', name: 'Preferencias de notificación', description: 'Configurar notificaciones', enabled: true }
+        { key: 'view_profile', name: 'Ver perfil', description: 'Ver y editar mi perfil', enabled: true }
       ]
     },
     {
@@ -55,7 +54,9 @@ export class PermissionsService {
         { key: 'add_notes', name: 'Agregar notas', description: 'Agregar notas a consultas', enabled: true },
         { key: 'view_statistics', name: 'Ver estadísticas', description: 'Ver estadísticas personales', enabled: true },
         { key: 'view_reviews', name: 'Ver reseñas', description: 'Ver reseñas recibidas', enabled: true },
-        { key: 'professional_dashboard', name: 'Dashboard profesional', description: 'Acceso al dashboard profesional', enabled: true }
+        { key: 'professional_dashboard', name: 'Dashboard profesional', description: 'Acceso al dashboard profesional', enabled: true },
+        { key: 'notification_preferences', name: 'Configurar notificaciones', description: 'Configurar cómo notificar a pacientes', enabled: true },
+        { key: 'view_profile', name: 'Ver perfil', description: 'Ver y editar perfil profesional', enabled: true }
       ]
     },
     {
@@ -67,7 +68,8 @@ export class PermissionsService {
         { key: 'view_reports', name: 'Ver reportes', description: 'Acceder a reportes del sistema', enabled: true },
         { key: 'process_payments', name: 'Procesar pagos', description: 'Gestionar pagos y facturación', enabled: true },
         { key: 'manage_specialties', name: 'Gestionar especialidades', description: 'Crear y editar especialidades', enabled: true },
-        { key: 'admin_dashboard', name: 'Panel administrativo', description: 'Acceso al panel de administración', enabled: true }
+        { key: 'admin_dashboard', name: 'Panel administrativo', description: 'Acceso al panel de administración', enabled: true },
+        { key: 'view_profile', name: 'Ver perfil', description: 'Ver y editar mi perfil', enabled: true }
       ]
     },
     {
@@ -79,7 +81,8 @@ export class PermissionsService {
         { key: 'view_system_logs', name: 'Ver logs del sistema', description: 'Acceder a logs de actividad', enabled: true },
         { key: 'reset_passwords', name: 'Resetear contraseñas', description: 'Resetear contraseñas de usuarios', enabled: true },
         { key: 'full_system_access', name: 'Acceso completo al sistema', description: 'Acceso total a todas las funciones', enabled: true },
-        { key: 'delete_users', name: 'Eliminar usuarios', description: 'Eliminar usuarios del sistema', enabled: true }
+        { key: 'delete_users', name: 'Eliminar usuarios', description: 'Eliminar usuarios del sistema', enabled: true },
+        { key: 'view_profile', name: 'Ver perfil', description: 'Ver y editar mi perfil', enabled: true }
       ]
     }
   ];
@@ -155,7 +158,15 @@ export class PermissionsService {
       icon: '👤',
       route: '/app/profile',
       requiredPermissions: ['view_profile'],
-      requiredRoles: ['patient', 'professional', 'admin', 'master']
+      requiredRoles: ['patient', 'admin', 'master']
+    },
+    {
+      key: 'professional_profile',
+      label: 'Perfil Profesional',
+      icon: '👨‍⚕️',
+      route: '/app/professional-profile',
+      requiredPermissions: ['view_profile'],
+      requiredRoles: ['professional']
     },
     {
       key: 'notifications',
@@ -163,7 +174,7 @@ export class PermissionsService {
       icon: '🔔',
       route: '/app/notification-preferences',
       requiredPermissions: ['notification_preferences'],
-      requiredRoles: ['patient', 'professional', 'admin', 'master']
+      requiredRoles: ['professional']
     }
   ];
 
@@ -358,6 +369,24 @@ export class PermissionsService {
       const userRole = rolePermissions.find(r => r.key === user.role);
       console.log('User role permissions:', userRole);
       console.log('Available menu options:', this.getAvailableMenuOptions());
+      
+      // Debug específico para cada opción
+      this.menuOptions.forEach(option => {
+        const hasRole = !option.requiredRoles || option.requiredRoles.includes(user.role);
+        const hasPermissions = option.requiredPermissions.length === 0 || 
+                              option.requiredPermissions.some(p => this.hasPermission(p));
+        console.log(`${option.label}: hasRole=${hasRole}, hasPermissions=${hasPermissions}`);
+      });
     }
+  }
+
+  clearStoredPermissions(): void {
+    localStorage.removeItem('rolePermissions');
+    this.loadRolePermissions();
+  }
+
+  forceReloadPermissions(): void {
+    this.rolePermissionsSubject.next(this.defaultRolePermissions);
+    localStorage.setItem('rolePermissions', JSON.stringify(this.defaultRolePermissions));
   }
 }

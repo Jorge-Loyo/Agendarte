@@ -40,7 +40,12 @@ export class Login {
     this.authService.login(this.email, this.password).subscribe({
       next: (response) => {
         console.log('Login exitoso:', response);
-        this.router.navigate(['/app/dashboard']);
+        const user = this.authService.getCurrentUser();
+        if (user?.role === 'professional') {
+          this.router.navigate(['/app/professional-dashboard']);
+        } else {
+          this.router.navigate(['/app/dashboard']);
+        }
       },
       error: (error) => {
         console.error('Error completo:', error);

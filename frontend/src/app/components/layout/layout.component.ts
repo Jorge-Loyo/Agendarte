@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet, RouterModule } from '@angular/router';
 import { HeaderComponent } from '../header/header.component';
 import { AuthService } from '../../services/auth.service';
+import { PermissionsService, MenuOption } from '../../services/permissions.service';
 
 @Component({
   selector: 'app-layout',
@@ -18,67 +19,14 @@ import { AuthService } from '../../services/auth.service';
         </div>
         
         <div class="sidebar-menu">
-          <!-- Sección General -->
-          <div class="menu-section">
-            <h4>General</h4>
-            <div class="menu-item" routerLink="/app/dashboard">
-              <span class="menu-icon">🏠</span>
-              <span class="menu-title">Dashboard</span>
-            </div>
-            <div class="menu-item" routerLink="/app/profile">
-              <span class="menu-icon">👤</span>
-              <span class="menu-title">Mi Perfil</span>
-            </div>
-          </div>
-
-          <!-- Sección Pacientes -->
-          <div class="menu-section">
-            <h4>Pacientes</h4>
-            <div class="menu-item" routerLink="/app/find-professionals">
-              <span class="menu-icon">🔍</span>
-              <span class="menu-title">Buscar Profesionales</span>
-            </div>
-            <div class="menu-item" routerLink="/app/my-appointments">
-              <span class="menu-icon">📋</span>
-              <span class="menu-title">Mis Turnos</span>
-            </div>
-            <div class="menu-item" routerLink="/app/leave-review">
-              <span class="menu-icon">⭐</span>
-              <span class="menu-title">Dejar Reseña</span>
-            </div>
-            <div class="menu-item" routerLink="/app/notification-preferences">
-              <span class="menu-icon">🔔</span>
-              <span class="menu-title">Notificaciones</span>
-            </div>
-          </div>
-
-          <!-- Sección Profesionales -->
-          <div class="menu-section">
-            <h4>Profesionales</h4>
-            <div class="menu-item" routerLink="/app/professional-dashboard">
-              <span class="menu-icon">📊</span>
-              <span class="menu-title">Mi Agenda</span>
-            </div>
-            <div class="menu-item" routerLink="/app/professional-appointment">
-              <span class="menu-icon">📝</span>
-              <span class="menu-title">Agendar Turno</span>
-            </div>
-            <div class="menu-item" routerLink="/app/my-reviews">
-              <span class="menu-icon">⭐</span>
-              <span class="menu-title">Mis Reseñas</span>
-            </div>
-            <div class="menu-item" routerLink="/app/schedule-config">
-              <span class="menu-icon">⏰</span>
-              <span class="menu-title">Configurar Horarios</span>
-            </div>
-          </div>
-
-          <!-- Sección Administración -->
-          <div class="menu-section">
-            <h4>Administración</h4>
-            <div class="menu-item" routerLink="/app/admin">
-              <span class="menu-icon">⚙️</span>
-              <span class="menu-title">Panel Admin</span>
+          <div class="menu-section" *ngFor="let section of menuSections">
+            <h4>{{ section.title }}</h4>
+            <div class="menu-item" 
+                 *ngFor="let option of section.options" 
+                 [routerLink]="option.route"
+                 routerLinkActive="active">
+              <span class="menu-icon">{{ option.icon }}</span>
+              <span class="menu-title">{{ option.label }}</span>
             </div>
           </div>
         </div>
@@ -299,10 +247,53 @@ import { AuthService } from '../../services/auth.service';
     }
   `]
 })
-export class LayoutComponent {
+export class LayoutComponent implements OnInit {
   sidebarOpen = false;
+  menuSections: any[] = [];
 
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private permissionsService: PermissionsService
+  ) {}
+
+  ngOnInit() {
+    this.loadMenuSections();
+  }
+
+  loadMenuSections() {
+    const availableOptions = this.permissionsService.getAvailableMenuOptions();
+    
+    // Agrupar opciones por categoría
+    const sections = [
+      {
+        title: 'General',
+        options: availableOptions.filter(opt => 
+          ['dashboard', 'profile', 'notifications'].includes(opt.key)
+        )
+      },
+      {
+        title: 'Pacientes', 
+        options: availableOptions.filter(opt => 
+          ['my_appointments', 'find_professionals'].includes(opt.key)
+        )
+      },
+      {
+        title: 'Profesionales',
+        options: availableOptions.filter(opt => 
+          ['professional_dashboard', 'schedule_config', 'my_reviews', 'my_patients'].includes(opt.key)
+        )
+      },
+      {
+        title: 'Administración',
+        options: availableOptions.filter(opt => 
+          ['admin_panel'].includes(opt.key)
+        )
+      }
+    ];
+    
+    // Solo mostrar secciones que tengan opciones
+    this.menuSections = sections.filter(section => section.options.length > 0);
+  }
 
   toggleSidebar() {
     this.sidebarOpen = !this.sidebarOpen;

@@ -6,8 +6,8 @@
         👨⚕️
       </div>
       <div class="welcome-info">
-        <h1>Dr. {{ currentUser?.profile?.firstName || 'Profesional' }} {{ currentUser?.profile?.lastName || '' }}</h1>
-        <p class="specialty">Especialista en Cardiología</p>
+        <h1>{{ currentUser?.profile?.firstName || 'Profesional' }} {{ currentUser?.profile?.lastName || '' }}</h1>
+        <p class="specialty">{{ currentUser?.profile?.specialty || 'Especialidad no definida' }}</p>
         <p class="today-date">{{ currentDate | date:'fullDate' }}</p>
       </div>
       <div class="quick-stats">

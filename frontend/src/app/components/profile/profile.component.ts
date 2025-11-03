@@ -32,6 +32,12 @@ export class ProfileComponent implements OnInit {
 
   selectedFile: File | null = null;
   imagePreview: string | null = null;
+  
+  passwordData = {
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  };
 
   get calculatedAge(): number | null {
     return this.currentUser?.profile?.age || null;
@@ -138,6 +144,33 @@ export class ProfileComponent implements OnInit {
   removeImage() {
     this.selectedFile = null;
     this.imagePreview = null;
+  }
+
+  changePassword() {
+    if (!this.passwordData.currentPassword || !this.passwordData.newPassword || !this.passwordData.confirmPassword) {
+      this.notificationService.error('Error', 'Todos los campos de contraseña son requeridos');
+      return;
+    }
+    
+    if (this.passwordData.newPassword !== this.passwordData.confirmPassword) {
+      this.notificationService.error('Error', 'Las contraseñas no coinciden');
+      return;
+    }
+    
+    if (this.passwordData.newPassword.length < 8) {
+      this.notificationService.error('Error', 'La nueva contraseña debe tener al menos 8 caracteres');
+      return;
+    }
+    
+    this.authService.changePassword(this.passwordData.currentPassword, this.passwordData.newPassword).subscribe({
+      next: () => {
+        this.notificationService.success('Éxito', 'Contraseña actualizada correctamente');
+        this.passwordData = { currentPassword: '', newPassword: '', confirmPassword: '' };
+      },
+      error: (error: any) => {
+        this.notificationService.error('Error', error.error?.message || 'Error al cambiar la contraseña');
+      }
+    });
   }
 
   goBack() {
