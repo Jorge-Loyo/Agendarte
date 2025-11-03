@@ -1,0 +1,204 @@
+<div class="admin-appointments-container">
+  <div class="header">
+    <h2>🗓️ Gestión de Turnos</h2>
+    <button class="btn-primary" (click)="openModal('create')">
+      ➕ Nuevo Turno
+    </button>
+  </div>
+
+  <!-- Filtros -->
+  <div class="filters-section">
+    <div class="filter-group">
+      <input 
+        type="text" 
+        placeholder="Buscar paciente o profesional..."
+        [(ngModel)]="searchTerm"
+        (input)="applyFilters()"
+        class="search-input">
+    </div>
+    
+    <div class="filter-group">
+      <select [(ngModel)]="selectedProfessional" (change)="applyFilters()" class="filter-select">
+        <option value="">Todos los profesionales</option>
+        <option *ngFor="let prof of professionals" [value]="prof.id">
+          {{prof.name}} - {{prof.specialty}}
+        </option>
+      </select>
+    </div>
+    
+    <div class="filter-group">
+      <select [(ngModel)]="selectedStatus" (change)="applyFilters()" class="filter-select">
+        <option value="">Todos los estados</option>
+        <option value="scheduled">Programado</option>
+        <option value="confirmed">Confirmado</option>
+        <option value="completed">Completado</option>
+        <option value="cancelled">Cancelado</option>
+      </select>
+    </div>
+    
+    <div class="filter-group">
+      <input 
+        type="date" 
+        [(ngModel)]="selectedDate"
+        (change)="applyFilters()"
+        class="filter-date">
+    </div>
+  </div>
+
+  <!-- Tabla de turnos -->
+  <div class="appointments-table">
+    <table>
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Hora</th>
+          <th>Paciente</th>
+          <th>Profesional</th>
+          <th>Estado</th>
+          <th>Pago</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let appointment of filteredAppointments">
+          <td>{{appointment.appointmentDate | date:'dd/MM/yyyy'}}</td>
+          <td>{{appointment.appointmentTime}}</td>
+          <td>
+            <div class="patient-info">
+              <strong>{{appointment.patient?.name}}</strong>
+              <small>{{appointment.patient?.dni}}</small>
+            </div>
+          </td>
+          <td>
+            <div class="professional-info">
+              <strong>{{appointment.professional?.name}}</strong>
+              <small>{{appointment.professional?.specialty}}</small>
+            </div>
+          </td>
+          <td>
+            <span class="status-badge" [ngClass]="getStatusClass(appointment.status)">
+              {{getStatusText(appointment.status)}}
+            </span>
+          </td>
+          <td>
+            <span class="payment-badge" [ngClass]="getPaymentStatusClass(appointment.paymentStatus)">
+              {{getPaymentStatusText(appointment.paymentStatus)}}
+            </span>
+            <button 
+              *ngIf="appointment.paymentStatus === 'pending'" 
+              class="btn-payment"
+              (click)="processPayment(appointment.id)">
+              💳 Procesar
+            </button>
+          </td>
+          <td>
+            <div class="actions">
+              <button 
+                class="btn-action btn-cancel"
+                *ngIf="appointment.status !== 'cancelled' && appointment.status !== 'completed'"
+                (click)="openModal('cancel', appointment)">
+                ❌
+              </button>
+              <button 
+                class="btn-action btn-reschedule"
+                *ngIf="appointment.status !== 'cancelled' && appointment.status !== 'completed'"
+                (click)="openModal('reschedule', appointment)">
+                📅
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <div *ngIf="filteredAppointments.length === 0" class="no-results">
+      <p>No se encontraron turnos con los filtros aplicados</p>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    
+    <!-- Crear turno -->
+    <div *ngIf="modalAction === 'create'">
+      <h3>➕ Crear Nuevo Turno</h3>
+      
+      <div class="form-group">
+        <label>Paciente</label>
+        <div class="patient-search">
+          <input 
+            type="text" 
+            placeholder="Buscar por nombre, DNI o email..."
+            [(ngModel)]="newAppointment.patientSearch"
+            (input)="searchPatients()"
+            class="form-input">
+          
+          <div class="patient-results" *ngIf="showPatientResults && patients.length > 0">
+            <div 
+              *ngFor="let patient of patients" 
+              class="patient-result"
+              (click)="selectPatient(patient)">
+              <strong>{{patient.firstName}} {{patient.lastName}}</strong>
+              <small>{{patient.dni}} - {{patient.email}}</small>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label>Profesional</label>
+        <select [(ngModel)]="newAppointment.professionalId" class="form-select">
+          <option value="">Seleccionar profesional</option>
+          <option *ngFor="let prof of professionals" [value]="prof.id">
+            {{prof.name}} - {{prof.specialty}}
+          </option>
+        </select>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label>Fecha</label>
+          <input type="date" [(ngModel)]="newAppointment.date" class="form-input">
+        </div>
+        
+        <div class="form-group">
+          <label>Hora</label>
+          <input type="time" [(ngModel)]="newAppointment.time" class="form-input">
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label>Notas (opcional)</label>
+        <textarea 
+          [(ngModel)]="newAppointment.notes" 
+          placeholder="Notas adicionales..."
+          class="form-textarea"></textarea>
+      </div>
+      
+      <div class="modal-actions">
+        <button class="btn-secondary" (click)="closeModal()">Cancelar</button>
+        <button class="btn-primary" (click)="createAppointment()">Crear Turno</button>
+      </div>
+    </div>
+    
+    <!-- Cancelar turno -->
+    <div *ngIf="modalAction === 'cancel'">
+      <h3>❌ Cancelar Turno</h3>
+      <p>¿Está seguro que desea cancelar este turno?</p>
+      
+      <div class="appointment-details">
+        <p><strong>Paciente:</strong> {{selectedAppointment?.patient?.name}}</p>
+        <p><strong>Profesional:</strong> {{selectedAppointment?.professional?.name}}</p>
+        <p><strong>Fecha:</strong> {{selectedAppointment?.appointmentDate | date:'dd/MM/yyyy'}} {{selectedAppointment?.appointmentTime}}</p>
+      </div>
+      
+      <div class="modal-actions">
+        <button class="btn-secondary" (click)="closeModal()">No, mantener</button>
+        <button class="btn-danger" (click)="cancelAppointment()">Sí, cancelar</button>
+      </div>
+    </div>
+    
+  </div>
+</div>

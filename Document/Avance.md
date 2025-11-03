@@ -9,15 +9,15 @@
 ## 🎯 RESUMEN EJECUTIVO
 
 - **Total HU:** 21
-- **HU Completadas:** 14 ✅
+- **HU Completadas:** 16 ✅
 - **HU Parcialmente Implementadas:** 1 🔄
-- **HU Pendientes:** 6 ❌
-- **Progreso General:** **76.2%** (15/21 HU iniciadas)
-- **Puntos Completados:** 186/234 pts (**79.5%**)
+- **HU Pendientes:** 4 ❌
+- **Progreso General:** **85.7%** (17/21 HU iniciadas)
+- **Puntos Completados:** 215/234 pts (**91.9%**)
 
 ---
 
-## ✅ HISTORIAS DE USUARIO COMPLETADAS (14)
+## ✅ HISTORIAS DE USUARIO COMPLETADAS (16)
 
 ### **HU-01: Registro de Paciente** ✅ **COMPLETADA**
 **Puntos:** 5 | **Prioridad:** Alta
@@ -191,6 +191,36 @@
 
 ---
 
+### **HU-14: Gestionar Turnos Admin** ✅ **COMPLETADA**
+**Puntos:** 21 | **Prioridad:** Media
+
+**✅ Criterios de Aceptación Cumplidos:**
+- ✅ Vista consolidada de todas las agendas
+- ✅ Agendar turnos para cualquier profesional
+- ✅ Cancelar/reprogramar turnos existentes
+- ✅ Buscar turnos por paciente, profesional o fecha
+- ✅ Procesar pagos manualmente
+- ✅ Interfaz administrativa intuitiva
+
+**📁 Archivos:** `admin-appointments/`, `admin.service.ts`, `admin.controller.js`
+
+---
+
+### **HU-15: Registrar Pacientes Admin** ✅ **COMPLETADA**
+**Puntos:** 8 | **Prioridad:** Media
+
+**✅ Criterios de Aceptación Cumplidos:**
+- ✅ Formulario de registro administrativo
+- ✅ Ingreso de todos los datos requeridos
+- ✅ Generación de contraseñas temporales
+- ✅ Simulación de envío de credenciales
+- ✅ Opción de registro + agendado
+- ✅ Validaciones de duplicados por DNI/email
+
+**📁 Archivos:** `admin/` (sección pacientes), `admin.service.ts`, `admin.controller.js`
+
+---
+
 ## 🔄 HISTORIAS DE USUARIO PARCIALMENTE IMPLEMENTADAS (1)
 
 ### **HU-04: Pago con Mercado Pago** ✅ **COMPLETADA**
@@ -249,9 +279,7 @@
 
 ### **Alta Prioridad (0 HU)**
 
-### **Media Prioridad (6 HU)**
-- ❌ **HU-14**: Gestionar Turnos Admin (21 pts)
-- ❌ **HU-15**: Registrar Pacientes Admin (8 pts)
+### **Media Prioridad (4 HU)**
 - ❌ **HU-18**: Gestionar Permisos Master (21 pts)
 - ❌ **HU-19**: Dejar Reseña (8 pts)
 - ❌ **HU-20**: Ver Reseñas Profesional (5 pts)
@@ -295,7 +323,7 @@
 ### **Por Rol de Usuario**
 - **Pacientes:** 100% funcionalidades core implementadas ✅
 - **Profesionales:** 100% funcionalidades core implementadas ✅
-- **Administrativos:** 85% funcionalidades implementadas ✅
+- **Administrativos:** 100% funcionalidades implementadas ✅
 - **Master:** 85% funcionalidades implementadas ✅
 
 ### **Por Módulo**
@@ -306,7 +334,7 @@
 - **Perfiles:** 100% ✅
 - **Notificaciones:** 100% ✅
 - **Pagos:** 100% ✅
-- **Administración:** 85% ✅
+- **Administración:** 100% ✅
 - **Reportes:** 0% ❌
 - **Reseñas:** 0% ❌
 
@@ -317,7 +345,7 @@
 ### **Inmediato (Sprint Actual)**
 1. **Completar HU-17** - Contraseñas temporales y envío de credenciales
 2. **HU-19, HU-20, HU-21** - Sistema de reseñas completo
-3. **HU-14, HU-15** - Funcionalidades administrativas
+3. **HU-16** - Reportes y analytics
 
 ### **Corto Plazo (Próximo Sprint)**
 4. **HU-16** - Reportes y analytics
@@ -350,7 +378,7 @@
 
 ## 📊 CONCLUSIÓN
 
-El proyecto Agendarte ha alcanzado un **76.2% de progreso** con **14 HU completadas** y **1 HU parcialmente implementada**. El sistema cuenta con un **MVP completamente funcional** para pacientes, profesionales y administradores.
+El proyecto Agendarte ha alcanzado un **85.7% de progreso** con **16 HU completadas** y **1 HU parcialmente implementada**. El sistema cuenta con un **MVP completamente funcional** para pacientes, profesionales y administradores.
 
 **Fortalezas:**
 - ✅ **Sistema Completo:** Funcionalidades core 100% implementadas para todos los roles
@@ -362,9 +390,9 @@ El proyecto Agendarte ha alcanzado un **76.2% de progreso** con **14 HU completa
 - ✅ **Integración Perfecta:** Frontend-Backend completamente sincronizados
 
 **Próximas Prioridades:**
-- ⭐ **Sistema de reseñas:** HU-19, HU-20, HU-21 (24 pts)
-- 👥 **Funcionalidades administrativas:** HU-14, HU-15 (29 pts)
+- ⭐ **Sistema de reseñas:** HU-19, HU-20, HU-21 (21 pts)
 - 📈 **Reportes y analytics:** HU-16 (13 pts)
+- 🔐 **Gestión de permisos:** HU-18 (21 pts)
 - 🔧 **Finalizar HU-17:** Contraseñas temporales (2 pts restantes)
 
 **El proyecto está prácticamente completo con un sistema robusto y moderno listo para producción. Solo faltan funcionalidades complementarias como reseñas y reportes avanzados.**

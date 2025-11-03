@@ -40,7 +40,8 @@ export const routes: Routes = [
           return authService.isAdmin();
         }],
         children: [
-          { path: '', loadComponent: () => import('./components/admin/admin.component').then(m => m.AdminComponent) }
+          { path: '', loadComponent: () => import('./components/admin/admin.component').then(m => m.AdminComponent) },
+          { path: 'appointments', loadComponent: () => import('./components/admin-appointments/admin-appointments.component').then(m => m.AdminAppointmentsComponent) }
         ]
       }
     ]

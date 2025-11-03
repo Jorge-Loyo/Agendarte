@@ -34,4 +34,48 @@ router.delete('/users/:userId',
   adminController.deleteUser
 );
 
+// Rutas para gestión de turnos
+router.get('/appointments', 
+  authenticateToken, 
+  authorizeRoles('admin', 'master'), 
+  adminController.getAllAppointments
+);
+
+router.post('/appointments', 
+  authenticateToken, 
+  authorizeRoles('admin', 'master'), 
+  adminController.createAppointment
+);
+
+router.put('/appointments/:appointmentId/cancel', 
+  authenticateToken, 
+  authorizeRoles('admin', 'master'), 
+  adminController.cancelAppointment
+);
+
+router.put('/appointments/:appointmentId/reschedule', 
+  authenticateToken, 
+  authorizeRoles('admin', 'master'), 
+  adminController.rescheduleAppointment
+);
+
+router.post('/appointments/:appointmentId/payment', 
+  authenticateToken, 
+  authorizeRoles('admin', 'master'), 
+  adminController.processPayment
+);
+
+// Rutas para gestión de pacientes
+router.get('/patients', 
+  authenticateToken, 
+  authorizeRoles('admin', 'master'), 
+  adminController.getPatients
+);
+
+router.post('/patients', 
+  authenticateToken, 
+  authorizeRoles('admin', 'master'), 
+  adminController.createPatient
+);
+
 module.exports = router;

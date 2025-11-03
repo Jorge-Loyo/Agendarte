@@ -43,4 +43,54 @@ export class AdminService {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     });
   }
+
+  // Gestión de turnos
+  getAllAppointments(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/appointments`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    });
+  }
+
+  createAppointment(appointmentData: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/appointments`, appointmentData, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    });
+  }
+
+  cancelAppointment(appointmentId: number, data: any): Observable<any> {
+    return this.http.put(`${this.baseUrl}/appointments/${appointmentId}/cancel`, data, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    });
+  }
+
+  rescheduleAppointment(appointmentId: number, data: any): Observable<any> {
+    return this.http.put(`${this.baseUrl}/appointments/${appointmentId}/reschedule`, data, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    });
+  }
+
+  processPayment(appointmentId: number): Observable<any> {
+    return this.http.post(`${this.baseUrl}/appointments/${appointmentId}/payment`, {}, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    });
+  }
+
+  searchPatients(query: string): Observable<any> {
+    return this.http.get(`http://localhost:3000/api/patients/search?q=${query}`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    });
+  }
+
+  // Gestión de pacientes
+  getPatients(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/patients`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    });
+  }
+
+  createPatient(patientData: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/patients`, patientData, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    });
+  }
 }

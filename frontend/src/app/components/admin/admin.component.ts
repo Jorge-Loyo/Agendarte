@@ -5,24 +5,30 @@ import { AdminService } from '../../services/admin.service';
 import { NotificationService } from '../../services/notification.service';
 import { AuthService } from '../../services/auth.service';
 import { SpecialtyService } from '../../services/specialty.service';
+import { AdminAppointmentsComponent } from '../admin-appointments/admin-appointments.component';
 
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, AdminAppointmentsComponent],
   templateUrl: './admin.component.html',
   styleUrls: ['./admin.component.css']
 })
 export class AdminComponent implements OnInit {
   users: any[] = [];
   specialties: any[] = [];
+  patients: any[] = [];
+  filteredPatients: any[] = [];
   loading = false;
   showCreateForm = false;
   showCreateSpecialty = false;
+  showCreatePatient = false;
   showEditForm = false;
   currentUser: any = null;
-  activeTab: 'users' | 'specialties' = 'users';
+  activeTab: 'users' | 'patients' | 'appointments' | 'specialties' = 'users';
   editingUser: any = null;
+  patientSearchTerm = '';
+  createAndSchedule = false;
 
   // Formulario de creación
   newUser = {
@@ -40,6 +46,17 @@ export class AdminComponent implements OnInit {
   newSpecialty = {
     name: '',
     description: ''
+  };
+
+  newPatient = {
+    email: '',
+    firstName: '',
+    lastName: '',
+    dni: '',
+    phone: '',
+    age: null,
+    gender: '',
+    address: ''
   };
 
   roles = [
@@ -62,6 +79,7 @@ export class AdminComponent implements OnInit {
     });
     this.loadUsers();
     this.loadSpecialties();
+    this.loadPatients();
   }
 
   loadSpecialties(): void {
@@ -309,5 +327,91 @@ export class AdminComponent implements OnInit {
     }
     // Permitir eliminar usuarios sin perfil o con perfil básico
     return !user.profile || (!user.profile.dni && !user.profile.phone);
+  }
+
+  // Métodos para gestión de pacientes
+  loadPatients(): void {
+    this.adminService.getPatients().subscribe({
+      next: (response) => {
+        this.patients = response.patients || [];
+        this.filteredPatients = [...this.patients];
+      },
+      error: (error) => {
+        console.error('Error cargando pacientes:', error);
+        this.notificationService.error('Error', 'No se pudieron cargar los pacientes');
+      }
+    });
+  }
+
+  createPatient(): void {
+    if (!this.newPatient.email || !this.newPatient.firstName || !this.newPatient.lastName || !this.newPatient.dni) {
+      this.notificationService.error('Error', 'Complete los campos obligatorios');
+      return;
+    }
+
+    const patientData = {
+      ...this.newPatient,
+      generatePassword: true,
+      sendCredentials: true,
+      createAndSchedule: this.createAndSchedule
+    };
+
+    this.adminService.createPatient(patientData).subscribe({
+      next: (response) => {
+        this.notificationService.success('Éxito', response.message || 'Paciente registrado exitosamente');
+        this.loadPatients();
+        this.resetPatientForm();
+        this.showCreatePatient = false;
+        
+        if (this.createAndSchedule && response.patient) {
+          this.scheduleForPatient(response.patient);
+        }
+      },
+      error: (error) => {
+        console.error('Error creando paciente:', error);
+        this.notificationService.error('Error', error.error?.message || 'No se pudo registrar el paciente');
+      }
+    });
+  }
+
+  resetPatientForm(): void {
+    this.newPatient = {
+      email: '',
+      firstName: '',
+      lastName: '',
+      dni: '',
+      phone: '',
+      age: null,
+      gender: '',
+      address: ''
+    };
+    this.createAndSchedule = false;
+  }
+
+  filterPatients(): void {
+    if (!this.patientSearchTerm) {
+      this.filteredPatients = [...this.patients];
+      return;
+    }
+
+    const term = this.patientSearchTerm.toLowerCase();
+    this.filteredPatients = this.patients.filter(patient => 
+      patient.email.toLowerCase().includes(term) ||
+      patient.profile?.firstName?.toLowerCase().includes(term) ||
+      patient.profile?.lastName?.toLowerCase().includes(term) ||
+      patient.profile?.dni?.includes(term)
+    );
+  }
+
+  scheduleForPatient(patient: any): void {
+    // Cambiar a la pestaña de turnos y pasar el paciente seleccionado
+    this.activeTab = 'appointments';
+    // Aquí se podría implementar la lógica para pre-seleccionar el paciente
+    this.notificationService.success('Info', `Redirigiendo para agendar turno para ${patient.profile?.firstName} ${patient.profile?.lastName}`);
+  }
+
+  editPatient(patient: any): void {
+    // Implementar edición de paciente
+    this.notificationService.success('Info', 'Función de edición en desarrollo');
   }
 }

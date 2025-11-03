@@ -14,6 +14,18 @@
     </button>
     <button 
       class="tab-btn" 
+      [class.active]="activeTab === 'patients'"
+      (click)="activeTab = 'patients'">
+      🧑‍⚕️ Pacientes
+    </button>
+    <button 
+      class="tab-btn" 
+      [class.active]="activeTab === 'appointments'"
+      (click)="activeTab = 'appointments'">
+      📅 Turnos
+    </button>
+    <button 
+      class="tab-btn" 
       [class.active]="activeTab === 'specialties'"
       (click)="activeTab = 'specialties'">
       🏥 Especialidades
@@ -194,6 +206,158 @@
       </div>
     </div>
   </div>
+  </div>
+
+  <!-- Patients Section -->
+  <div class="section-content" *ngIf="activeTab === 'patients'">
+    <div class="section-header">
+      <h2>Registro de Pacientes</h2>
+      <button class="btn-create" (click)="showCreatePatient = !showCreatePatient">
+        {{ showCreatePatient ? 'Cancelar' : '+ Registrar Paciente' }}
+      </button>
+    </div>
+
+    <!-- Create Patient Form -->
+    <div class="create-form" *ngIf="showCreatePatient">
+      <div class="form-card">
+        <h3>Registrar Nuevo Paciente</h3>
+        
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Email *</label>
+            <input type="email" [(ngModel)]="newPatient.email" placeholder="paciente@ejemplo.com">
+          </div>
+          
+          <div class="form-group">
+            <label>Nombre *</label>
+            <input type="text" [(ngModel)]="newPatient.firstName" placeholder="Nombre">
+          </div>
+          
+          <div class="form-group">
+            <label>Apellido *</label>
+            <input type="text" [(ngModel)]="newPatient.lastName" placeholder="Apellido">
+          </div>
+          
+          <div class="form-group">
+            <label>DNI *</label>
+            <input type="text" [(ngModel)]="newPatient.dni" placeholder="12345678">
+          </div>
+          
+          <div class="form-group">
+            <label>Teléfono</label>
+            <input type="text" [(ngModel)]="newPatient.phone" placeholder="+54911123456">
+          </div>
+          
+          <div class="form-group">
+            <label>Edad</label>
+            <input type="number" [(ngModel)]="newPatient.age" placeholder="25">
+          </div>
+          
+          <div class="form-group">
+            <label>Género</label>
+            <select [(ngModel)]="newPatient.gender">
+              <option value="">Seleccionar</option>
+              <option value="M">Masculino</option>
+              <option value="F">Femenino</option>
+              <option value="Other">Otro</option>
+            </select>
+          </div>
+          
+          <div class="form-group full-width">
+            <label>Dirección</label>
+            <input type="text" [(ngModel)]="newPatient.address" placeholder="Dirección completa">
+          </div>
+        </div>
+        
+        <div class="form-options">
+          <label class="checkbox-label">
+            <input type="checkbox" [(ngModel)]="createAndSchedule">
+            Crear paciente y agendar turno inmediatamente
+          </label>
+        </div>
+        
+        <div class="form-actions">
+          <button class="btn-save" (click)="createPatient()">{{ createAndSchedule ? 'Crear y Agendar' : 'Crear Paciente' }}</button>
+          <button class="btn-cancel" (click)="showCreatePatient = false; resetPatientForm()">Cancelar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Patients List -->
+    <div class="patients-section" *ngIf="!loading">
+      <div class="table-card">
+        <h3>Pacientes Registrados ({{ patients.length }})</h3>
+        
+        <div class="search-bar">
+          <input 
+            type="text" 
+            placeholder="Buscar paciente por nombre, DNI o email..."
+            [(ngModel)]="patientSearchTerm"
+            (input)="filterPatients()"
+            class="search-input">
+        </div>
+        
+        <div class="table-container">
+          <table class="patients-table">
+            <thead>
+              <tr>
+                <th>Paciente</th>
+                <th>DNI</th>
+                <th>Contacto</th>
+                <th>Edad</th>
+                <th>Registro</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let patient of filteredPatients">
+                <td>
+                  <div class="patient-info">
+                    <div class="patient-avatar">
+                      {{ (patient.profile?.firstName || 'P').charAt(0) }}
+                    </div>
+                    <div class="patient-details">
+                      <strong>{{ patient.profile?.firstName }} {{ patient.profile?.lastName }}</strong>
+                      <small>{{ patient.email }}</small>
+                    </div>
+                  </div>
+                </td>
+                <td>{{ patient.profile?.dni || 'Sin DNI' }}</td>
+                <td>
+                  <div class="contact-info">
+                    <div *ngIf="patient.profile?.phone">{{ patient.profile.phone }}</div>
+                    <div *ngIf="patient.profile?.address" class="address">{{ patient.profile.address }}</div>
+                  </div>
+                </td>
+                <td>{{ patient.profile?.age || '-' }}</td>
+                <td>{{ patient.createdAt | date:'dd/MM/yyyy' }}</td>
+                <td>
+                  <div class="actions">
+                    <button 
+                      class="btn-action btn-schedule"
+                      (click)="scheduleForPatient(patient)"
+                      title="Agendar turno">
+                      📅
+                    </button>
+                    <button 
+                      class="btn-action btn-edit"
+                      (click)="editPatient(patient)"
+                      title="Editar">
+                      ✏️
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Appointments Section -->
+  <div class="section-content" *ngIf="activeTab === 'appointments'">
+    <app-admin-appointments></app-admin-appointments>
   </div>
 
   <!-- Specialties Section -->
