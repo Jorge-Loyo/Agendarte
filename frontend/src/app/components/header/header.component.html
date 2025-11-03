@@ -12,23 +12,62 @@
       <h1 class="brand-name">Agendarte</h1>
     </div>
 
+    <!-- Menú Hamburguesa -->
+    <div class="hamburger-menu" *ngIf="isLoggedIn">
+      <button class="hamburger-btn" (click)="toggleMenu()" [class.active]="isMenuOpen">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      
+      <!-- Menú desplegable -->
+      <div class="dropdown-menu" [class.show]="isMenuOpen">
+        <div class="menu-header">
+          <div class="user-info-menu">
+            <div class="user-avatar-menu">
+              {{ userProfile?.firstName?.charAt(0) || 'U' }}
+            </div>
+            <div class="user-details">
+              <span class="user-name-menu">{{ userProfile?.firstName || 'Usuario' }} {{ userProfile?.lastName || '' }}</span>
+              <span class="user-role">{{ getRoleLabel(userProfile?.role) }}</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="menu-divider"></div>
+        
+        <nav class="menu-nav">
+          <a *ngFor="let option of availableMenuOptions" 
+             [routerLink]="option.route" 
+             routerLinkActive="active"
+             class="menu-item"
+             (click)="closeMenu()">
+            <span class="menu-icon">{{ option.icon }}</span>
+            <span class="menu-label">{{ option.label }}</span>
+          </a>
+        </nav>
+        
+        <div class="menu-divider"></div>
+        
+        <div class="menu-footer">
+          <button class="logout-btn-menu" (click)="logout()">
+            <span class="menu-icon">🚪</span>
+            <span class="menu-label">Cerrar Sesión</span>
+          </button>
+        </div>
+      </div>
+    </div>
 
-
-    <!-- Navegación -->
-    <nav class="main-nav" *ngIf="isLoggedIn">
-      <a routerLink="/app/dashboard" routerLinkActive="active">Dashboard</a>
-      <a routerLink="/app/my-appointments" routerLinkActive="active">Mis Turnos</a>
-      <a routerLink="/app/find-professionals" routerLinkActive="active">Profesionales</a>
-    </nav>
+    <!-- Navegación Desktop removida -->
 
     <!-- Usuario y acciones -->
     <div class="header-actions">
-      <div *ngIf="isLoggedIn; else loginActions" class="user-menu">
+      <div *ngIf="isLoggedIn; else loginActions" class="user-menu desktop-only">
         <div class="user-info">
           <div class="user-avatar">
             {{ userProfile?.firstName?.charAt(0) || 'U' }}
           </div>
-          <span class="user-name">{{ userProfile?.firstName || 'Usuario' }}</span>
+          <span class="user-name">{{ getUserDisplayName() }}</span>
         </div>
         <button class="logout-btn" (click)="logout()">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
@@ -46,4 +85,7 @@
       </ng-template>
     </div>
   </div>
+  
+  <!-- Overlay para cerrar menú -->
+  <div class="menu-overlay" [class.show]="isMenuOpen" (click)="closeMenu()"></div>
 </header>

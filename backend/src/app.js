@@ -97,6 +97,7 @@ app.use("/api/stats", require("./routes/stats.routes"));
 app.use("/api/notes", require("./routes/notes.routes"));
 app.use("/api/admin", require("./routes/admin.routes"));
 app.use("/api/reviews", require("./routes/review.routes"));
+app.use("/api/google-calendar", require("./routes/google-calendar.routes"));
 // Debug: Cargar rutas de horarios
 console.log('Cargando rutas de schedules...');
 app.use("/api/schedules", require("./routes/schedule.routes"));

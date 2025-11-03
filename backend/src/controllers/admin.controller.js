@@ -1,5 +1,5 @@
 const bcrypt = require('bcryptjs');
-const { User, Profile, Professional } = require('../models');
+const { User, Profile, Professional, Appointment } = require('../models');
 const { Op } = require('sequelize');
 
 const getAllUsers = async (req, res) => {
@@ -368,16 +368,40 @@ const getPatients = async (req, res) => {
   try {
     const patients = await User.findAll({
       where: { role: 'patient', isActive: true },
+      include: [{
+        model: Profile,
+        as: 'profile'
+      }],
       order: [['createdAt', 'DESC']]
     });
 
+    const formattedPatients = patients.map(patient => ({
+      id: patient.id,
+      email: patient.email,
+      isActive: patient.isActive,
+      createdAt: patient.createdAt,
+      profile: patient.profile ? {
+        firstName: patient.profile.firstName,
+        lastName: patient.profile.lastName,
+        dni: patient.profile.dni,
+        phone: patient.profile.phone,
+        age: patient.profile.age,
+        gender: patient.profile.gender,
+        address: patient.profile.address
+      } : null
+    }));
+
     res.json({
       message: 'Pacientes obtenidos exitosamente',
-      patients: patients || []
+      patients: formattedPatients
     });
   } catch (error) {
     console.error('Error obteniendo pacientes:', error);
-    res.status(500).json({ message: 'Error interno del servidor' });
+    console.error('Stack trace:', error.stack);
+    res.status(500).json({ 
+      message: 'Error interno del servidor',
+      error: error.message 
+    });
   }
 };
 

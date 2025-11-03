@@ -497,29 +497,48 @@
   <div class="section-content" *ngIf="activeTab === 'permissions'">
     <div class="section-header">
       <h2>Gestión de Permisos y Roles</h2>
-      <button class="btn-create" (click)="showUserLogs = !showUserLogs">
-        {{ showUserLogs ? 'Ocultar Logs' : '📄 Ver Logs' }}
-      </button>
+      <div class="header-actions">
+        <button class="btn-secondary" (click)="resetPermissionsToDefault()">
+          🔄 Restaurar Valores por Defecto
+        </button>
+        <button class="btn-create" (click)="showUserLogs = !showUserLogs">
+          {{ showUserLogs ? 'Ocultar Logs' : '📄 Ver Logs' }}
+        </button>
+      </div>
     </div>
 
     <!-- Configuración de Roles -->
     <div class="permissions-grid">
       <div class="role-config-section">
-        <h3>Configuración de Roles</h3>
+        <h3>Configuración de Permisos por Rol</h3>
+        <p class="section-description">Configure qué funciones puede acceder cada tipo de usuario. Los cambios se aplican inmediatamente.</p>
+        
         <div class="role-cards">
-          <div class="role-card" *ngFor="let role of rolePermissions">
+          <div class="role-card" *ngFor="let role of currentRolePermissions">
             <div class="role-header">
-              <h4>{{ role.name }}</h4>
-              <span class="role-badge" [ngClass]="role.key">{{ role.key }}</span>
+              <div class="role-info">
+                <h4>{{ role.name }}</h4>
+                <span class="role-badge" [ngClass]="role.key">{{ role.key }}</span>
+              </div>
+              <div class="role-stats">
+                <span class="permissions-count">
+                  {{ getEnabledPermissionsCount(role) }}/{{ role.permissions.length }} activos
+                </span>
+              </div>
             </div>
+            
             <div class="permissions-list">
               <div class="permission-item" *ngFor="let permission of role.permissions">
                 <label class="permission-label">
                   <input 
                     type="checkbox" 
                     [checked]="permission.enabled"
-                    (change)="togglePermission(role.key, permission.key, $event)">
-                  <span>{{ permission.name }}</span>
+                    (change)="onPermissionToggle(role.key, permission.key, $event)"
+                    class="permission-checkbox">
+                  <div class="permission-info">
+                    <span class="permission-name">{{ permission.name }}</span>
+                    <span class="permission-description">{{ permission.description }}</span>
+                  </div>
                 </label>
               </div>
             </div>
@@ -527,46 +546,79 @@
         </div>
       </div>
 
-      <!-- Gestión de Usuarios Avanzada -->
-      <div class="user-management-section">
-        <h3>Gestión Avanzada de Usuarios</h3>
+      <!-- Vista Previa del Menú -->
+      <div class="menu-preview-section">
+        <h3>Vista Previa del Menú por Rol</h3>
+        <p class="section-description">Vea cómo se verá el menú de navegación para cada tipo de usuario.</p>
         
-        <div class="user-actions-grid">
-          <div class="action-card" *ngFor="let user of users">
-            <div class="user-summary">
-              <div class="user-avatar-small">
-                {{ (user.profile?.firstName || 'U').charAt(0) }}
-              </div>
-              <div class="user-info-compact">
-                <strong>{{ user.profile?.firstName }} {{ user.profile?.lastName }}</strong>
-                <small>{{ user.email }}</small>
-                <span class="role-badge-small" [ngClass]="user.role">{{ getRoleLabel(user.role) }}</span>
-              </div>
+        <div class="role-selector">
+          <label>Seleccionar rol para vista previa:</label>
+          <select [(ngModel)]="previewRole" (change)="updateMenuPreview()" class="role-select">
+            <option *ngFor="let role of currentRolePermissions" [value]="role.key">
+              {{ role.name }}
+            </option>
+          </select>
+        </div>
+        
+        <div class="menu-preview" *ngIf="previewMenuOptions.length > 0">
+          <div class="preview-menu-item" *ngFor="let option of previewMenuOptions">
+            <span class="preview-icon">{{ option.icon }}</span>
+            <span class="preview-label">{{ option.label }}</span>
+            <span class="preview-route">{{ option.route }}</span>
+          </div>
+        </div>
+        
+        <div class="no-menu-options" *ngIf="previewMenuOptions.length === 0">
+          <p>Este rol no tiene opciones de menú disponibles</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Gestión de Usuarios Avanzada -->
+    <div class="user-management-section">
+      <h3>Gestión Avanzada de Usuarios</h3>
+      <p class="section-description">Controle el estado y acceso de los usuarios del sistema.</p>
+      
+      <div class="user-actions-grid">
+        <div class="action-card" *ngFor="let user of users">
+          <div class="user-summary">
+            <div class="user-avatar-small">
+              {{ (user.profile?.firstName || 'U').charAt(0) }}
             </div>
+            <div class="user-info-compact">
+              <strong>{{ user.profile?.firstName }} {{ user.profile?.lastName }}</strong>
+              <small>{{ user.email }}</small>
+              <span class="role-badge-small" [ngClass]="user.role">{{ getRoleLabel(user.role) }}</span>
+              <span class="user-status" [class]="user.isActive ? 'active' : 'inactive'">
+                {{ user.isActive ? 'Activo' : 'Inactivo' }}
+              </span>
+            </div>
+          </div>
+          
+          <div class="user-controls">
+            <button 
+              class="btn-control"
+              [class.active]="user.isActive"
+              (click)="toggleUserStatus(user)"
+              [disabled]="!canManageUser(user)"
+              title="{{ user.isActive ? 'Desactivar' : 'Activar' }} usuario">
+              {{ user.isActive ? '🔒' : '🔓' }}
+            </button>
             
-            <div class="user-controls">
-              <button 
-                class="btn-control"
-                [class.active]="user.isActive"
-                (click)="toggleUserStatus(user)"
-                title="{{ user.isActive ? 'Desactivar' : 'Activar' }} usuario">
-                {{ user.isActive ? '🔒' : '🔓' }}
-              </button>
-              
-              <button 
-                class="btn-control btn-reset"
-                (click)="resetUserPassword(user)"
-                title="Resetear contraseña">
-                🔄
-              </button>
-              
-              <button 
-                class="btn-control btn-logs"
-                (click)="viewUserActivity(user)"
-                title="Ver actividad">
-                📄
-              </button>
-            </div>
+            <button 
+              class="btn-control btn-reset"
+              (click)="resetUserPassword(user)"
+              [disabled]="!canManageUser(user)"
+              title="Resetear contraseña">
+              🔄
+            </button>
+            
+            <button 
+              class="btn-control btn-logs"
+              (click)="viewUserActivity(user)"
+              title="Ver actividad">
+              📄
+            </button>
           </div>
         </div>
       </div>
@@ -574,17 +626,26 @@
 
     <!-- Logs de Actividad -->
     <div class="logs-section" *ngIf="showUserLogs">
-      <h3>Logs de Actividad del Sistema</h3>
+      <div class="logs-header">
+        <h3>Logs de Actividad del Sistema</h3>
+        <button class="btn-secondary" (click)="refreshLogs()">
+          🔄 Actualizar
+        </button>
+      </div>
+      
       <div class="logs-container">
-        <div class="log-entry" *ngFor="let log of systemLogs">
+        <div class="log-entry" *ngFor="let log of systemLogs" [ngClass]="log.type">
           <div class="log-timestamp">{{ log.timestamp | date:'dd/MM/yyyy HH:mm:ss' }}</div>
           <div class="log-user">{{ log.user }}</div>
-          <div class="log-action" [ngClass]="log.type">{{ log.action }}</div>
+          <div class="log-action">{{ log.action }}</div>
           <div class="log-details">{{ log.details }}</div>
         </div>
         
         <div class="no-logs" *ngIf="systemLogs.length === 0">
-          <p>No hay logs de actividad disponibles</p>
+          <div class="empty-state">
+            <span class="empty-icon">📄</span>
+            <p>No hay logs de actividad disponibles</p>
+          </div>
         </div>
       </div>
     </div>

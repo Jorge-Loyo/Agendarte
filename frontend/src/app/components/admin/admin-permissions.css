@@ -1,0 +1,520 @@
+/* Estilos para la sección de permisos */
+.permissions-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2rem;
+  margin-top: 1.5rem;
+}
+
+.role-config-section,
+.menu-preview-section,
+.user-management-section {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.section-description {
+  color: #6b7280;
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+/* Tarjetas de roles */
+.role-cards {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.role-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.role-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.role-header {
+  background: #f9fafb;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.role-info h4 {
+  margin: 0 0 0.5rem 0;
+  color: #1f2937;
+  font-size: 1.1rem;
+}
+
+.role-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.role-badge.patient {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.role-badge.professional {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.role-badge.admin {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.role-badge.master {
+  background: #fce7f3;
+  color: #be185d;
+}
+
+.permissions-count {
+  font-size: 0.8rem;
+  color: #6b7280;
+  background: #f3f4f6;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+/* Lista de permisos */
+.permissions-list {
+  padding: 1rem 1.5rem;
+}
+
+.permission-item {
+  margin-bottom: 1rem;
+}
+
+.permission-item:last-child {
+  margin-bottom: 0;
+}
+
+.permission-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+}
+
+.permission-label:hover {
+  background: #f9fafb;
+}
+
+.permission-checkbox {
+  margin-top: 0.25rem;
+  width: 16px;
+  height: 16px;
+  accent-color: #667eea;
+}
+
+.permission-info {
+  flex: 1;
+}
+
+.permission-name {
+  display: block;
+  font-weight: 500;
+  color: #1f2937;
+  margin-bottom: 0.25rem;
+}
+
+.permission-description {
+  display: block;
+  font-size: 0.8rem;
+  color: #6b7280;
+  line-height: 1.4;
+}
+
+/* Vista previa del menú */
+.role-selector {
+  margin-bottom: 1.5rem;
+}
+
+.role-selector label {
+  display: block;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.role-select {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  background: white;
+}
+
+.menu-preview {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.preview-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #f3f4f6;
+  background: white;
+}
+
+.preview-menu-item:last-child {
+  border-bottom: none;
+}
+
+.preview-icon {
+  font-size: 1.1rem;
+  width: 24px;
+  text-align: center;
+}
+
+.preview-label {
+  font-weight: 500;
+  color: #374151;
+  flex: 1;
+}
+
+.preview-route {
+  font-size: 0.8rem;
+  color: #6b7280;
+  font-family: monospace;
+  background: #f3f4f6;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+.no-menu-options {
+  text-align: center;
+  padding: 2rem;
+  color: #6b7280;
+}
+
+/* Gestión de usuarios avanzada */
+.user-management-section {
+  grid-column: 1 / -1;
+  margin-top: 1.5rem;
+}
+
+.user-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+.action-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.action-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.user-summary {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+}
+
+.user-avatar-small {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.user-info-compact {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.user-info-compact strong {
+  color: #1f2937;
+  font-size: 0.9rem;
+}
+
+.user-info-compact small {
+  color: #6b7280;
+  font-size: 0.8rem;
+}
+
+.role-badge-small {
+  padding: 0.125rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  width: fit-content;
+}
+
+.role-badge-small.patient {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.role-badge-small.professional {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.role-badge-small.admin {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.role-badge-small.master {
+  background: #fce7f3;
+  color: #be185d;
+}
+
+.user-status {
+  padding: 0.125rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  width: fit-content;
+}
+
+.user-status.active {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.user-status.inactive {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.user-controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-control {
+  width: 32px;
+  height: 32px;
+  border: 1px solid #d1d5db;
+  background: white;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.btn-control:hover {
+  background: #f9fafb;
+  transform: translateY(-1px);
+}
+
+.btn-control:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-control.active {
+  background: #10b981;
+  color: white;
+  border-color: #10b981;
+}
+
+.btn-control.btn-reset:hover {
+  background: #fef3c7;
+  border-color: #f59e0b;
+}
+
+.btn-control.btn-logs:hover {
+  background: #eff6ff;
+  border-color: #3b82f6;
+}
+
+/* Logs de actividad */
+.logs-section {
+  grid-column: 1 / -1;
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-top: 1.5rem;
+}
+
+.logs-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.logs-header h3 {
+  margin: 0;
+  color: #1f2937;
+}
+
+.logs-container {
+  max-height: 400px;
+  overflow-y: auto;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+}
+
+.log-entry {
+  display: grid;
+  grid-template-columns: 150px 200px 1fr 2fr;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #f3f4f6;
+  font-size: 0.85rem;
+  align-items: center;
+}
+
+.log-entry:last-child {
+  border-bottom: none;
+}
+
+.log-entry.success {
+  background: #f0fdf4;
+  border-left: 3px solid #10b981;
+}
+
+.log-entry.warning {
+  background: #fffbeb;
+  border-left: 3px solid #f59e0b;
+}
+
+.log-entry.error {
+  background: #fef2f2;
+  border-left: 3px solid #ef4444;
+}
+
+.log-entry.info {
+  background: #f8fafc;
+  border-left: 3px solid #6b7280;
+}
+
+.log-timestamp {
+  color: #6b7280;
+  font-family: monospace;
+}
+
+.log-user {
+  font-weight: 500;
+  color: #374151;
+}
+
+.log-action {
+  font-weight: 500;
+}
+
+.log-details {
+  color: #6b7280;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #6b7280;
+}
+
+.empty-icon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+/* Botones */
+.btn-secondary {
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background: #e5e7eb;
+  transform: translateY(-1px);
+}
+
+.header-actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .permissions-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .user-actions-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .log-entry {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+  
+  .log-entry > div {
+    padding: 0.25rem 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .role-config-section,
+  .menu-preview-section,
+  .user-management-section,
+  .logs-section {
+    padding: 1rem;
+  }
+  
+  .header-actions {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .header-actions button {
+    width: 100%;
+  }
+}

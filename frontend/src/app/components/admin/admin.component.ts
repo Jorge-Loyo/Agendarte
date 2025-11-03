@@ -1,20 +1,23 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminService } from '../../services/admin.service';
 import { NotificationService } from '../../services/notification.service';
 import { AuthService } from '../../services/auth.service';
 import { SpecialtyService } from '../../services/specialty.service';
+import { PermissionsService, RolePermissions, MenuOption } from '../../services/permissions.service';
 import { AdminAppointmentsComponent } from '../admin-appointments/admin-appointments.component';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-admin',
   standalone: true,
   imports: [CommonModule, FormsModule, AdminAppointmentsComponent],
   templateUrl: './admin.component.html',
-  styleUrls: ['./admin.component.css']
+  styleUrls: ['./admin.component.css', './admin-permissions.css']
 })
-export class AdminComponent implements OnInit {
+export class AdminComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
   users: any[] = [];
   specialties: any[] = [];
   patients: any[] = [];
@@ -43,50 +46,9 @@ export class AdminComponent implements OnInit {
   // Permisos y logs
   showUserLogs = false;
   systemLogs: any[] = [];
-  rolePermissions = [
-    {
-      key: 'patient',
-      name: 'Paciente',
-      permissions: [
-        { key: 'view_appointments', name: 'Ver turnos', enabled: true },
-        { key: 'create_appointments', name: 'Crear turnos', enabled: true },
-        { key: 'cancel_appointments', name: 'Cancelar turnos', enabled: true },
-        { key: 'view_professionals', name: 'Ver profesionales', enabled: true }
-      ]
-    },
-    {
-      key: 'professional',
-      name: 'Profesional',
-      permissions: [
-        { key: 'manage_schedule', name: 'Gestionar horarios', enabled: true },
-        { key: 'view_patient_history', name: 'Ver historial pacientes', enabled: true },
-        { key: 'manage_appointments', name: 'Gestionar turnos', enabled: true },
-        { key: 'add_notes', name: 'Agregar notas', enabled: true },
-        { key: 'view_statistics', name: 'Ver estadísticas', enabled: true }
-      ]
-    },
-    {
-      key: 'admin',
-      name: 'Administrativo',
-      permissions: [
-        { key: 'manage_all_appointments', name: 'Gestionar todos los turnos', enabled: true },
-        { key: 'register_patients', name: 'Registrar pacientes', enabled: true },
-        { key: 'view_reports', name: 'Ver reportes', enabled: true },
-        { key: 'process_payments', name: 'Procesar pagos', enabled: true }
-      ]
-    },
-    {
-      key: 'master',
-      name: 'Master',
-      permissions: [
-        { key: 'manage_users', name: 'Gestionar usuarios', enabled: true },
-        { key: 'manage_permissions', name: 'Gestionar permisos', enabled: true },
-        { key: 'view_system_logs', name: 'Ver logs del sistema', enabled: true },
-        { key: 'reset_passwords', name: 'Resetear contraseñas', enabled: true },
-        { key: 'full_system_access', name: 'Acceso completo al sistema', enabled: true }
-      ]
-    }
-  ];
+  currentRolePermissions: RolePermissions[] = [];
+  previewRole = 'patient';
+  previewMenuOptions: MenuOption[] = [];
 
   // Formulario de creación
   newUser = {
@@ -128,18 +90,34 @@ export class AdminComponent implements OnInit {
     private adminService: AdminService,
     private notificationService: NotificationService,
     private authService: AuthService,
-    private specialtyService: SpecialtyService
+    private specialtyService: SpecialtyService,
+    private permissionsService: PermissionsService
   ) {}
 
   ngOnInit(): void {
-    this.authService.currentUser$.subscribe(user => {
-      this.currentUser = user;
-    });
+    this.authService.currentUser$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(user => {
+        this.currentUser = user;
+      });
+    
+    this.permissionsService.rolePermissions$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(rolePermissions => {
+        this.currentRolePermissions = rolePermissions;
+        this.updateMenuPreview();
+      });
+    
     this.loadUsers();
     this.loadSpecialties();
     this.loadPatients();
     this.loadProfessionals();
     this.loadSystemLogs();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   loadSpecialties(): void {
@@ -551,16 +529,48 @@ export class AdminComponent implements OnInit {
   }
 
   // Métodos para gestión de permisos
-  togglePermission(roleKey: string, permissionKey: string, event: any): void {
-    const role = this.rolePermissions.find(r => r.key === roleKey);
-    if (role) {
-      const permission = role.permissions.find(p => p.key === permissionKey);
-      if (permission) {
-        permission.enabled = event.target.checked;
-        this.notificationService.success('Éxito', `Permiso ${permission.name} ${permission.enabled ? 'activado' : 'desactivado'} para ${role.name}`);
-        this.logActivity('permission_change', `Permiso ${permissionKey} ${permission.enabled ? 'activado' : 'desactivado'} para rol ${roleKey}`);
-      }
+  onPermissionToggle(roleKey: string, permissionKey: string, event: any): void {
+    const enabled = event.target.checked;
+    this.permissionsService.togglePermission(roleKey, permissionKey, enabled);
+    
+    const role = this.currentRolePermissions.find(r => r.key === roleKey);
+    const permission = role?.permissions.find(p => p.key === permissionKey);
+    
+    if (role && permission) {
+      this.notificationService.success('Éxito', 
+        `Permiso "${permission.name}" ${enabled ? 'activado' : 'desactivado'} para ${role.name}`);
+      this.logActivity('permission_change', 
+        `Permiso ${permissionKey} ${enabled ? 'activado' : 'desactivado'} para rol ${roleKey}`);
     }
+  }
+
+  getEnabledPermissionsCount(role: RolePermissions): number {
+    return role.permissions.filter(p => p.enabled).length;
+  }
+
+  updateMenuPreview(): void {
+    // Simular usuario con el rol seleccionado para vista previa
+    const originalUser = this.authService.getCurrentUser();
+    if (originalUser) {
+      // Crear usuario temporal para vista previa
+      const tempUser = { ...originalUser, role: this.previewRole };
+      
+      // Obtener opciones de menú para este rol
+      this.previewMenuOptions = this.permissionsService.getAvailableMenuOptions();
+    }
+  }
+
+  resetPermissionsToDefault(): void {
+    if (confirm('¿Está seguro de restaurar todos los permisos a sus valores por defecto? Esta acción no se puede deshacer.')) {
+      this.permissionsService.resetToDefaults();
+      this.notificationService.success('Éxito', 'Permisos restaurados a valores por defecto');
+      this.logActivity('permissions_reset', 'Permisos restaurados a configuración por defecto');
+    }
+  }
+
+  refreshLogs(): void {
+    this.loadSystemLogs();
+    this.notificationService.success('Info', 'Logs actualizados');
   }
 
   resetUserPassword(user: any): void {

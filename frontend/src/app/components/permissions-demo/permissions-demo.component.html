@@ -1,0 +1,117 @@
+<div class="permissions-demo">
+  <div class="demo-header">
+    <h2>🔐 Demostración del Sistema de Permisos</h2>
+    <p>Este componente muestra cómo funciona el sistema de permisos basado en roles.</p>
+  </div>
+
+  <div class="demo-content">
+    <!-- Información del usuario actual -->
+    <div class="current-user-info">
+      <h3>Usuario Actual</h3>
+      <div class="user-card" *ngIf="currentUser">
+        <div class="user-avatar">
+          {{ (currentUser.profile?.firstName || 'U').charAt(0) }}
+        </div>
+        <div class="user-details">
+          <strong>{{ currentUser.profile?.firstName }} {{ currentUser.profile?.lastName }}</strong>
+          <span class="user-email">{{ currentUser.email }}</span>
+          <span class="user-role" [ngClass]="currentUser.role">{{ getRoleLabel(currentUser.role) }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Permisos del usuario actual -->
+    <div class="user-permissions">
+      <h3>Permisos Activos</h3>
+      <div class="permissions-grid">
+        <div class="permission-item" *ngFor="let permission of userPermissions" [class.enabled]="permission.enabled">
+          <span class="permission-icon">{{ permission.enabled ? '✅' : '❌' }}</span>
+          <div class="permission-info">
+            <strong>{{ permission.name }}</strong>
+            <small>{{ permission.description }}</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Opciones de menú disponibles -->
+    <div class="available-menu">
+      <h3>Opciones de Menú Disponibles</h3>
+      <div class="menu-options">
+        <div class="menu-option" *ngFor="let option of availableMenuOptions">
+          <span class="menu-icon">{{ option.icon }}</span>
+          <div class="menu-info">
+            <strong>{{ option.label }}</strong>
+            <small>{{ option.route }}</small>
+          </div>
+          <button class="btn-navigate" (click)="navigateTo(option.route)">
+            Ir →
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Simulador de cambio de rol -->
+    <div class="role-simulator" *ngIf="currentUser?.role === 'master'">
+      <h3>Simulador de Roles (Solo Master)</h3>
+      <p>Simula cómo se vería el sistema para diferentes roles:</p>
+      
+      <div class="role-buttons">
+        <button 
+          *ngFor="let role of availableRoles" 
+          class="role-btn"
+          [class.active]="simulatedRole === role.key"
+          (click)="simulateRole(role.key)">
+          {{ role.label }}
+        </button>
+        <button class="role-btn reset" (click)="resetSimulation()">
+          Resetear
+        </button>
+      </div>
+
+      <div class="simulation-result" *ngIf="simulatedRole">
+        <h4>Vista como {{ getRoleLabel(simulatedRole) }}:</h4>
+        <div class="simulated-menu">
+          <div class="simulated-option" *ngFor="let option of simulatedMenuOptions">
+            <span class="menu-icon">{{ option.icon }}</span>
+            <span class="menu-label">{{ option.label }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pruebas de permisos -->
+    <div class="permission-tests">
+      <h3>Pruebas de Permisos</h3>
+      <div class="test-grid">
+        <div class="test-item">
+          <strong>¿Puede ver turnos?</strong>
+          <span class="test-result" [class.success]="hasPermission('view_appointments')" [class.error]="!hasPermission('view_appointments')">
+            {{ hasPermission('view_appointments') ? 'SÍ' : 'NO' }}
+          </span>
+        </div>
+        
+        <div class="test-item">
+          <strong>¿Puede gestionar horarios?</strong>
+          <span class="test-result" [class.success]="hasPermission('manage_schedule')" [class.error]="!hasPermission('manage_schedule')">
+            {{ hasPermission('manage_schedule') ? 'SÍ' : 'NO' }}
+          </span>
+        </div>
+        
+        <div class="test-item">
+          <strong>¿Puede acceder al panel admin?</strong>
+          <span class="test-result" [class.success]="hasPermission('admin_dashboard')" [class.error]="!hasPermission('admin_dashboard')">
+            {{ hasPermission('admin_dashboard') ? 'SÍ' : 'NO' }}
+          </span>
+        </div>
+        
+        <div class="test-item">
+          <strong>¿Puede gestionar usuarios?</strong>
+          <span class="test-result" [class.success]="hasPermission('manage_users')" [class.error]="!hasPermission('manage_users')">
+            {{ hasPermission('manage_users') ? 'SÍ' : 'NO' }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
