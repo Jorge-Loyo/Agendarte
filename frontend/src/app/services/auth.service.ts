@@ -81,6 +81,15 @@ export class AuthService {
     return user?.role === role;
   }
 
+  hasAnyRole(roles: string[]): boolean {
+    const user = this.getCurrentUser();
+    return user ? roles.includes(user.role) : false;
+  }
+
+  isAdmin(): boolean {
+    return this.hasAnyRole(['admin', 'master']);
+  }
+
   updateProfile(userData: any): Observable<any> {
     return this.http.put(this.profileUrl, userData, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }

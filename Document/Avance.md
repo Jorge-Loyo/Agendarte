@@ -9,15 +9,15 @@
 ## 🎯 RESUMEN EJECUTIVO
 
 - **Total HU:** 21
-- **HU Completadas:** 10 ✅
+- **HU Completadas:** 13 ✅
 - **HU Parcialmente Implementadas:** 1 🔄
-- **HU Pendientes:** 10 ❌
-- **Progreso General:** **61.9%** (11/21 HU iniciadas)
-- **Puntos Completados:** 144/234 pts (**61.5%**)
+- **HU Pendientes:** 7 ❌
+- **Progreso General:** **71.4%** (14/21 HU iniciadas)
+- **Puntos Completados:** 165/234 pts (**70.5%**)
 
 ---
 
-## ✅ HISTORIAS DE USUARIO COMPLETADAS (10)
+## ✅ HISTORIAS DE USUARIO COMPLETADAS (13)
 
 ### **HU-01: Registro de Paciente** ✅ **COMPLETADA**
 **Puntos:** 5 | **Prioridad:** Alta
@@ -146,6 +146,49 @@
 
 **📁 Archivos:** `professional-appointment/`, `patient.service.ts`, `appointment.controller.js`
 
+### **HU-11: Ver Historial de Paciente** ✅ **COMPLETADA**
+**Puntos:** 8 | **Prioridad:** Media
+
+**✅ Criterios de Aceptación Cumplidos:**
+- ✅ Acceso al historial desde agenda profesional
+- ✅ Listado de consultas previas del paciente
+- ✅ Visualización de notas de consultas anteriores
+- ✅ Datos personales actualizados del paciente
+- ✅ Búsqueda en historial por fecha y palabra clave
+- ✅ Restricciones de privacidad (solo consultas propias)
+
+**📁 Archivos:** `patient-history/`, `patient-history.service.ts`, `patient-history.controller.js`
+
+---
+
+### **HU-12: Cancelar/Reprogramar Turnos (Profesional)** ✅ **COMPLETADA**
+**Puntos:** 8 | **Prioridad:** Media
+
+**✅ Criterios de Aceptación Cumplidos:**
+- ✅ Cancelación de turnos desde agenda profesional
+- ✅ Reprogramación con selección de nueva fecha/hora
+- ✅ Notificación automática al paciente del cambio
+- ✅ Campo para agregar motivo de cancelación/reprogramación
+- ✅ Validación de disponibilidad de horarios
+- ✅ Registro de cambios en historial de notas
+
+**📁 Archivos:** `appointment.controller.js` (professional methods), `appointment.service.ts`, `professional-dashboard/`
+
+---
+
+### **HU-13: Agregar Notas a Consulta** ✅ **COMPLETADA**
+**Puntos:** 5 | **Prioridad:** Media
+
+**✅ Criterios de Aceptación Cumplidos:**
+- ✅ Agregar notas durante o después de la consulta
+- ✅ Guardado automático cada 2 segundos
+- ✅ Edición de notas del mismo día o citas completadas
+- ✅ Notas privadas y solo visibles para el profesional
+- ✅ Registro de fecha y hora de modificación
+- ✅ Editor de texto con contador de caracteres
+
+**📁 Archivos:** `appointment-notes/`, `notes.service.ts`, `notes.controller.js`
+
 ---
 
 ## 🔄 HISTORIAS DE USUARIO PARCIALMENTE IMPLEMENTADAS (1)
@@ -204,10 +247,7 @@
 
 ### **Alta Prioridad (0 HU)**
 
-### **Media Prioridad (10 HU)**
-- ❌ **HU-11**: Historial de Paciente (8 pts)
-- ❌ **HU-12**: Cancelar/Reprogramar Profesional (8 pts)
-- ❌ **HU-13**: Notas de Consulta (5 pts)
+### **Media Prioridad (7 HU)**
 - ❌ **HU-14**: Gestionar Turnos Admin (21 pts)
 - ❌ **HU-15**: Registrar Pacientes Admin (8 pts)
 - ❌ **HU-18**: Gestionar Permisos Master (21 pts)
@@ -291,18 +331,20 @@
 ## 🏆 LOGROS DESTACADOS
 
 1. **MVP Funcional:** Sistema completo para pacientes y profesionales
-2. **Gestión Completa de Turnos:** Agendar, ver, cancelar, reprogramar
-3. **Sistema de Recordatorios:** Email y WhatsApp automáticos
-4. **Calendarios Avanzados:** Múltiples vistas y navegación fluida
-5. **Arquitectura Escalable:** Base sólida para funcionalidades futuras
-6. **UX Optimizada:** Interfaz intuitiva y responsive
-7. **Integración Completa:** Frontend-Backend sincronizados
+2. **Historial de Pacientes:** Acceso completo a consultas anteriores con filtros
+3. **Estadísticas Reales:** Dashboard con datos en tiempo real
+4. **Gestión Completa de Turnos:** Agendar, ver, cancelar, reprogramar
+5. **Sistema de Recordatorios:** Email y WhatsApp automáticos
+6. **Calendarios Avanzados:** Múltiples vistas y navegación fluida
+7. **Arquitectura Escalable:** Base sólida para funcionalidades futuras
+8. **UX Optimizada:** Interfaz intuitiva y responsive
+9. **Integración Completa:** Frontend-Backend sincronizados
 
 ---
 
 ## 📊 CONCLUSIÓN
 
-El proyecto Agendarte ha alcanzado un **61.9% de progreso** con **10 HU completadas** y **1 HU parcialmente implementada**. El sistema cuenta con un **MVP completamente funcional** para pacientes y profesionales.
+El proyecto Agendarte ha alcanzado un **71.4% de progreso** con **13 HU completadas** y **1 HU parcialmente implementada**. El sistema cuenta con un **MVP completamente funcional** para pacientes y profesionales.
 
 **Fortalezas:**
 - ✅ **MVP Operativo:** Funcionalidades core 100% implementadas
@@ -313,9 +355,9 @@ El proyecto Agendarte ha alcanzado un **61.9% de progreso** con **10 HU completa
 - ✅ **Integración Sólida:** Frontend-Backend sincronizados
 
 **Próximas Prioridades:**
-- 📝 **HU-13:** Notas de consulta
-- 📄 **HU-11:** Historial de paciente
-- 🔄 **HU-12:** Cancelar/Reprogramar profesional
-- 👥 **Funcionalidades administrativas**
+- 👥 **Funcionalidades administrativas:** HU-14, HU-15
+- ⭐ **Sistema de reseñas:** HU-19, HU-20, HU-21
+- 🔧 **Completar HU-17:** Usuarios Master
+- 📈 **Reportes:** HU-16
 
 **El proyecto tiene una base sólida y funcional, con un MVP completo listo para producción. Las funcionalidades core están 100% implementadas y el sistema es completamente operativo para pacientes y profesionales.**

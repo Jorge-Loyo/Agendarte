@@ -8,5 +8,7 @@ router.post('/', authenticateToken, appointmentController.createAppointment);
 router.post('/professional', authenticateToken, appointmentController.createProfessionalAppointment);
 router.put('/:id/cancel', authenticateToken, appointmentController.cancelAppointment);
 router.put('/:id/reschedule', authenticateToken, appointmentController.rescheduleAppointment);
+router.put('/:id/professional-cancel', authenticateToken, appointmentController.cancelProfessionalAppointment);
+router.put('/:id/professional-reschedule', authenticateToken, appointmentController.rescheduleProfessionalAppointment);
 
 module.exports = router;

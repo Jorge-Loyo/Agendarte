@@ -42,6 +42,10 @@ app.use("/api/calendar", require("./routes/calendar.routes"));
 app.use("/api/patients", require("./routes/patient.routes"));
 app.use("/api/notifications", require("./routes/notification.routes"));
 app.use("/api/payments", require("./routes/payment.routes"));
+app.use("/api/patient-history", require("./routes/patient-history.routes"));
+app.use("/api/stats", require("./routes/stats.routes"));
+app.use("/api/notes", require("./routes/notes.routes"));
+app.use("/api/admin", require("./routes/admin.routes"));
 // Debug: Cargar rutas de horarios
 console.log('Cargando rutas de schedules...');
 app.use("/api/schedules", require("./routes/schedule.routes"));
@@ -88,6 +92,123 @@ app.get("/api/debug/appointments", async (req, res) => {
         time: apt.appointmentTime,
         status: apt.status,
         patient: apt.patient?.profile?.firstName + ' ' + apt.patient?.profile?.lastName
+      }))
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Ruta para verificar usuarios
+app.get("/api/debug/users", async (req, res) => {
+  try {
+    const users = await User.findAll({
+      include: [{ model: Profile, as: 'profile' }],
+      order: [['id', 'ASC']]
+    });
+    res.json({
+      total: users.length,
+      users: users.map(user => ({
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        name: user.profile ? `${user.profile.firstName} ${user.profile.lastName}` : 'Sin perfil'
+      }))
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Crear cita de prueba para historial
+app.post("/api/debug/create-history", async (req, res) => {
+  try {
+    const appointment = await Appointment.create({
+      patientId: 3, // Ana García
+      professionalId: 1, // Primer profesional
+      appointmentDate: '2024-10-15',
+      appointmentTime: '10:00:00',
+      status: 'completed',
+      paymentStatus: 'paid',
+      notes: 'Control rutinario. Paciente presenta buen estado general. Se recomienda continuar con medicación actual.',
+      createdBy: 7
+    });
+    res.json({ message: 'Cita de prueba creada', appointment });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Crear múltiples citas para estadísticas
+app.post("/api/debug/create-stats-data", async (req, res) => {
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    const professional = await Professional.findOne({ where: { userId: 7 } });
+    
+    if (!professional) {
+      return res.status(404).json({ message: 'Profesional no encontrado' });
+    }
+
+    const appointments = [
+      {
+        patientId: 3,
+        professionalId: professional.id,
+        appointmentDate: today,
+        appointmentTime: '09:00:00',
+        status: 'confirmed',
+        paymentStatus: 'paid',
+        notes: 'Consulta matutina',
+        createdBy: 7
+      },
+      {
+        patientId: 4,
+        professionalId: professional.id,
+        appointmentDate: today,
+        appointmentTime: '14:00:00',
+        status: 'confirmed',
+        paymentStatus: 'paid',
+        notes: 'Control vespertino',
+        createdBy: 7
+      }
+    ];
+
+    await Appointment.bulkCreate(appointments);
+    res.json({ message: 'Datos de estadísticas creados', count: appointments.length });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Obtener turnos del profesional
+app.get("/api/debug/professional-appointments/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const professional = await Professional.findOne({ where: { userId } });
+    
+    if (!professional) {
+      return res.status(404).json({ message: 'Profesional no encontrado' });
+    }
+
+    const appointments = await Appointment.findAll({
+      where: { professionalId: professional.id },
+      include: [{
+        model: User,
+        as: 'patient',
+        include: [{ model: Profile, as: 'profile' }]
+      }],
+      order: [['appointmentDate', 'ASC'], ['appointmentTime', 'ASC']]
+    });
+
+    res.json({
+      professional: professional.id,
+      total: appointments.length,
+      appointments: appointments.map(apt => ({
+        id: apt.id,
+        date: apt.appointmentDate,
+        time: apt.appointmentTime,
+        status: apt.status,
+        patient: apt.patient?.profile?.firstName + ' ' + apt.patient?.profile?.lastName,
+        notes: apt.notes
       }))
     });
   } catch (error) {

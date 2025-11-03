@@ -1,10 +1,11 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService, User } from '../../services/auth.service';
 import { AppointmentService } from '../../services/appointment.service';
 import { NotificationService } from '../../services/notification.service';
+import { StatsService } from '../../services/stats.service';
 
 @Component({
   selector: 'app-professional-dashboard',
@@ -26,39 +27,54 @@ export class ProfessionalDashboardComponent implements OnInit {
   monthDays: any[] = [];
   
   todayAppointments = [
-    { id: 1, time: '09:00', patient: 'María García', reason: 'Control rutinario', status: 'confirmed', duration: 30 },
-    { id: 2, time: '10:30', patient: 'Juan Pérez', reason: 'Consulta inicial', status: 'confirmed', duration: 60 },
-    { id: 3, time: '14:00', patient: 'Ana López', reason: 'Seguimiento', status: 'pending', duration: 30 },
-    { id: 4, time: '15:30', patient: 'Carlos Ruiz', reason: 'Control post-operatorio', status: 'confirmed', duration: 30 }
+    { id: 1, time: '09:00', patient: 'María García', patientName: 'María García', reason: 'Control rutinario', status: 'confirmed', duration: 30 },
+    { id: 2, time: '10:30', patient: 'Juan Pérez', patientName: 'Juan Pérez', reason: 'Consulta inicial', status: 'confirmed', duration: 60 },
+    { id: 3, time: '14:00', patient: 'Ana López', patientName: 'Ana López', reason: 'Seguimiento', status: 'pending', duration: 30 },
+    { id: 4, time: '15:30', patient: 'Carlos Ruiz', patientName: 'Carlos Ruiz', reason: 'Control post-operatorio', status: 'confirmed', duration: 30 }
   ];
 
   weeklyStats = {
-    totalAppointments: 28,
-    completedAppointments: 24,
-    cancelledAppointments: 2,
-    pendingAppointments: 2,
-    newPatients: 5,
-    revenue: 12500
+    todayAppointments: 0,
+    weeklyConfirmed: 0,
+    weeklyTotal: 0,
+    weeklyPatients: 0,
+    monthlyRevenue: 0
   };
 
   recentPatients = [
-    { id: 1, name: 'María García', lastVisit: '2024-11-01', condition: 'Hipertensión', status: 'Estable' },
-    { id: 2, name: 'Juan Pérez', lastVisit: '2024-10-28', condition: 'Diabetes tipo 2', status: 'En tratamiento' },
-    { id: 3, name: 'Ana López', lastVisit: '2024-10-25', condition: 'Control rutinario', status: 'Saludable' }
+    { id: 3, name: 'Ana García', lastVisit: '2024-11-01', condition: 'Hipertensión', status: 'Estable' },
+    { id: 4, name: 'Prueba Perez', lastVisit: '2024-10-28', condition: 'Diabetes tipo 2', status: 'En tratamiento' },
+    { id: 5, name: 'Usuario Prueba', lastVisit: '2024-10-25', condition: 'Control rutinario', status: 'Saludable' }
   ];
 
   constructor(
     private authService: AuthService,
     private appointmentService: AppointmentService,
     private notificationService: NotificationService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private router: Router,
+    private statsService: StatsService
   ) {}
 
   ngOnInit() {
     this.authService.currentUser$.subscribe(user => {
       this.currentUser = user;
+      if (user?.role === 'professional') {
+        this.loadStats();
+      }
     });
     this.generateCalendarData();
+  }
+
+  loadStats(): void {
+    this.statsService.getProfessionalStats().subscribe({
+      next: (response) => {
+        this.weeklyStats = response.stats;
+      },
+      error: (error) => {
+        console.error('Error cargando estadísticas:', error);
+      }
+    });
   }
 
   generateCalendarData() {
@@ -192,7 +208,7 @@ export class ProfessionalDashboardComponent implements OnInit {
   }
 
   addNotes(appointment: any) {
-    this.notificationService.info('Notas', `Agregar notas para ${appointment.patientName}`);
+    this.router.navigate(['/app/appointment-notes', appointment.id]);
   }
 
   scheduleAppointment(time: string) {
@@ -247,6 +263,44 @@ export class ProfessionalDashboardComponent implements OnInit {
       case 'En tratamiento': return 'patient-treatment';
       case 'Saludable': return 'patient-healthy';
       default: return '';
+    }
+  }
+
+  viewPatientHistory(patientId: number): void {
+    this.router.navigate(['/app/patient-history', patientId]);
+  }
+
+  cancelAppointment(appointment: any): void {
+    const reason = prompt('Motivo de cancelación (opcional):');
+    if (reason !== null) {
+      this.appointmentService.cancelProfessionalAppointment(appointment.id, reason).subscribe({
+        next: () => {
+          this.notificationService.success('Éxito', 'Turno cancelado exitosamente');
+          this.generateCalendarData();
+        },
+        error: (error) => {
+          this.notificationService.error('Error', 'No se pudo cancelar el turno');
+        }
+      });
+    }
+  }
+
+  rescheduleAppointment(appointment: any): void {
+    const newDate = prompt('Nueva fecha (YYYY-MM-DD):');
+    if (newDate) {
+      const newTime = prompt('Nueva hora (HH:MM):');
+      if (newTime) {
+        const reason = prompt('Motivo de reprogramación (opcional):');
+        this.appointmentService.rescheduleProfessionalAppointment(appointment.id, newDate, newTime, reason || '').subscribe({
+          next: () => {
+            this.notificationService.success('Éxito', 'Turno reprogramado exitosamente');
+            this.generateCalendarData();
+          },
+          error: (error) => {
+            this.notificationService.error('Error', 'No se pudo reprogramar el turno');
+          }
+        });
+      }
     }
   }
 }

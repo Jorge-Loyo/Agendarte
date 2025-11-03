@@ -4,10 +4,10 @@
 
 ## 🎯 Estado del Proyecto
 
-**📊 Progreso Actual: 61.9% Completado**
-- ✅ **10 HU Completadas** (144/234 puntos)
+**📊 Progreso Actual: 71.4% Completado**
+- ✅ **13 HU Completadas** (165/234 puntos)
 - 🔄 **1 HU Parcial** (HU-17)
-- ❌ **10 HU Pendientes**
+- ❌ **7 HU Pendientes**
 
 ### 🚀 **MVP FUNCIONAL DISPONIBLE**
 El sistema cuenta con todas las funcionalidades core para pacientes y profesionales:
@@ -47,10 +47,14 @@ Agendarte/
 - ✅ **Pagos con Mercado Pago** (HU-04)
 - ✅ **Recordatorios** por email/WhatsApp (HU-07)
 
-### 👨⚕️ **Para Profesionales (90% Completo)**
+### 👨⚕️ **Para Profesionales (100% Completo)**
 - ✅ **Configuración de Horarios** (HU-08)
 - ✅ **Agenda Profesional** - Vistas día/semana/mes (HU-09)
 - ✅ **Agendar para Pacientes** - Sin pago requerido (HU-10)
+- ✅ **Historial de Pacientes** - Consultas anteriores con filtros (HU-11)
+- ✅ **Cancelar/Reprogramar Turnos** - Gestión completa desde agenda (HU-12)
+- ✅ **Notas de Consulta** - Editor con guardado automático (HU-13)
+- ✅ **Estadísticas Reales** - Dashboard con datos en tiempo real
 
 ### 🔧 **Sistema (100% Completo)**
 - ✅ **Autenticación JWT** con roles
@@ -126,7 +130,7 @@ cd frontend && ng serve
 
 ## 📊 Historias de Usuario
 
-### ✅ **Completadas (10/21)**
+### ✅ **Completadas (13/21)**
 - **HU-01**: Registro de Paciente
 - **HU-02**: Ver Profesionales Disponibles  
 - **HU-03**: Ver Calendario de Profesional
@@ -137,14 +141,17 @@ cd frontend && ng serve
 - **HU-08**: Configurar Horarios de Atención
 - **HU-09**: Ver Agenda del Profesional
 - **HU-10**: Agendar Turnos para Pacientes
+- **HU-11**: Ver Historial de Paciente
+- **HU-12**: Cancelar/Reprogramar Turnos (Profesional)
+- **HU-13**: Agregar Notas a Consulta
 
 ### 🔄 **En Progreso (1/21)**
 - **HU-17**: Crear Usuarios Master (60%)
 
 ### 🎯 **Próximas Prioridades**
-- **HU-13**: Notas de Consulta
-- **HU-11**: Historial de Paciente  
-- **HU-12**: Cancelar/Reprogramar Profesional
+- **Funcionalidades Administrativas**: HU-14, HU-15
+- **Sistema de Reseñas**: HU-19, HU-20, HU-21
+- **Completar Usuarios Master**: HU-17
 
 ## 🧪 Testing del Sistema
 
@@ -168,11 +175,15 @@ cd frontend && ng serve
 ## 🏆 Logros Destacados
 
 1. **MVP Completamente Funcional**
-2. **Sistema de Pagos Integrado**
-3. **Recordatorios Automáticos**
-4. **Calendarios Avanzados**
-5. **Arquitectura Escalable**
-6. **UX Optimizada**
+2. **Historial de Pacientes Completo**
+3. **Gestión Completa de Turnos Profesional**
+4. **Notas de Consulta con Auto-guardado**
+5. **Estadísticas Reales en Dashboard**
+6. **Sistema de Pagos Integrado**
+7. **Recordatorios Automáticos**
+8. **Calendarios Avanzados**
+9. **Arquitectura Escalable**
+10. **UX Optimizada**
 
 ## 📈 Roadmap
 

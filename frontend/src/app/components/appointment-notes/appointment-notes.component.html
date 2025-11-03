@@ -1,0 +1,97 @@
+<div class="notes-container">
+  <!-- Header -->
+  <div class="header">
+    <button class="back-btn" (click)="goBack()">
+      ← Volver a Agenda
+    </button>
+    <h2>Notas de Consulta</h2>
+    <div class="save-status">
+      <span *ngIf="saving" class="saving">Guardando...</span>
+      <span *ngIf="hasUnsavedChanges() && !saving" class="unsaved">Cambios sin guardar</span>
+      <span *ngIf="!hasUnsavedChanges() && !saving" class="saved">Guardado</span>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Cargando consulta...</p>
+  </div>
+
+  <!-- Appointment Info -->
+  <div class="appointment-info" *ngIf="appointment && !loading">
+    <div class="info-card">
+      <h3>Información de la Consulta</h3>
+      <div class="info-grid">
+        <div class="info-item">
+          <label>Paciente:</label>
+          <span>{{ appointment.patient.name }}</span>
+        </div>
+        <div class="info-item">
+          <label>DNI:</label>
+          <span>{{ appointment.patient.dni }}</span>
+        </div>
+        <div class="info-item">
+          <label>Fecha:</label>
+          <span>{{ formatDate(appointment.date) }}</span>
+        </div>
+        <div class="info-item">
+          <label>Hora:</label>
+          <span>{{ appointment.time }}</span>
+        </div>
+        <div class="info-item">
+          <label>Estado:</label>
+          <span class="status" [class]="appointment.status">{{ appointment.status }}</span>
+        </div>
+        <div class="info-item" *ngIf="appointment.updatedAt">
+          <label>Última modificación:</label>
+          <span>{{ appointment.updatedAt | date:'dd/MM/yyyy HH:mm' }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notes Editor -->
+  <div class="notes-editor" *ngIf="appointment && !loading">
+    <div class="editor-card">
+      <div class="editor-header">
+        <h3>Notas de la Consulta</h3>
+        <button class="save-btn" (click)="manualSave()" [disabled]="saving || !hasUnsavedChanges()">
+          <span *ngIf="!saving">💾 Guardar</span>
+          <span *ngIf="saving">⏳ Guardando...</span>
+        </button>
+      </div>
+      
+      <div class="editor-toolbar">
+        <small class="help-text">
+          💡 Las notas se guardan automáticamente. Puedes usar formato básico como **negrita** y *cursiva*.
+        </small>
+      </div>
+      
+      <textarea 
+        class="notes-textarea"
+        [(ngModel)]="notes"
+        (input)="onNotesChange()"
+        placeholder="Escribe aquí las notas de la consulta...
+
+Ejemplo:
+- Motivo de consulta: Control rutinario
+- Síntomas: Sin síntomas particulares
+- Examen físico: Normal
+- Diagnóstico: Paciente en buen estado general
+- Tratamiento: Continuar con medicación actual
+- Próxima cita: En 3 meses"
+        rows="15">
+      </textarea>
+      
+      <div class="editor-footer">
+        <div class="word-count">
+          {{ notes.length }} caracteres
+        </div>
+        <div class="auto-save-info">
+          <small>💾 Guardado automático cada 2 segundos</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

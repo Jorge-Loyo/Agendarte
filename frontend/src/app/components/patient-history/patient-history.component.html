@@ -1,0 +1,97 @@
+<div class="patient-history-container">
+  <!-- Header -->
+  <div class="header">
+    <button class="back-btn" (click)="goBack()">
+      ← Volver a Agenda
+    </button>
+    <h2>Historial del Paciente</h2>
+  </div>
+
+  <!-- Patient Info -->
+  <div class="patient-info" *ngIf="patient">
+    <div class="patient-card">
+      <h3>{{ patient.name }}</h3>
+      <div class="patient-details">
+        <span><strong>DNI:</strong> {{ patient.dni }}</span>
+        <span><strong>Email:</strong> {{ patient.email }}</span>
+        <span><strong>Teléfono:</strong> {{ patient.phone }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-section">
+    <div class="filters">
+      <div class="filter-group">
+        <label>Buscar en notas:</label>
+        <input 
+          type="text" 
+          [(ngModel)]="searchTerm" 
+          placeholder="Buscar en consultas..."
+          class="search-input">
+      </div>
+      
+      <div class="filter-group">
+        <label>Desde:</label>
+        <input type="date" [(ngModel)]="startDate" class="date-input">
+      </div>
+      
+      <div class="filter-group">
+        <label>Hasta:</label>
+        <input type="date" [(ngModel)]="endDate" class="date-input">
+      </div>
+      
+      <div class="filter-actions">
+        <button class="btn-primary" (click)="applyFilters()">Filtrar</button>
+        <button class="btn-secondary" (click)="clearFilters()">Limpiar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Cargando historial...</p>
+  </div>
+
+  <!-- History List -->
+  <div class="history-section" *ngIf="!loading">
+    <div class="history-header">
+      <h3>Consultas Anteriores ({{ history.length }})</h3>
+    </div>
+
+    <div class="no-history" *ngIf="history.length === 0">
+      <p>No se encontraron consultas anteriores</p>
+    </div>
+
+    <div class="history-list" *ngIf="history.length > 0">
+      <div class="history-item" *ngFor="let consultation of history">
+        <div class="consultation-header">
+          <div class="date-time">
+            <span class="date">{{ formatDate(consultation.date) }}</span>
+            <span class="time">{{ consultation.time }}</span>
+          </div>
+          <span class="status" [class]="getStatusClass(consultation.status)">
+            {{ getStatusText(consultation.status) }}
+          </span>
+        </div>
+        
+        <div class="consultation-details">
+          <div class="professional-info">
+            <strong>{{ consultation.professional.name }}</strong>
+            <span class="specialty">{{ consultation.professional.specialty }}</span>
+          </div>
+          
+          <div class="notes" *ngIf="consultation.notes">
+            <h4>Notas de la consulta:</h4>
+            <p>{{ consultation.notes }}</p>
+          </div>
+          
+          <div class="no-notes" *ngIf="!consultation.notes">
+            <p class="text-muted">Sin notas registradas</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

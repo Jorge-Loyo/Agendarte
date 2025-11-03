@@ -325,10 +325,119 @@ const createProfessionalAppointment = async (req, res) => {
   }
 };
 
+const cancelProfessionalAppointment = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { reason } = req.body;
+    const professionalUserId = req.user.id;
+
+    const professional = await Professional.findOne({ where: { userId: professionalUserId } });
+    if (!professional) {
+      return res.status(404).json({ message: 'Profesional no encontrado' });
+    }
+
+    const appointment = await Appointment.findOne({
+      where: { id, professionalId: professional.id },
+      include: [{
+        model: User,
+        as: 'patient',
+        include: [{ model: Profile, as: 'profile' }]
+      }]
+    });
+
+    if (!appointment) {
+      return res.status(404).json({ message: 'Turno no encontrado' });
+    }
+
+    if (appointment.status === 'cancelled') {
+      return res.status(400).json({ message: 'El turno ya está cancelado' });
+    }
+
+    await appointment.update({
+      status: 'cancelled',
+      notes: reason ? `${appointment.notes || ''} - Cancelado por profesional: ${reason}` : appointment.notes
+    });
+
+    // Simular notificación al paciente
+    console.log(`📧 Notificación: Turno cancelado por profesional para ${appointment.patient.profile.firstName}`);
+
+    res.json({
+      message: 'Turno cancelado exitosamente',
+      appointment
+    });
+  } catch (error) {
+    console.error('Error cancelando turno:', error);
+    res.status(500).json({ message: 'Error interno del servidor' });
+  }
+};
+
+const rescheduleProfessionalAppointment = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { newDate, newTime, reason } = req.body;
+    const professionalUserId = req.user.id;
+
+    const professional = await Professional.findOne({ where: { userId: professionalUserId } });
+    if (!professional) {
+      return res.status(404).json({ message: 'Profesional no encontrado' });
+    }
+
+    const appointment = await Appointment.findOne({
+      where: { id, professionalId: professional.id },
+      include: [{
+        model: User,
+        as: 'patient',
+        include: [{ model: Profile, as: 'profile' }]
+      }]
+    });
+
+    if (!appointment) {
+      return res.status(404).json({ message: 'Turno no encontrado' });
+    }
+
+    if (appointment.status === 'cancelled') {
+      return res.status(400).json({ message: 'No se puede reprogramar un turno cancelado' });
+    }
+
+    // Verificar disponibilidad del nuevo horario
+    const existingAppointment = await Appointment.findOne({
+      where: {
+        professionalId: professional.id,
+        appointmentDate: newDate,
+        appointmentTime: newTime,
+        status: { [Op.ne]: 'cancelled' },
+        id: { [Op.ne]: id }
+      }
+    });
+
+    if (existingAppointment) {
+      return res.status(400).json({ message: 'El nuevo horario no está disponible' });
+    }
+
+    await appointment.update({
+      appointmentDate: newDate,
+      appointmentTime: newTime,
+      notes: reason ? `${appointment.notes || ''} - Reprogramado por profesional: ${reason}` : appointment.notes
+    });
+
+    console.log(`📧 Notificación: Turno reprogramado por profesional para ${appointment.patient.profile.firstName}`);
+
+    res.json({
+      message: 'Turno reprogramado exitosamente',
+      appointment
+    });
+  } catch (error) {
+    console.error('Error reprogramando turno:', error);
+    res.status(500).json({ message: 'Error interno del servidor' });
+  }
+};
+
 module.exports = {
   getMyAppointments,
   createAppointment,
   createProfessionalAppointment,
   cancelAppointment,
-  rescheduleAppointment
+  rescheduleAppointment,
+  cancelProfessionalAppointment,
+  rescheduleProfessionalAppointment
 };

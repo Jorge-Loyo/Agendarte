@@ -27,6 +27,16 @@
   gap: 30px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.3);
+  margin-bottom: 20px;
+}
+
+.quick-actions-top {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(25px);
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .doctor-avatar {
@@ -237,10 +247,11 @@
 
 .appointment-actions {
   display: flex;
-  gap: 8px;
+  gap: 4px;
+  flex-wrap: wrap;
 }
 
-.btn-details, .btn-notes {
+.btn-details, .btn-notes, .btn-cancel, .btn-reschedule {
   padding: 4px 8px;
   border: 1px solid var(--primary-color);
   background: transparent;
@@ -249,10 +260,31 @@
   font-size: 11px;
   cursor: pointer;
   transition: all 0.3s ease;
+  margin: 2px;
 }
 
 .btn-details:hover, .btn-notes:hover {
   background: var(--primary-color);
+  color: white;
+}
+
+.btn-cancel {
+  border-color: var(--error-color);
+  color: var(--error-color);
+}
+
+.btn-cancel:hover {
+  background: var(--error-color);
+  color: white;
+}
+
+.btn-reschedule {
+  border-color: var(--warning-color);
+  color: var(--warning-color);
+}
+
+.btn-reschedule:hover {
+  background: var(--warning-color);
   color: white;
 }
 

@@ -39,4 +39,16 @@ export class AppointmentService {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     });
   }
+
+  cancelProfessionalAppointment(appointmentId: number, reason?: string): Observable<any> {
+    return this.http.put(`${this.baseUrl}/${appointmentId}/professional-cancel`, { reason }, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    });
+  }
+
+  rescheduleProfessionalAppointment(appointmentId: number, newDate: string, newTime: string, reason?: string): Observable<any> {
+    return this.http.put(`${this.baseUrl}/${appointmentId}/professional-reschedule`, { newDate, newTime, reason }, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    });
+  }
 }

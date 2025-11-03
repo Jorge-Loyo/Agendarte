@@ -1,9 +1,11 @@
 import { Routes } from '@angular/router';
+import { inject } from '@angular/core';
 import { Login } from './components/login/login';
 import { Register } from './components/register/register';
 import { LayoutComponent } from './components/layout/layout.component';
 import { HomeComponent } from './components/home/home.component';
 import { authGuard } from './guards/auth.guard';
+import { AuthService } from './services/auth.service';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -28,12 +30,17 @@ export const routes: Routes = [
       { path: 'professional-dashboard', loadComponent: () => import('./components/professional-dashboard/professional-dashboard.component').then(m => m.ProfessionalDashboardComponent) },
       { path: 'professional-appointment', loadComponent: () => import('./components/professional-appointment/professional-appointment.component').then(m => m.ProfessionalAppointmentComponent) },
       { path: 'schedule-config', loadComponent: () => import('./components/schedule-config/schedule-config.component').then(m => m.ScheduleConfigComponent) },
+      { path: 'patient-history/:id', loadComponent: () => import('./components/patient-history/patient-history.component').then(m => m.PatientHistoryComponent) },
+      { path: 'appointment-notes/:id', loadComponent: () => import('./components/appointment-notes/appointment-notes.component').then(m => m.AppointmentNotesComponent) },
       { path: 'payment/:id', loadComponent: () => import('./components/payment/payment.component').then(m => m.PaymentComponent) },
       { 
         path: 'admin', 
+        canActivate: [(route, state) => {
+          const authService = inject(AuthService);
+          return authService.isAdmin();
+        }],
         children: [
-          { path: '', loadComponent: () => import('./components/admin/admin.component').then(m => m.AdminComponent) },
-          { path: 'specialties', loadComponent: () => import('./components/admin/specialties/specialties.component').then(m => m.SpecialtiesComponent) }
+          { path: '', loadComponent: () => import('./components/admin/admin.component').then(m => m.AdminComponent) }
         ]
       }
     ]

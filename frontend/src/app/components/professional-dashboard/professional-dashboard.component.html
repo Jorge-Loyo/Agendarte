@@ -17,6 +17,31 @@
         </div>
       </div>
     </div>
+    
+    <!-- Quick Actions -->
+    <div class="quick-actions-top">
+      <div class="actions-grid">
+        <button class="action-btn new-appointment" routerLink="/app/professional-appointment">
+          <div class="action-icon">📝</div>
+          <span>Nueva Cita</span>
+        </button>
+        
+        <button class="action-btn patient-search">
+          <div class="action-icon">🔍</div>
+          <span>Buscar Paciente</span>
+        </button>
+        
+        <button class="action-btn medical-notes">
+          <div class="action-icon">📋</div>
+          <span>Notas Médicas</span>
+        </button>
+        
+        <button class="action-btn reports">
+          <div class="action-icon">📈</div>
+          <span>Reportes</span>
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- Main Dashboard Grid -->
@@ -54,6 +79,8 @@
               <div class="appointment-actions">
                 <button class="btn-details" (click)="viewAppointmentDetails(slot.appointment)">Ver</button>
                 <button class="btn-notes" (click)="addNotes(slot.appointment)">Notas</button>
+                <button class="btn-cancel" (click)="cancelAppointment(slot.appointment)">Cancelar</button>
+                <button class="btn-reschedule" (click)="rescheduleAppointment(slot.appointment)">Reprogramar</button>
               </div>
             </div>
             <ng-template #emptySlot>
@@ -108,34 +135,34 @@
       
       <div class="stats-grid">
         <div class="stat-card appointments">
-          <div class="stat-icon">📋</div>
+          <div class="stat-icon">📅</div>
           <div class="stat-info">
-            <span class="stat-value">{{ weeklyStats.totalAppointments }}</span>
-            <span class="stat-title">Total Citas</span>
+            <span class="stat-value">{{ weeklyStats.todayAppointments }}</span>
+            <span class="stat-title">Turnos Hoy</span>
           </div>
         </div>
         
         <div class="stat-card completed">
           <div class="stat-icon">✅</div>
           <div class="stat-info">
-            <span class="stat-value">{{ weeklyStats.completedAppointments }}</span>
-            <span class="stat-title">Completadas</span>
+            <span class="stat-value">{{ weeklyStats.weeklyConfirmed }}</span>
+            <span class="stat-title">Confirmados</span>
           </div>
         </div>
         
         <div class="stat-card patients">
           <div class="stat-icon">👥</div>
           <div class="stat-info">
-            <span class="stat-value">{{ weeklyStats.newPatients }}</span>
-            <span class="stat-title">Nuevos Pacientes</span>
+            <span class="stat-value">{{ weeklyStats.weeklyPatients }}</span>
+            <span class="stat-title">Pacientes</span>
           </div>
         </div>
         
         <div class="stat-card revenue">
           <div class="stat-icon">💰</div>
           <div class="stat-info">
-            <span class="stat-value">${{ weeklyStats.revenue | number }}</span>
-            <span class="stat-title">Ingresos</span>
+            <span class="stat-value">${{ weeklyStats.monthlyRevenue | number }}</span>
+            <span class="stat-title">Ingresos Mes</span>
           </div>
         </div>
       </div>
@@ -162,37 +189,12 @@
             {{ patient.status }}
           </div>
           <div class="patient-actions">
-            <button class="btn-view-history">Ver Historial</button>
+            <button class="btn-view-history" (click)="viewPatientHistory(patient.id)">Ver Historial</button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Quick Actions -->
-    <div class="quick-actions">
-      <h2>⚡ Acciones Rápidas</h2>
-      
-      <div class="actions-grid">
-        <button class="action-btn new-appointment">
-          <div class="action-icon">📝</div>
-          <span>Nueva Cita</span>
-        </button>
-        
-        <button class="action-btn patient-search">
-          <div class="action-icon">🔍</div>
-          <span>Buscar Paciente</span>
-        </button>
-        
-        <button class="action-btn medical-notes">
-          <div class="action-icon">📋</div>
-          <span>Notas Médicas</span>
-        </button>
-        
-        <button class="action-btn reports">
-          <div class="action-icon">📈</div>
-          <span>Reportes</span>
-        </button>
-      </div>
-    </div>
+
   </div>
 </div>
