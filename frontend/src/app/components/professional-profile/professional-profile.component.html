@@ -40,7 +40,8 @@
               id="email" 
               name="email"
               [(ngModel)]="profile.email" 
-              required>
+              readonly
+              class="readonly-field">
           </div>
           <div class="form-group">
             <label for="phone">Teléfono</label>
@@ -50,6 +51,24 @@
               name="phone"
               [(ngModel)]="profile.phone">
           </div>
+          <div class="form-group">
+            <label for="birthDate">Fecha de Nacimiento</label>
+            <input 
+              type="date" 
+              id="birthDate" 
+              name="birthDate"
+              [(ngModel)]="profile.birthDate">
+          </div>
+        </div>
+        
+        <div class="form-group full-width">
+          <label for="address">Dirección</label>
+          <input 
+            type="text" 
+            id="address" 
+            name="address"
+            [(ngModel)]="profile.address"
+            placeholder="Ingresa tu dirección completa">
         </div>
       </div>
 
@@ -65,6 +84,15 @@
               name="specialty"
               [(ngModel)]="profile.specialty" 
               required>
+          </div>
+          <div class="form-group">
+            <label for="subspecialty">Sub-especialidad</label>
+            <input 
+              type="text" 
+              id="subspecialty" 
+              name="subspecialty"
+              [(ngModel)]="profile.subspecialty"
+              placeholder="Ej: Cardiología Intervencionista">
           </div>
           <div class="form-group">
             <label for="licenseNumber">Número de Matrícula</label>
@@ -110,6 +138,81 @@
             [(ngModel)]="profile.description" 
             rows="4"
             placeholder="Describe tu experiencia y enfoque profesional..."></textarea>
+        </div>
+      </div>
+
+      <!-- Imagen de Perfil -->
+      <div class="form-section">
+        <h2>Imagen de Perfil</h2>
+        <div class="image-upload-section">
+          <div class="current-image" *ngIf="profile.profileImage">
+            <img [src]="profile.profileImage" alt="Imagen de perfil" class="profile-preview">
+          </div>
+          <div class="upload-area">
+            <input 
+              type="file" 
+              id="profileImage" 
+              name="profileImage"
+              accept="image/*"
+              (change)="onImageSelected($event)"
+              class="file-input">
+            <label for="profileImage" class="file-label">
+              <span class="upload-icon">📷</span>
+              <span>Seleccionar imagen</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Redes Sociales -->
+      <div class="form-section">
+        <h2>Redes Sociales</h2>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="facebook">Facebook</label>
+            <input 
+              type="url" 
+              id="facebook" 
+              name="facebook"
+              [(ngModel)]="profile.socialNetworks.facebook"
+              placeholder="https://facebook.com/tu-perfil">
+          </div>
+          <div class="form-group">
+            <label for="instagram">Instagram</label>
+            <input 
+              type="url" 
+              id="instagram" 
+              name="instagram"
+              [(ngModel)]="profile.socialNetworks.instagram"
+              placeholder="https://instagram.com/tu-perfil">
+          </div>
+          <div class="form-group">
+            <label for="linkedin">LinkedIn</label>
+            <input 
+              type="url" 
+              id="linkedin" 
+              name="linkedin"
+              [(ngModel)]="profile.socialNetworks.linkedin"
+              placeholder="https://linkedin.com/in/tu-perfil">
+          </div>
+          <div class="form-group">
+            <label for="tiktok">TikTok</label>
+            <input 
+              type="url" 
+              id="tiktok" 
+              name="tiktok"
+              [(ngModel)]="profile.socialNetworks.tiktok"
+              placeholder="https://tiktok.com/@tu-perfil">
+          </div>
+          <div class="form-group">
+            <label for="website">Sitio Web</label>
+            <input 
+              type="url" 
+              id="website" 
+              name="website"
+              [(ngModel)]="profile.socialNetworks.website"
+              placeholder="https://tu-sitio-web.com">
+          </div>
         </div>
       </div>
 

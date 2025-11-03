@@ -43,6 +43,8 @@ export class Login {
         const user = this.authService.getCurrentUser();
         if (user?.role === 'professional') {
           this.router.navigate(['/app/professional-dashboard']);
+        } else if (user?.role === 'master') {
+          this.router.navigate(['/app/admin']);
         } else {
           this.router.navigate(['/app/dashboard']);
         }

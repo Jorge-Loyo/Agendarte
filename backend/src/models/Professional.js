@@ -26,6 +26,23 @@ const Professional = sequelize.define('Professional', {
     type: DataTypes.DECIMAL(10, 2),
     field: 'consultation_price'
   },
+  subspecialty: {
+    type: DataTypes.STRING(100)
+  },
+  experience: {
+    type: DataTypes.INTEGER
+  },
+  education: {
+    type: DataTypes.TEXT
+  },
+  socialNetworks: {
+    type: DataTypes.JSON,
+    field: 'social_networks'
+  },
+  profileImage: {
+    type: DataTypes.TEXT,
+    field: 'profile_image'
+  },
   averageRating: {
     type: DataTypes.DECIMAL(2, 1),
     defaultValue: 0.0,

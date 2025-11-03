@@ -31,13 +31,27 @@ export const permissionsGuard: CanActivateFn = (route, state) => {
 
   // Verificar roles requeridos
   if (requiredRoles && !requiredRoles.includes(user.role)) {
-    router.navigate(['/app/dashboard']);
+    // Redireccionar según el rol del usuario
+    if (user.role === 'professional') {
+      router.navigate(['/app/professional-dashboard']);
+    } else if (user.role === 'master') {
+      router.navigate(['/app/admin']);
+    } else {
+      router.navigate(['/app/dashboard']);
+    }
     return false;
   }
 
   // Verificar permisos requeridos
   if (requiredPermissions && !permissionsService.hasAnyPermission(requiredPermissions)) {
-    router.navigate(['/app/dashboard']);
+    // Redireccionar según el rol del usuario
+    if (user.role === 'professional') {
+      router.navigate(['/app/professional-dashboard']);
+    } else if (user.role === 'master') {
+      router.navigate(['/app/admin']);
+    } else {
+      router.navigate(['/app/dashboard']);
+    }
     return false;
   }
 
@@ -69,7 +83,12 @@ export const adminPermissionsGuard: CanActivateFn = (route, state) => {
   ]);
 
   if (!hasAdminPermissions) {
-    router.navigate(['/app/dashboard']);
+    // Redireccionar según el rol del usuario
+    if (user.role === 'professional') {
+      router.navigate(['/app/professional-dashboard']);
+    } else {
+      router.navigate(['/app/dashboard']);
+    }
     return false;
   }
 
@@ -89,14 +108,19 @@ export const professionalPermissionsGuard: CanActivateFn = (route, state) => {
 
   const user = authService.getCurrentUser();
   if (!user || user.role !== 'professional') {
-    router.navigate(['/app/dashboard']);
+    // Redireccionar según el rol del usuario
+    if (user?.role === 'master') {
+      router.navigate(['/app/admin']);
+    } else {
+      router.navigate(['/app/dashboard']);
+    }
     return false;
   }
 
   // Verificar permisos específicos de profesional si es necesario
   const requiredPermissions = route.data?.['requiredPermissions'] as string[];
   if (requiredPermissions && !permissionsService.hasAnyPermission(requiredPermissions)) {
-    router.navigate(['/app/dashboard']);
+    router.navigate(['/app/professional-dashboard']);
     return false;
   }
 

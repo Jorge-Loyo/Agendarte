@@ -41,7 +41,8 @@ export class PermissionsService {
         { key: 'cancel_appointments', name: 'Cancelar turnos', description: 'Cancelar mis turnos', enabled: true },
         { key: 'view_professionals', name: 'Ver profesionales', description: 'Ver lista de profesionales', enabled: true },
         { key: 'leave_reviews', name: 'Dejar reseñas', description: 'Dejar reseñas de profesionales', enabled: true },
-        { key: 'view_profile', name: 'Ver perfil', description: 'Ver y editar mi perfil', enabled: true }
+        { key: 'view_profile', name: 'Ver perfil', description: 'Ver y editar mi perfil', enabled: true },
+        { key: 'dashboard_general', name: 'Dashboard general', description: 'Acceder al dashboard general', enabled: true }
       ]
     },
     {
@@ -56,7 +57,8 @@ export class PermissionsService {
         { key: 'view_reviews', name: 'Ver reseñas', description: 'Ver reseñas recibidas', enabled: true },
         { key: 'professional_dashboard', name: 'Dashboard profesional', description: 'Acceso al dashboard profesional', enabled: true },
         { key: 'notification_preferences', name: 'Configurar notificaciones', description: 'Configurar cómo notificar a pacientes', enabled: true },
-        { key: 'view_profile', name: 'Ver perfil', description: 'Ver y editar perfil profesional', enabled: true }
+        { key: 'view_profile', name: 'Ver perfil', description: 'Ver y editar perfil profesional', enabled: true },
+        { key: 'view_professional_profile', name: 'Perfil Profesional', description: 'Acceder al perfil profesional completo', enabled: true }
       ]
     },
     {
@@ -93,7 +95,7 @@ export class PermissionsService {
       label: 'Dashboard',
       icon: '🏠',
       route: '/app/dashboard',
-      requiredPermissions: [],
+      requiredPermissions: ['dashboard_general'],
       requiredRoles: ['patient', 'professional', 'admin', 'master']
     },
     {

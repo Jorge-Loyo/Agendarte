@@ -19,7 +19,12 @@ export const routes: Routes = [
     component: LayoutComponent,
     canActivate: [authGuard],
     children: [
-      { path: 'dashboard', loadComponent: () => import('./components/dashboard/dashboard').then(m => m.Dashboard) },
+      { 
+        path: 'dashboard', 
+        loadComponent: () => import('./components/dashboard/dashboard').then(m => m.Dashboard),
+        canActivate: [permissionsGuard],
+        data: { requiredPermissions: ['dashboard_general'] }
+      },
       { path: 'appointments', loadComponent: () => import('./components/appointments/appointments.component').then(m => m.AppointmentsComponent) },
       { path: 'professionals', loadComponent: () => import('./components/professionals/professionals.component').then(m => m.ProfessionalsComponent) },
       { 

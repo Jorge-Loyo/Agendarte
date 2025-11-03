@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { User, Profile } = require('../models');
+const { User, Profile, Professional } = require('../models');
 
 // Simulación de envío de email (en producción usar nodemailer)
 const sendConfirmationEmail = async (email, firstName) => {
@@ -156,16 +156,30 @@ const login = async (req, res) => {
 
 const getProfile = async (req, res) => {
   try {
+    const includes = [{
+      model: Profile,
+      as: 'profile'
+    }];
+    
+    // Si es profesional, incluir datos profesionales
     const user = await User.findByPk(req.user.id, {
-      include: [{
-        model: Profile,
-        as: 'profile'
-      }],
+      attributes: { exclude: ['password'] }
+    });
+    
+    if (user.role === 'professional') {
+      includes.push({
+        model: Professional,
+        as: 'professional'
+      });
+    }
+    
+    const userWithIncludes = await User.findByPk(req.user.id, {
+      include: includes,
       attributes: { exclude: ['password'] }
     });
 
     res.json({
-      user
+      user: userWithIncludes
     });
   } catch (error) {
     res.status(500).json({
@@ -213,9 +227,52 @@ const changePassword = async (req, res) => {
   }
 };
 
+const updateProfile = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { firstName, lastName, phone, birthDate, address, specialty, subspecialty, licenseNumber, experience, yearsOfExperience, education, bio, consultationPrice, socialNetworks, profileImage } = req.body;
+    
+    console.log('Updating profile for user:', userId);
+    console.log('Professional data:', { specialty, subspecialty, socialNetworks, profileImage: profileImage ? 'Image provided' : 'No image' });
+    console.log('Full request body:', req.body);
+
+    // Actualizar Profile
+    await Profile.update(
+      { firstName, lastName, phone, birthDate, address },
+      { where: { userId } }
+    );
+
+    // Si es profesional, actualizar datos profesionales
+    const user = await User.findByPk(userId);
+    if (user.role === 'professional') {
+      const [professional, created] = await Professional.findOrCreate({
+        where: { userId },
+        defaults: { specialty, subspecialty, licenseNumber, experience: experience || yearsOfExperience, education, bio, consultationPrice, socialNetworks, profileImage }
+      });
+      
+      if (!created) {
+        const updated = await professional.update({ specialty, subspecialty, licenseNumber, experience: experience || yearsOfExperience, education, bio, consultationPrice, socialNetworks, profileImage });
+        console.log('Professional updated:', updated);
+      } else {
+        console.log('Professional created:', professional.toJSON());
+      }
+    }
+
+    res.json({
+      message: 'Perfil actualizado correctamente'
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: 'Error en el servidor',
+      error: error.message
+    });
+  }
+};
+
 module.exports = {
   register,
   login,
   getProfile,
-  changePassword
+  changePassword,
+  updateProfile
 };

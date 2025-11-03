@@ -263,36 +263,13 @@ export class LayoutComponent implements OnInit {
   loadMenuSections() {
     const availableOptions = this.permissionsService.getAvailableMenuOptions();
     
-    // Agrupar opciones por categoría
-    const sections = [
+    // Usar todas las opciones disponibles sin filtros adicionales
+    this.menuSections = [
       {
-        title: 'General',
-        options: availableOptions.filter(opt => 
-          ['dashboard', 'profile', 'notifications'].includes(opt.key)
-        )
-      },
-      {
-        title: 'Pacientes', 
-        options: availableOptions.filter(opt => 
-          ['my_appointments', 'find_professionals'].includes(opt.key)
-        )
-      },
-      {
-        title: 'Profesionales',
-        options: availableOptions.filter(opt => 
-          ['professional_dashboard', 'schedule_config', 'my_reviews', 'my_patients'].includes(opt.key)
-        )
-      },
-      {
-        title: 'Administración',
-        options: availableOptions.filter(opt => 
-          ['admin_panel'].includes(opt.key)
-        )
+        title: 'Menú',
+        options: availableOptions
       }
     ];
-    
-    // Solo mostrar secciones que tengan opciones
-    this.menuSections = sections.filter(section => section.options.length > 0);
   }
 
   toggleSidebar() {

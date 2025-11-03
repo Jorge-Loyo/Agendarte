@@ -37,7 +37,7 @@
         <div class="menu-divider"></div>
         
         <nav class="menu-nav">
-          <a *ngFor="let option of availableMenuOptions" 
+          <a *ngFor="let option of availableMenuOptions; trackBy: trackByFn" 
              [routerLink]="option.route" 
              routerLinkActive="active"
              class="menu-item"

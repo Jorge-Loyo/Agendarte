@@ -29,7 +29,12 @@ export class AuthService {
     // Verificar si hay token guardado
     const token = localStorage.getItem('token');
     if (token) {
-      this.getProfile().subscribe();
+      this.getProfile().subscribe({
+        error: () => {
+          // Si el token es inválido, limpiar
+          this.logout();
+        }
+      });
     }
   }
 
@@ -69,7 +74,9 @@ export class AuthService {
   }
 
   isAuthenticated(): boolean {
-    return !!localStorage.getItem('token');
+    const token = localStorage.getItem('token');
+    const user = this.getCurrentUser();
+    return !!(token && user);
   }
 
   getCurrentUser(): User | null {

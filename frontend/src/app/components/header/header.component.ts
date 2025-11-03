@@ -33,8 +33,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    // Forzar recarga de permisos para obtener los últimos cambios
-    this.permissionsService.forceReloadPermissions();
+    // Limpiar permisos guardados y forzar recarga
+    this.permissionsService.clearStoredPermissions();
     
     // Suscribirse a cambios de autenticación
     this.authService.currentUser$
@@ -43,6 +43,13 @@ export class HeaderComponent implements OnInit, OnDestroy {
         this.isLoggedIn = !!user;
         this.userProfile = user;
         this.updateMenuOptions();
+        
+        // Debug temporal
+        if (user?.role === 'professional') {
+          console.log('Professional user permissions:');
+          console.log('Has view_profile:', this.permissionsService.hasPermission('view_profile'));
+          console.log('Available options:', this.permissionsService.getAvailableMenuOptions().map(o => o.label));
+        }
       });
 
     // Suscribirse a cambios de permisos
@@ -95,6 +102,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
         console.error('Error loading profile:', error);
       }
     });
+  }
+
+  trackByFn(index: number, item: any) {
+    return item.key;
   }
 
   logout() {
