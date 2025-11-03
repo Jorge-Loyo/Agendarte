@@ -366,30 +366,49 @@ const processPaymentAdmin = async (req, res) => {
 
 const getPatients = async (req, res) => {
   try {
+    console.log('Iniciando getPatients...');
+    
     const patients = await User.findAll({
       where: { role: 'patient', isActive: true },
-      include: [{
-        model: Profile,
-        as: 'profile'
-      }],
-      order: [['createdAt', 'DESC']]
+      order: [['created_at', 'DESC']]
     });
+    
+    console.log(`Encontrados ${patients.length} pacientes`);
 
-    const formattedPatients = patients.map(patient => ({
-      id: patient.id,
-      email: patient.email,
-      isActive: patient.isActive,
-      createdAt: patient.createdAt,
-      profile: patient.profile ? {
-        firstName: patient.profile.firstName,
-        lastName: patient.profile.lastName,
-        dni: patient.profile.dni,
-        phone: patient.profile.phone,
-        age: patient.profile.age,
-        gender: patient.profile.gender,
-        address: patient.profile.address
-      } : null
-    }));
+    const formattedPatients = [];
+    
+    for (const patient of patients) {
+      try {
+        const profile = await Profile.findOne({ where: { userId: patient.id } });
+        
+        formattedPatients.push({
+          id: patient.id,
+          email: patient.email,
+          isActive: patient.isActive,
+          createdAt: patient.createdAt,
+          profile: profile ? {
+            firstName: profile.firstName,
+            lastName: profile.lastName,
+            dni: profile.dni,
+            phone: profile.phone,
+            age: profile.age,
+            gender: profile.gender,
+            address: profile.address
+          } : null
+        });
+      } catch (profileError) {
+        console.error(`Error obteniendo perfil para usuario ${patient.id}:`, profileError);
+        formattedPatients.push({
+          id: patient.id,
+          email: patient.email,
+          isActive: patient.isActive,
+          createdAt: patient.createdAt,
+          profile: null
+        });
+      }
+    }
+    
+    console.log('Enviando respuesta con', formattedPatients.length, 'pacientes');
 
     res.json({
       message: 'Pacientes obtenidos exitosamente',

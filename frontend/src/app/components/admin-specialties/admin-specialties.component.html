@@ -1,0 +1,69 @@
+<div class="admin-specialties-container">
+  <div class="header">
+    <h1>🏥 Gestión de Especialidades</h1>
+    <button class="btn-create" (click)="showCreateForm = !showCreateForm">
+      {{ showCreateForm ? 'Cancelar' : '+ Crear Especialidad' }}
+    </button>
+  </div>
+
+  <!-- Create Form -->
+  <div class="create-form" *ngIf="showCreateForm">
+    <div class="form-card">
+      <h3>Crear Nueva Especialidad</h3>
+      
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Nombre *</label>
+          <input type="text" [(ngModel)]="newSpecialty.name" placeholder="Cardiología">
+        </div>
+        
+        <div class="form-group">
+          <label>Duración (minutos)</label>
+          <input type="number" [(ngModel)]="newSpecialty.duration" placeholder="30">
+        </div>
+        
+        <div class="form-group">
+          <label>Precio Base</label>
+          <input type="number" [(ngModel)]="newSpecialty.price" placeholder="5000">
+        </div>
+        
+        <div class="form-group full-width">
+          <label>Descripción</label>
+          <textarea [(ngModel)]="newSpecialty.description" placeholder="Descripción de la especialidad"></textarea>
+        </div>
+      </div>
+      
+      <div class="form-actions">
+        <button class="btn-save" (click)="createSpecialty()">Crear Especialidad</button>
+        <button class="btn-cancel" (click)="showCreateForm = false; resetForm()">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Cargando especialidades...</p>
+  </div>
+
+  <!-- Specialties Grid -->
+  <div class="specialties-grid" *ngIf="!loading">
+    <div class="specialty-card" *ngFor="let specialty of specialties">
+      <div class="specialty-header">
+        <h3>{{ specialty.name }}</h3>
+        <div class="actions">
+          <button class="btn-edit" (click)="editSpecialty(specialty)" title="Editar">✏️</button>
+          <button class="btn-delete" (click)="deleteSpecialty(specialty)" title="Eliminar">🗑️</button>
+        </div>
+      </div>
+      
+      <div class="specialty-info">
+        <p>{{ specialty.description }}</p>
+        <div class="specialty-details">
+          <span class="duration">⏱️ {{ specialty.duration }} min</span>
+          <span class="price">💰 ${{ specialty.price }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

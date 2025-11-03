@@ -1,0 +1,111 @@
+<div class="admin-reports-container">
+  <div class="header">
+    <h1>📊 Reportes y Estadísticas</h1>
+    <div class="header-actions">
+      <button class="btn-export" (click)="exportReport('pdf')">📄 Exportar PDF</button>
+      <button class="btn-export" (click)="exportReport('excel')">📊 Exportar Excel</button>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    <div class="stat-card users">
+      <div class="stat-icon">👥</div>
+      <div class="stat-info">
+        <h3>{{ stats.totalUsers }}</h3>
+        <p>Total Usuarios</p>
+      </div>
+    </div>
+
+    <div class="stat-card appointments">
+      <div class="stat-icon">📅</div>
+      <div class="stat-info">
+        <h3>{{ stats.totalAppointments }}</h3>
+        <p>Total Turnos</p>
+      </div>
+    </div>
+
+    <div class="stat-card professionals">
+      <div class="stat-icon">👨‍⚕️</div>
+      <div class="stat-info">
+        <h3>{{ stats.totalProfessionals }}</h3>
+        <p>Profesionales</p>
+      </div>
+    </div>
+
+    <div class="stat-card patients">
+      <div class="stat-icon">🧑‍⚕️</div>
+      <div class="stat-info">
+        <h3>{{ stats.totalPatients }}</h3>
+        <p>Pacientes</p>
+      </div>
+    </div>
+
+    <div class="stat-card monthly">
+      <div class="stat-icon">📈</div>
+      <div class="stat-info">
+        <h3>{{ stats.monthlyAppointments }}</h3>
+        <p>Turnos Este Mes</p>
+      </div>
+    </div>
+
+    <div class="stat-card revenue">
+      <div class="stat-icon">💰</div>
+      <div class="stat-info">
+        <h3>${{ stats.revenue | number }}</h3>
+        <p>Ingresos Mensuales</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Section -->
+  <div class="charts-section">
+    <div class="chart-card">
+      <h3>Turnos por Mes</h3>
+      <div class="chart-placeholder">
+        <p>📊 Gráfico de turnos por mes</p>
+        <small>Implementar con Chart.js o similar</small>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <h3>Especialidades Más Solicitadas</h3>
+      <div class="chart-placeholder">
+        <p>🥧 Gráfico circular de especialidades</p>
+        <small>Implementar con Chart.js o similar</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Activity -->
+  <div class="activity-section">
+    <div class="table-card">
+      <h3>Actividad Reciente</h3>
+      <div class="activity-list">
+        <div class="activity-item">
+          <span class="activity-icon">👤</span>
+          <div class="activity-info">
+            <strong>Nuevo usuario registrado</strong>
+            <small>Juan Pérez - hace 2 horas</small>
+          </div>
+        </div>
+        
+        <div class="activity-item">
+          <span class="activity-icon">📅</span>
+          <div class="activity-info">
+            <strong>Turno agendado</strong>
+            <small>María García - Cardiología - hace 3 horas</small>
+          </div>
+        </div>
+        
+        <div class="activity-item">
+          <span class="activity-icon">✅</span>
+          <div class="activity-info">
+            <strong>Turno completado</strong>
+            <small>Carlos López - Dermatología - hace 5 horas</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

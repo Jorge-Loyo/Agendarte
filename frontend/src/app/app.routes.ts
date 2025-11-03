@@ -73,7 +73,12 @@ export const routes: Routes = [
         canActivate: [adminPermissionsGuard],
         children: [
           { path: '', loadComponent: () => import('./components/admin/admin.component').then(m => m.AdminComponent) },
-          { path: 'appointments', loadComponent: () => import('./components/admin-appointments/admin-appointments.component').then(m => m.AdminAppointmentsComponent) }
+          { path: 'users', loadComponent: () => import('./components/admin-users/admin-users.component').then(m => m.AdminUsersComponent) },
+          { path: 'patients', loadComponent: () => import('./components/admin-patients/admin-patients.component').then(m => m.AdminPatientsComponent) },
+          { path: 'appointments', loadComponent: () => import('./components/admin-appointments/admin-appointments.component').then(m => m.AdminAppointmentsComponent) },
+          { path: 'specialties', loadComponent: () => import('./components/admin-specialties/admin-specialties.component').then(m => m.AdminSpecialtiesComponent) },
+          { path: 'reports', loadComponent: () => import('./components/admin-reports/admin-reports.component').then(m => m.AdminReportsComponent) },
+          { path: 'permissions', loadComponent: () => import('./components/admin-permissions/admin-permissions.component').then(m => m.AdminPermissionsComponent) }
         ]
       }
     ]

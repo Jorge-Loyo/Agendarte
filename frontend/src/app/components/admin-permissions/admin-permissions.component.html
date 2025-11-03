@@ -1,0 +1,110 @@
+<div class="permissions-container">
+  <div class="header">
+    <div class="header-content">
+      <button class="btn-back" (click)="goBack()">
+        ← Volver
+      </button>
+      <div>
+        <h1>🔐 Gestión de Permisos</h1>
+        <p>Configura los permisos por rol de usuario</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-secondary" (click)="resetPermissions()">
+        🔄 Restablecer
+      </button>
+      <button class="btn-primary" (click)="savePermissions()">
+        💾 Guardar Cambios
+      </button>
+    </div>
+  </div>
+
+  <div class="permissions-content">
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+      <div class="stat-card" *ngFor="let role of roles">
+        <div class="stat-icon" [style.background]="getRoleColor(role)">
+          {{ getRoleIcon(role) }}
+        </div>
+        <div class="stat-info">
+          <h3>{{ getPermissionCount(role) }}</h3>
+          <p>{{ getRoleLabel(role) }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modern Permissions Matrix -->
+    <div class="matrix-card">
+      <div class="matrix-header">
+        <h2>Matriz de Permisos</h2>
+        <div class="matrix-legend">
+          <span class="legend-item">
+            <div class="legend-dot enabled"></div>
+            Habilitado
+          </span>
+          <span class="legend-item">
+            <div class="legend-dot disabled"></div>
+            Deshabilitado
+          </span>
+        </div>
+      </div>
+
+      <div class="matrix-table-container">
+        <table class="modern-matrix-table">
+          <thead>
+            <tr>
+              <th class="permission-column">Permiso</th>
+              <th *ngFor="let role of roles" class="role-column" [style.color]="getRoleColor(role)">
+                <div class="role-header">
+                  <span class="role-icon">{{ getRoleIcon(role) }}</span>
+                  <span class="role-name">{{ getRoleLabel(role) }}</span>
+                </div>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let permission of permissions" class="permission-row">
+              <td class="permission-info">
+                <div class="permission-details">
+                  <h4>{{ permission.name }}</h4>
+                  <p>{{ permission.description }}</p>
+                </div>
+              </td>
+              <td *ngFor="let role of roles" class="permission-toggle">
+                <label class="modern-toggle">
+                  <input 
+                    type="checkbox" 
+                    [checked]="hasPermission(role, permission.key)"
+                    [disabled]="!canModifyRole(role)"
+                    (change)="togglePermission(role, permission.key)">
+                  <span class="toggle-slider" 
+                        [style.background]="hasPermission(role, permission.key) ? getRoleColor(role) : '#ddd'"
+                        [class.disabled]="!canModifyRole(role)"></span>
+                </label>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+      <h3>Acciones Rápidas</h3>
+      <div class="actions-grid">
+        <button class="action-card" (click)="enableAllForRole('admin')">
+          <span class="action-icon">✅</span>
+          <span class="action-text">Habilitar todo para Admin</span>
+        </button>
+        <button class="action-card" (click)="disableAllForRole('patient')">
+          <span class="action-icon">❌</span>
+          <span class="action-text">Deshabilitar todo para Paciente</span>
+        </button>
+        <button class="action-card" (click)="copyPermissions('admin', 'master')">
+          <span class="action-icon">📋</span>
+          <span class="action-text">Copiar Admin → Master</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

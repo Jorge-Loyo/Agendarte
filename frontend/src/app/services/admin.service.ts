@@ -107,4 +107,32 @@ export class AdminService {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     });
   }
+
+  getUsers(): Observable<any> {
+    return this.getAllUsers();
+  }
+
+  getSpecialties(): Observable<any> {
+    return this.http.get(`http://localhost:3000/api/specialties`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    });
+  }
+
+  createSpecialty(specialtyData: any): Observable<any> {
+    return this.http.post(`http://localhost:3000/api/specialties`, specialtyData, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    });
+  }
+
+  deleteSpecialty(specialtyId: number): Observable<any> {
+    return this.http.delete(`http://localhost:3000/api/specialties/${specialtyId}`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    });
+  }
+
+  deletePatient(patientId: number): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/patients/${patientId}`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    });
+  }
 }

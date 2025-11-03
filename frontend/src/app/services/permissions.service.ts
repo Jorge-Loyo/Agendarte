@@ -135,10 +135,10 @@ export class PermissionsService {
     },
     {
       key: 'admin_panel',
-      label: 'Panel Administrativo',
+      label: 'Panel Admin',
       icon: '🛡️',
       route: '/app/admin',
-      requiredPermissions: ['admin_dashboard'],
+      requiredPermissions: [],
       requiredRoles: ['admin', 'master']
     },
     {
@@ -225,7 +225,7 @@ export class PermissionsService {
         return false;
       }
 
-      // Verificar permisos requeridos
+      // Verificar permisos requeridos (usar OR en lugar de AND)
       if (option.requiredPermissions.length > 0) {
         return this.hasAnyPermission(option.requiredPermissions);
       }
@@ -256,5 +256,59 @@ export class PermissionsService {
 
   resetToDefaults(): void {
     this.updateRolePermissions(this.defaultRolePermissions);
+  }
+
+  getCurrentUser(): any {
+    return this.authService.getCurrentUser();
+  }
+
+  getAllPermissions(): Permission[] {
+    const allPermissions = new Map<string, Permission>();
+    this.getRolePermissions().forEach(role => {
+      role.permissions.forEach(permission => {
+        if (!allPermissions.has(permission.key)) {
+          allPermissions.set(permission.key, {
+            key: permission.key,
+            name: permission.name,
+            description: permission.description,
+            enabled: false
+          });
+        }
+      });
+    });
+    return Array.from(allPermissions.values());
+  }
+
+  getAllRoles(): string[] {
+    return this.getRolePermissions().map(role => role.key);
+  }
+
+  getPermissionsMatrix(): any {
+    const roles = this.getAllRoles();
+    const permissions = this.getAllPermissions();
+    const matrix: any = {};
+    
+    roles.forEach(role => {
+      matrix[role] = {};
+      permissions.forEach(permission => {
+        matrix[role][permission.key] = this.hasRolePermission(role, permission.key);
+      });
+    });
+    
+    return matrix;
+  }
+
+  hasRolePermission(roleKey: string, permissionKey: string): boolean {
+    const rolePermissions = this.getRolePermissions();
+    const role = rolePermissions.find(r => r.key === roleKey);
+    if (!role) return false;
+    
+    const permission = role.permissions.find(p => p.key === permissionKey);
+    return permission ? permission.enabled : false;
+  }
+
+  savePermissions(): void {
+    const rolePermissions = this.getRolePermissions();
+    localStorage.setItem('rolePermissions', JSON.stringify(rolePermissions));
   }
 }
