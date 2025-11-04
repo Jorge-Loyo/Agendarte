@@ -1,0 +1,141 @@
+<div class="medical-record-container">
+  <div class="header">
+    <button class="btn-back" (click)="goBack()">← Volver</button>
+    <h1>📋 Historia Clínica</h1>
+    <button class="btn-save" (click)="saveMedicalRecord()" [disabled]="loading">
+      {{ loading ? 'Guardando...' : 'Guardar' }}
+    </button>
+  </div>
+
+  <!-- Patient Info -->
+  <div class="patient-info-card">
+    <div class="patient-header">
+      <div class="patient-avatar">
+        {{ patient.firstName?.charAt(0) }}{{ patient.lastName?.charAt(0) }}
+      </div>
+      <div class="patient-details">
+        <h2>{{ patient.firstName }} {{ patient.lastName }}</h2>
+        <p>DNI: {{ patient.dni }} | Edad: {{ patient.age }} años</p>
+        <p>Email: {{ patient.email }} | Tel: {{ patient.phone }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Medical Record Form -->
+  <div class="medical-form">
+    <!-- Antecedentes -->
+    <div class="form-section">
+      <h3>🩺 Antecedentes Médicos</h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Alergias</label>
+          <textarea [(ngModel)]="medicalRecord.allergies" placeholder="Alergias conocidas..." rows="3"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Enfermedades Crónicas</label>
+          <textarea [(ngModel)]="medicalRecord.chronicDiseases" placeholder="Diabetes, hipertensión, etc..." rows="3"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Medicamentos Actuales</label>
+          <textarea [(ngModel)]="medicalRecord.medications" placeholder="Medicamentos que toma regularmente..." rows="3"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Cirugías Previas</label>
+          <textarea [(ngModel)]="medicalRecord.surgeries" placeholder="Cirugías realizadas..." rows="3"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Antecedentes Familiares -->
+    <div class="form-section">
+      <h3>👨‍👩‍👧‍👦 Antecedentes Familiares</h3>
+      <div class="form-group">
+        <label>Historia Familiar</label>
+        <textarea [(ngModel)]="medicalRecord.familyHistory" placeholder="Enfermedades en la familia..." rows="4"></textarea>
+      </div>
+    </div>
+
+    <!-- Antecedentes Personales -->
+    <div class="form-section">
+      <h3>👤 Antecedentes Personales</h3>
+      <div class="form-group">
+        <label>Historia Personal</label>
+        <textarea [(ngModel)]="medicalRecord.personalHistory" placeholder="Hábitos, estilo de vida, ocupación..." rows="4"></textarea>
+      </div>
+    </div>
+
+    <!-- Signos Vitales -->
+    <div class="form-section">
+      <h3>📊 Signos Vitales</h3>
+      <div class="vitals-grid">
+        <div class="form-group">
+          <label>Presión Arterial</label>
+          <input type="text" [(ngModel)]="medicalRecord.vitalSigns.bloodPressure" placeholder="120/80 mmHg">
+        </div>
+        <div class="form-group">
+          <label>Frecuencia Cardíaca</label>
+          <input type="text" [(ngModel)]="medicalRecord.vitalSigns.heartRate" placeholder="72 bpm">
+        </div>
+        <div class="form-group">
+          <label>Temperatura</label>
+          <input type="text" [(ngModel)]="medicalRecord.vitalSigns.temperature" placeholder="36.5°C">
+        </div>
+        <div class="form-group">
+          <label>Peso</label>
+          <input type="text" [(ngModel)]="medicalRecord.vitalSigns.weight" placeholder="70 kg">
+        </div>
+        <div class="form-group">
+          <label>Altura</label>
+          <input type="text" [(ngModel)]="medicalRecord.vitalSigns.height" placeholder="170 cm">
+        </div>
+      </div>
+    </div>
+
+    <!-- Examen Físico -->
+    <div class="form-section">
+      <h3>🔍 Examen Físico</h3>
+      <div class="form-group">
+        <label>Hallazgos del Examen Físico</label>
+        <textarea [(ngModel)]="medicalRecord.physicalExam" placeholder="Descripción del examen físico..." rows="5"></textarea>
+      </div>
+    </div>
+
+    <!-- Diagnóstico -->
+    <div class="form-section">
+      <h3>🎯 Diagnóstico</h3>
+      <div class="form-group">
+        <label>Diagnóstico Principal</label>
+        <textarea [(ngModel)]="medicalRecord.diagnosis" placeholder="Diagnóstico principal y diferenciales..." rows="4"></textarea>
+      </div>
+    </div>
+
+    <!-- Tratamiento -->
+    <div class="form-section">
+      <h3>💊 Plan de Tratamiento</h3>
+      <div class="form-group">
+        <label>Tratamiento Prescrito</label>
+        <textarea [(ngModel)]="medicalRecord.treatment" placeholder="Medicamentos, terapias, recomendaciones..." rows="5"></textarea>
+      </div>
+    </div>
+
+    <!-- Observaciones -->
+    <div class="form-section">
+      <h3>📝 Observaciones</h3>
+      <div class="form-group">
+        <label>Notas Adicionales</label>
+        <textarea [(ngModel)]="medicalRecord.observations" placeholder="Observaciones generales..." rows="4"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Próxima Cita</label>
+        <input type="date" [(ngModel)]="medicalRecord.nextAppointment">
+      </div>
+    </div>
+  </div>
+
+  <!-- Save Button -->
+  <div class="save-section">
+    <button class="btn-save-large" (click)="saveMedicalRecord()" [disabled]="loading">
+      {{ loading ? 'Guardando Historia Clínica...' : 'Guardar Historia Clínica' }}
+    </button>
+  </div>
+</div>

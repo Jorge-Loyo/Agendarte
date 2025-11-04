@@ -1,0 +1,59 @@
+<div class="clinical-history-container">
+  <div class="header">
+    <div class="header-left">
+      <button class="btn-back" routerLink="/app/professional-dashboard">← Volver al Dashboard</button>
+      <h1>📋 Historias Clínicas</h1>
+    </div>
+  </div>
+
+  <div class="search-section">
+    <div class="search-box">
+      <input 
+        type="text" 
+        [(ngModel)]="searchTerm" 
+        placeholder="Buscar paciente por nombre o DNI..." 
+        class="search-input"
+      >
+      <span class="search-icon">🔍</span>
+    </div>
+  </div>
+
+  <div class="patients-section" *ngIf="!loading">
+    <h2>Seleccionar Paciente ({{ filteredPatients.length }})</h2>
+    
+    <div class="patients-grid">
+      <div class="patient-card" *ngFor="let patient of filteredPatients" (click)="viewPatientHistory(patient.id)">
+        <div class="patient-info">
+          <div class="patient-avatar">
+            {{ patient.firstName?.charAt(0) }}{{ patient.lastName?.charAt(0) }}
+          </div>
+          <div class="patient-details">
+            <h4>{{ patient.firstName }} {{ patient.lastName }}</h4>
+            <p>DNI: {{ patient.dni }}</p>
+            <p>Email: {{ patient.email }}</p>
+            <p *ngIf="patient.phone">Tel: {{ patient.phone }}</p>
+          </div>
+        </div>
+        <div class="patient-action">
+          <span class="view-history">Ver Historia Clínica →</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="empty-state" *ngIf="filteredPatients.length === 0 && patients.length > 0">
+      <p>No se encontraron pacientes con "{{ searchTerm }}"</p>
+    </div>
+
+    <div class="empty-state" *ngIf="patients.length === 0">
+      <p>No tienes pacientes en tu cartilla</p>
+      <button class="btn-add" routerLink="/app/my-patients">
+        Agregar pacientes
+      </button>
+    </div>
+  </div>
+
+  <div class="loading" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Cargando pacientes...</p>
+  </div>
+</div>

@@ -86,6 +86,18 @@ export const routes: Routes = [
         data: { requiredPermissions: ['view_patient_history'] }
       },
       { 
+        path: 'clinical-history', 
+        loadComponent: () => import('./components/clinical-history/clinical-history.component').then(m => m.ClinicalHistoryComponent),
+        canActivate: [professionalPermissionsGuard],
+        data: { requiredPermissions: ['view_patient_history'] }
+      },
+      { 
+        path: 'medical-record/:id', 
+        loadComponent: () => import('./components/medical-record/medical-record.component').then(m => m.MedicalRecordComponent),
+        canActivate: [professionalPermissionsGuard],
+        data: { requiredPermissions: ['view_patient_history'] }
+      },
+      { 
         path: 'admin', 
         canActivate: [adminPermissionsGuard],
         children: [

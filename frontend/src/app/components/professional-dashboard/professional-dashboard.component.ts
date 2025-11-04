@@ -59,7 +59,8 @@ export class ProfessionalDashboardComponent implements OnInit {
         this.loadRecentPatients();
       }
     });
-    this.generateCalendarData();
+    // Navegar a la fecha de la primera cita si existe
+    this.loadAppointments();
   }
 
   loadStats(): void {
@@ -77,10 +78,18 @@ export class ProfessionalDashboardComponent implements OnInit {
     this.appointmentService.getProfessionalAppointments().subscribe({
       next: (response) => {
         this.todayAppointments = response.appointments || [];
+        
+        // Si hay citas, navegar a la fecha de la primera cita
+        if (this.todayAppointments.length > 0) {
+          const firstAppointmentDate = new Date(this.todayAppointments[0].appointmentDate);
+          this.displayDate = firstAppointmentDate;
+          this.currentDate = new Date(firstAppointmentDate);
+        }
+        
         this.generateCalendarData();
       },
       error: (error) => {
-        console.error('Error cargando citas:', error);
+        console.error('❌ Error cargando citas:', error);
         this.todayAppointments = [];
         this.generateCalendarData();
       }
@@ -110,44 +119,48 @@ export class ProfessionalDashboardComponent implements OnInit {
   generateDayView() {
     const slots = [];
     const occupiedSlots = new Set();
+    const today = this.displayDate.toISOString().split('T')[0];
+    
+    const todayAppointments = this.todayAppointments.filter(apt => 
+      apt.appointmentDate === today
+    );
     
     for (let hour = 9; hour < 18; hour++) {
-      for (let minute = 0; minute < 60; minute += 30) {
-        const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+      for (let minute = 0; minute < 60; minute += 60) {
+        const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}:00`;
+        const timeDisplay = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
         
         if (occupiedSlots.has(time)) {
-          continue; // Skip if already occupied by longer appointment
+          continue;
         }
         
-        const appointment = this.todayAppointments.find(apt => apt.time === time);
+        const appointment = todayAppointments.find(apt => 
+          apt.time === time || apt.time === timeDisplay
+        );
         
         if (appointment) {
-          // Mark additional slots as occupied for 60-minute appointments
-          if (appointment.duration === 60) {
-            const nextSlot = `${hour.toString().padStart(2, '0')}:${(minute + 30).toString().padStart(2, '0')}`;
-            occupiedSlots.add(nextSlot);
-          }
-          
           slots.push({
-            time,
+            time: timeDisplay,
             isOccupied: true,
-            duration: appointment.duration || 30,
+            duration: 60,
             appointment: {
-              patientName: appointment.patient,
-              reason: appointment.reason,
+              id: appointment.id,
+              patientName: appointment.patient || appointment.patientName,
+              reason: appointment.reason || appointment.notes || 'Consulta',
               status: appointment.status
             }
           });
         } else {
           slots.push({
-            time,
+            time: timeDisplay,
             isOccupied: false,
-            duration: 30,
+            duration: 60,
             appointment: null
           });
         }
       }
     }
+    
     this.dayTimeSlots = slots;
   }
 
@@ -171,15 +184,37 @@ export class ProfessionalDashboardComponent implements OnInit {
       );
       
       return {
-        name,
+        name: `${name} ${currentDay.getDate()}`,
         date: currentDay,
+        timeSlots: this.generateTimeSlotsForDay(dayAppointments),
         appointments: dayAppointments.map(apt => ({
+          id: apt.id,
           time: apt.time,
-          patientName: apt.patient,
-          status: apt.status
+          patientName: apt.patient || apt.patientName,
+          status: apt.status,
+          reason: apt.reason || apt.notes
         }))
       };
     });
+  }
+
+  generateTimeSlotsForDay(dayAppointments: any[]) {
+    const slots = [];
+    for (let hour = 9; hour < 18; hour++) {
+      const time = `${hour.toString().padStart(2, '0')}:00`;
+      const appointment = dayAppointments.find(apt => 
+        apt.time === `${time}:00` || apt.time === time
+      );
+      
+      slots.push({
+        time,
+        appointment: appointment ? {
+          patientName: appointment.patient || appointment.patientName,
+          status: appointment.status
+        } : null
+      });
+    }
+    return slots;
   }
 
   generateMonthView() {
@@ -196,15 +231,24 @@ export class ProfessionalDashboardComponent implements OnInit {
     for (let i = 0; i < 42; i++) {
       const date = new Date(startDate);
       date.setDate(startDate.getDate() + i);
+      const dateString = date.toISOString().split('T')[0];
+      
+      const dayAppointments = this.todayAppointments.filter(apt => 
+        apt.appointmentDate === dateString
+      );
       
       days.push({
         number: date.getDate(),
         isCurrentMonth: date.getMonth() === currentMonth,
         isToday: date.toDateString() === today.toDateString(),
-        appointments: date.toDateString() === today.toDateString() ? 
-          this.todayAppointments.map(apt => ({ status: apt.status })) : []
+        appointments: dayAppointments.map(apt => ({ 
+          status: apt.status,
+          time: apt.time,
+          patient: apt.patient || apt.patientName
+        }))
       });
     }
+    
     this.monthDays = days;
   }
 
@@ -215,7 +259,6 @@ export class ProfessionalDashboardComponent implements OnInit {
   }
 
   previousPeriod() {
-    console.log('Previous - Antes:', this.displayDate.toDateString());
     if (this.currentView === 'day') {
       this.displayDate = new Date(this.displayDate.getTime() - 24 * 60 * 60 * 1000);
     } else if (this.currentView === 'week') {
@@ -223,14 +266,12 @@ export class ProfessionalDashboardComponent implements OnInit {
     } else {
       this.displayDate = new Date(this.displayDate.getFullYear(), this.displayDate.getMonth() - 1, this.displayDate.getDate());
     }
-    console.log('Previous - Después:', this.displayDate.toDateString());
     this.currentDate = new Date(this.displayDate);
     this.dateKey = Date.now();
     this.generateCalendarData();
   }
 
   nextPeriod() {
-    console.log('Next - Antes:', this.displayDate.toDateString());
     if (this.currentView === 'day') {
       this.displayDate = new Date(this.displayDate.getTime() + 24 * 60 * 60 * 1000);
     } else if (this.currentView === 'week') {
@@ -238,7 +279,6 @@ export class ProfessionalDashboardComponent implements OnInit {
     } else {
       this.displayDate = new Date(this.displayDate.getFullYear(), this.displayDate.getMonth() + 1, this.displayDate.getDate());
     }
-    console.log('Next - Después:', this.displayDate.toDateString());
     this.currentDate = new Date(this.displayDate);
     this.dateKey = Date.now();
     this.generateCalendarData();

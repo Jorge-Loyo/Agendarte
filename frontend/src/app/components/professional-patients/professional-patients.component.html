@@ -85,10 +85,21 @@
 
   <!-- My Patients List -->
   <div class="my-patients" *ngIf="!loading">
-    <h2>Mis Pacientes Activos ({{ myPatients.length }})</h2>
+    <div class="patients-header">
+      <h2>Mis Pacientes Activos ({{ filteredPatients.length }})</h2>
+      <div class="search-box">
+        <input 
+          type="text" 
+          [(ngModel)]="searchTerm" 
+          placeholder="Buscar por nombre o DNI..." 
+          class="search-input"
+        >
+        <span class="search-icon">🔍</span>
+      </div>
+    </div>
     
     <div class="patients-grid">
-      <div class="patient-card active" *ngFor="let patient of myPatients">
+      <div class="patient-card active" *ngFor="let patient of filteredPatients">
         <div class="patient-info">
           <div class="patient-avatar">
             {{ patient.firstName?.charAt(0) }}{{ patient.lastName?.charAt(0) }}
@@ -105,6 +116,10 @@
           <button class="btn-remove" *ngIf="!patient.hasHistory" (click)="removePatientFromCartilla(patient)" title="Remover de cartilla">🗑️</button>
         </div>
       </div>
+    </div>
+
+    <div class="empty-state" *ngIf="filteredPatients.length === 0 && myPatients.length > 0">
+      <p>No se encontraron pacientes con "{{ searchTerm }}"</p>
     </div>
 
     <div class="empty-state" *ngIf="myPatients.length === 0">

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { ProfessionalService } from '../../services/professional.service';
 import { AuthService } from '../../services/auth.service';
 
@@ -34,7 +34,8 @@ export class ProfessionalPatientsComponent implements OnInit {
 
   constructor(
     private professionalService: ProfessionalService,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -101,9 +102,7 @@ export class ProfessionalPatientsComponent implements OnInit {
   }
   
   viewPatientHistory(patientId: number) {
-    // Navegar al historial del paciente
-    console.log('Ver historial del paciente:', patientId);
-    alert('Funcionalidad de historial - próximamente');
+    this.router.navigate(['/app/patient-history', patientId]);
   }
 
   createPatient() {
@@ -185,6 +184,14 @@ export class ProfessionalPatientsComponent implements OnInit {
     this.whatsappLink = '';
   }
   
+  get filteredPatients() {
+    if (!this.searchTerm) return this.myPatients;
+    return this.myPatients.filter(patient =>
+      `${patient.firstName} ${patient.lastName}`.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+      patient.dni?.includes(this.searchTerm)
+    );
+  }
+
   get filteredAvailablePatients() {
     if (!this.searchTerm) return this.availablePatients;
     return this.availablePatients.filter(patient =>

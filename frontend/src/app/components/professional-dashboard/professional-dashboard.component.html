@@ -31,9 +31,9 @@
           <span>Buscar Paciente</span>
         </button>
         
-        <button class="action-btn medical-notes">
+        <button class="action-btn medical-notes" routerLink="/app/clinical-history">
           <div class="action-icon">📋</div>
-          <span>Notas Médicas</span>
+          <span>Historias Clínicas</span>
         </button>
         
         <button class="action-btn reports">
@@ -101,16 +101,27 @@
         <div class="week-title">
           <h3>{{ getWeekRange() }}</h3>
         </div>
-        <div class="week-header">
-          <div class="week-day" *ngFor="let day of weekDays">{{ day.name }}</div>
-        </div>
-        <div class="week-grid">
-          <div class="week-column" *ngFor="let day of weekDays">
-            <div class="day-appointments">
-              <div class="mini-appointment" *ngFor="let apt of day.appointments" [class]="apt.status">
-                <span class="apt-time">{{ apt.time }}</span>
-                <span class="apt-patient">{{ apt.patientName }}</span>
-              </div>
+        <div class="week-matrix">
+          <!-- Header con días -->
+          <div class="matrix-header">
+            <div class="time-header">Hora</div>
+            <div class="day-header" *ngFor="let day of weekDays">{{ day.name }}</div>
+          </div>
+          
+          <!-- Filas de horarios -->
+          <div class="matrix-row" *ngFor="let hour of [9,10,11,12,13,14,15,16,17]">
+            <div class="time-cell">{{ hour.toString().padStart(2, '0') }}:00</div>
+            <div class="day-cell" *ngFor="let day of weekDays">
+              <ng-container *ngFor="let slot of day.timeSlots">
+                <div *ngIf="slot.time === hour.toString().padStart(2, '0') + ':00'">
+                  <div *ngIf="slot.appointment; else emptyCell" class="appointment-cell" [class]="slot.appointment.status">
+                    {{ slot.appointment.patientName }}
+                  </div>
+                  <ng-template #emptyCell>
+                    <div class="empty-cell"></div>
+                  </ng-template>
+                </div>
+              </ng-container>
             </div>
           </div>
         </div>
