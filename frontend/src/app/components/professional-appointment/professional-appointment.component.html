@@ -120,10 +120,44 @@
       </div>
     </div>
 
+    <!-- Google Calendar Section -->
+    <div class="google-calendar-section">
+      <div class="calendar-header">
+        <label class="checkbox-label">
+          <input 
+            type="checkbox" 
+            [(ngModel)]="addToGoogleCalendar"
+            class="calendar-checkbox">
+          <span class="checkmark"></span>
+          📅 Agregar a Google Calendar
+        </label>
+      </div>
+      
+      <div class="calendar-fields" *ngIf="addToGoogleCalendar">
+        <div class="form-group">
+          <label>Título del evento:</label>
+          <input 
+            type="text" 
+            [(ngModel)]="googleEventTitle"
+            placeholder="Título del evento en Google Calendar"
+            class="form-input">
+        </div>
+        
+        <div class="form-group">
+          <label>Descripción (opcional):</label>
+          <textarea 
+            [(ngModel)]="googleEventDescription"
+            placeholder="Descripción adicional para el evento"
+            class="form-textarea"
+            rows="3"></textarea>
+        </div>
+      </div>
+    </div>
+
     <div class="confirm-buttons">
       <button class="btn-cancel" (click)="step = 2">Modificar</button>
       <button class="btn-confirm" (click)="confirmAppointment()" [disabled]="loading">
-        {{ loading ? 'Agendando...' : 'Confirmar Turno' }}
+        {{ loading ? 'Agendando...' : (addToGoogleCalendar ? 'Confirmar y Agregar a Calendar' : 'Confirmar Turno') }}
       </button>
     </div>
   </div>

@@ -9,7 +9,7 @@ const testGoogleCalendar = async () => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        email: 'jorgenayati@gmail.com',
+        email: 'svzurbaran@gmail.com',
         password: 'Matris94'
       })
     });

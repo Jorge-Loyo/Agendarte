@@ -46,8 +46,8 @@ export class ProfessionalService {
     });
   }
 
-  getAvailablePatients(): Observable<any> {
-    return this.http.get(`http://localhost:3000/api/patients`, {
+  searchPatients(query: string): Observable<any> {
+    return this.http.get(`${this.baseUrl}/search-patients?q=${encodeURIComponent(query)}`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     });
   }
@@ -74,5 +74,10 @@ export class ProfessionalService {
     return this.http.get(`http://localhost:3000/api/admin/check-dni/${dni}`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     });
+  }
+
+  // Mantener compatibilidad con código existente
+  getAvailablePatients(): Observable<any> {
+    return this.searchPatients('');
   }
 }

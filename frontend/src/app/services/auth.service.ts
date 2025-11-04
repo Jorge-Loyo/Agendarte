@@ -8,6 +8,7 @@ export interface User {
   email: string;
   role: string;
   profile?: any;
+  professional?: any;
 }
 
 export interface AuthResponse {
@@ -26,65 +27,33 @@ export class AuthService {
   public currentUser$ = this.currentUserSubject.asObservable();
 
   constructor(private http: HttpClient) {
-    this.initializeAuth();
+    this.loadStoredAuth();
   }
 
-  private initializeAuth(): void {
-    const token = this.getStoredToken();
-    const userData = this.getStoredUser();
+  private loadStoredAuth(): void {
+    const token = localStorage.getItem('token');
+    const userStr = localStorage.getItem('user');
     
-    if (token && userData) {
-      // Restaurar usuario desde cache
-      this.currentUserSubject.next(userData);
-      
-      // Verificar token válido
-      this.getProfile().subscribe({
-        next: (response: any) => {
-          this.storeUser(response.user);
-        },
-        error: () => {
-          this.clearAuth();
-        }
-      });
+    if (token && userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        this.currentUserSubject.next(user);
+        console.log('✅ Usuario restaurado desde localStorage:', user.email);
+      } catch (error) {
+        console.error('❌ Error parseando usuario:', error);
+        this.logout();
+      }
     }
   }
 
-  private getStoredToken(): string | null {
-    return localStorage.getItem('token') || sessionStorage.getItem('token');
-  }
 
-  private getStoredUser(): User | null {
-    const userData = localStorage.getItem('user') || sessionStorage.getItem('user');
-    return userData ? JSON.parse(userData) : null;
-  }
-
-  private storeAuth(token: string, user: User, remember: boolean = true): void {
-    const storage = remember ? localStorage : sessionStorage;
-    storage.setItem('token', token);
-    storage.setItem('user', JSON.stringify(user));
-    storage.setItem('authTime', Date.now().toString());
-  }
-
-  private storeUser(user: User): void {
-    const storage = localStorage.getItem('token') ? localStorage : sessionStorage;
-    storage.setItem('user', JSON.stringify(user));
-  }
-
-  private clearAuth(): void {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    localStorage.removeItem('authTime');
-    sessionStorage.removeItem('token');
-    sessionStorage.removeItem('user');
-    sessionStorage.removeItem('authTime');
-    this.currentUserSubject.next(null);
-  }
 
   register(userData: any): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.baseUrl}/register`, userData)
       .pipe(
         tap(response => {
-          this.storeAuth(response.token, response.user, true);
+          localStorage.setItem('token', response.token);
+          localStorage.setItem('user', JSON.stringify(response.user));
           this.currentUserSubject.next(response.user);
         })
       );
@@ -94,42 +63,36 @@ export class AuthService {
     return this.http.post<AuthResponse>(`${this.baseUrl}/login`, { email, password })
       .pipe(
         tap(response => {
-          this.storeAuth(response.token, response.user, remember);
+          localStorage.setItem('token', response.token);
+          localStorage.setItem('user', JSON.stringify(response.user));
           this.currentUserSubject.next(response.user);
+          console.log('✅ Login exitoso, token guardado');
         })
       );
   }
 
   logout(): void {
-    this.clearAuth();
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    this.currentUserSubject.next(null);
   }
 
   getProfile(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/profile`).pipe(
+    const token = localStorage.getItem('token');
+    return this.http.get(`${this.baseUrl}/profile`, {
+      headers: { Authorization: `Bearer ${token}` }
+    }).pipe(
       tap((response: any) => {
-        this.storeUser(response.user);
+        localStorage.setItem('user', JSON.stringify(response.user));
         this.currentUserSubject.next(response.user);
       })
     );
   }
 
   isAuthenticated(): boolean {
-    const token = this.getStoredToken();
+    const token = localStorage.getItem('token');
     const user = this.getCurrentUser();
-    const authTime = localStorage.getItem('authTime') || sessionStorage.getItem('authTime');
-    
-    if (!token || !user || !authTime) return false;
-    
-    // Verificar si el token no ha expirado (24 horas)
-    const tokenAge = Date.now() - parseInt(authTime);
-    const maxAge = 24 * 60 * 60 * 1000; // 24 horas
-    
-    if (tokenAge > maxAge) {
-      this.clearAuth();
-      return false;
-    }
-    
-    return true;
+    return !!(token && user);
   }
 
   getCurrentUser(): User | null {
@@ -151,7 +114,10 @@ export class AuthService {
   }
 
   updateProfile(userData: any): Observable<any> {
-    return this.http.put(`${this.baseUrl}/profile`, userData).pipe(
+    const token = localStorage.getItem('token');
+    return this.http.put(`${this.baseUrl}/profile`, userData, {
+      headers: { Authorization: `Bearer ${token}` }
+    }).pipe(
       tap((response: any) => {
         this.getProfile().subscribe();
       })
@@ -159,12 +125,16 @@ export class AuthService {
   }
 
   changePassword(currentPassword: string, newPassword: string): Observable<any> {
+    const token = localStorage.getItem('token');
     return this.http.put(`${this.baseUrl}/change-password`, 
-      { currentPassword, newPassword }
+      { currentPassword, newPassword }, 
+      {
+        headers: { Authorization: `Bearer ${token}` }
+      }
     );
   }
 
   getToken(): string | null {
-    return this.getStoredToken();
+    return localStorage.getItem('token');
   }
 }

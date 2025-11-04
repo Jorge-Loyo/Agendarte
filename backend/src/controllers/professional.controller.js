@@ -139,7 +139,6 @@ const professionalCartillas = new Map();
 const getMyPatients = async (req, res) => {
   try {
     const professionalUserId = req.user.id;
-    console.log('👥 Obteniendo pacientes para profesional:', professionalUserId);
     
     // Obtener el profesional
     const professional = await Professional.findOne({ where: { userId: professionalUserId } });
@@ -147,26 +146,19 @@ const getMyPatients = async (req, res) => {
       return res.status(404).json({ message: 'Profesional no encontrado' });
     }
 
-    // Obtener pacientes desde la base de datos
-    // Obtener pacientes usando la relación many-to-many
-    const patients = await User.findAll({
-      where: { role: 'patient', isActive: true },
-      include: [
-        { model: Profile, as: 'profile' },
-        {
-          model: Professional,
-          as: 'professionals',
-          where: { id: professional.id },
-          through: { attributes: [] }
-        }
-      ],
-      order: [['created_at', 'DESC']]
+    // Obtener solo los pacientes en la cartilla del profesional
+    const cartillaRelations = await ProfessionalPatient.findAll({
+      where: { professionalId: professional.id },
+      include: [{
+        model: User,
+        as: 'patient',
+        include: [{ model: Profile, as: 'profile' }]
+      }]
     });
 
-    console.log(`📊 Encontrados ${patients.length} pacientes en BD`);
-
     const { Appointment } = require('../models');
-    const formattedPatients = await Promise.all(patients.map(async (patient) => {
+    const formattedPatients = await Promise.all(cartillaRelations.map(async (relation) => {
+      const patient = relation.patient;
       
       // Verificar si tiene historial con este profesional
       const hasHistory = await Appointment.count({
@@ -190,10 +182,8 @@ const getMyPatients = async (req, res) => {
       };
     }));
 
-    console.log('📤 Enviando pacientes:', formattedPatients);
     res.json(formattedPatients);
   } catch (error) {
-    console.error('Error obteniendo pacientes:', error);
     res.status(500).json({
       message: 'Error interno del servidor',
       error: error.message
@@ -273,11 +263,58 @@ const removePatientFromCartilla = async (req, res) => {
   }
 };
 
+const searchPatients = async (req, res) => {
+  try {
+    const { q } = req.query;
+    
+    if (!q || q.length < 2) {
+      return res.json({ patients: [] });
+    }
+
+    const patients = await User.findAll({
+      where: {
+        role: 'patient',
+        isActive: true,
+        [Op.or]: [
+          { email: { [Op.iLike]: `%${q}%` } },
+          { '$profile.firstName$': { [Op.iLike]: `%${q}%` } },
+          { '$profile.lastName$': { [Op.iLike]: `%${q}%` } },
+          { '$profile.dni$': { [Op.like]: `%${q}%` } }
+        ]
+      },
+      include: [{
+        model: Profile,
+        as: 'profile',
+        required: false
+      }],
+      limit: 10
+    });
+
+    const formattedPatients = patients.map(patient => ({
+      id: patient.id,
+      firstName: patient.profile?.firstName || 'Sin nombre',
+      lastName: patient.profile?.lastName || '',
+      dni: patient.profile?.dni || 'Sin DNI',
+      phone: patient.profile?.phone || 'Sin teléfono',
+      email: patient.email
+    }));
+
+    res.json({ patients: formattedPatients });
+  } catch (error) {
+    console.error('Error searching patients:', error);
+    res.status(500).json({
+      message: 'Error interno del servidor',
+      error: error.message
+    });
+  }
+};
+
 module.exports = {
   getAllProfessionals,
   getProfessionalById,
   getMyPatients,
   addPatientToCartilla,
   removePatientFromCartilla,
+  searchPatients,
   professionalCartillas
 };

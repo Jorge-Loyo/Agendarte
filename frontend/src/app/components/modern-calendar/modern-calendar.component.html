@@ -5,10 +5,8 @@
   </div>
 
   <div class="auth-section">
-    <button class="btn" (click)="authenticate()">🔐 Conectar con Google</button>
-    <button class="btn success" (click)="loadCalendar()">📅 Cargar Eventos</button>
-    <button class="btn" routerLink="/app/create-event">➕ Crear Evento</button>
-    <button class="btn danger" (click)="clearCalendar()">🗑️ Limpiar</button>
+    <button class="btn" (click)="authenticate()">🔗 Conectar con Google</button>
+    <button class="btn success" (click)="showEventTypeModalDialog()">📅 Cargar Eventos</button>
   </div>
 
   <div class="loading" id="loading" style="display: none;">
@@ -93,6 +91,69 @@
     <div class="modal-footer">
       <button class="btn" (click)="closeEditModal()">✅ Guardar</button>
       <button class="btn secondary" (click)="closeEditModal()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para seleccionar tipo de evento -->
+<div class="modal-overlay" [style.display]="showEventTypeModal ? 'block' : 'none'">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>📅 Seleccionar Tipo de Evento</h3>
+      <button class="modal-close" (click)="closeEventTypeModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <p style="margin-bottom: 20px; color: #666;">¿Qué tipo de evento deseas cargar?</p>
+      <div style="display: grid; gap: 12px;">
+        <button class="btn" style="padding: 15px; font-size: 16px;" (click)="loadEventType('evento')">
+          ➕ Crear Evento en Google
+        </button>
+        <button class="btn" style="padding: 15px; font-size: 16px; background: #4285f4;" (click)="loadGoogleEvents()">
+          📅 Cargar Eventos de Google
+        </button>
+        <button class="btn" style="padding: 15px; font-size: 16px; background: #34a853;" (click)="loadEventType('cita')">
+          🩺 Cargar Citas Médicas
+        </button>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn secondary" (click)="closeEventTypeModal()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para crear evento en Google Calendar -->
+<div class="modal-overlay" [style.display]="showCreateEventModal ? 'block' : 'none'">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>🎉 Crear Evento en Google Calendar</h3>
+      <button class="modal-close" (click)="closeCreateEventModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <form #eventForm="ngForm">
+        <div class="form-group">
+          <label>Título del evento:</label>
+          <input type="text" class="form-input" name="title" ngModel required placeholder="Ej: Reunión de equipo">
+        </div>
+        <div class="form-group">
+          <label>Descripción:</label>
+          <textarea class="form-input form-textarea" name="description" ngModel placeholder="Descripción del evento (opcional)"></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Fecha y hora de inicio:</label>
+            <input type="datetime-local" class="form-input" name="startTime" ngModel required>
+          </div>
+          <div class="form-group">
+            <label>Fecha y hora de fin:</label>
+            <input type="datetime-local" class="form-input" name="endTime" ngModel required>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" (click)="createGoogleEvent(eventForm)">✅ Crear Evento</button>
+      <button class="btn secondary" (click)="closeCreateEventModal()">Cancelar</button>
     </div>
   </div>
 </div>

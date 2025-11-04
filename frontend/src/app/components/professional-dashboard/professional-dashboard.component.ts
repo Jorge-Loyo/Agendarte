@@ -30,6 +30,7 @@ export class ProfessionalDashboardComponent implements OnInit {
   monthDays: any[] = [];
   
   todayAppointments: any[] = [];
+  realTodayAppointments = 0;
 
   weeklyStats = {
     todayAppointments: 0,
@@ -40,6 +41,8 @@ export class ProfessionalDashboardComponent implements OnInit {
   };
 
   recentPatients: any[] = [];
+  upcomingEvents: any[] = [];
+  lastEvent: any = null;
 
   constructor(
     private authService: AuthService,
@@ -58,6 +61,8 @@ export class ProfessionalDashboardComponent implements OnInit {
         this.loadStats();
         this.loadAppointments();
         this.loadRecentPatients();
+        this.loadUpcomingEvents();
+        this.loadLastEvent();
       }
     });
     
@@ -91,6 +96,12 @@ export class ProfessionalDashboardComponent implements OnInit {
       next: (response) => {
         this.todayAppointments = response.appointments || [];
         
+        // Calcular citas reales de hoy
+        const today = new Date().toISOString().split('T')[0];
+        this.realTodayAppointments = this.todayAppointments.filter(apt => 
+          apt.appointmentDate === today
+        ).length;
+        
         // Si hay citas, navegar a la fecha de la primera cita
         if (this.todayAppointments.length > 0) {
           const firstAppointmentDate = new Date(this.todayAppointments[0].appointmentDate);
@@ -103,6 +114,7 @@ export class ProfessionalDashboardComponent implements OnInit {
       error: (error) => {
         console.error('❌ Error cargando citas:', error);
         this.todayAppointments = [];
+        this.realTodayAppointments = 0;
         this.generateCalendarData();
       }
     });
@@ -332,7 +344,19 @@ export class ProfessionalDashboardComponent implements OnInit {
       month: 'long',
       day: 'numeric'
     };
-    return this.displayDate.toLocaleDateString('es-ES', options);
+    return this.currentDate.toLocaleDateString('es-ES', options)
+      .replace(/^\w/, c => c.toUpperCase());
+  }
+
+  formatSpanishDate(date: Date): string {
+    const options: Intl.DateTimeFormatOptions = {
+      weekday: 'long',
+      year: 'numeric', 
+      month: 'long',
+      day: 'numeric'
+    };
+    return date.toLocaleDateString('es-ES', options)
+      .replace(/^\w/, c => c.toUpperCase());
   }
 
   getFormattedMonth(): string {
@@ -340,7 +364,8 @@ export class ProfessionalDashboardComponent implements OnInit {
       month: 'long',
       year: 'numeric'
     };
-    return this.displayDate.toLocaleDateString('es-ES', options);
+    return this.displayDate.toLocaleDateString('es-ES', options)
+      .replace(/^\w/, c => c.toUpperCase());
   }
 
   getWeekRange(): string {
@@ -412,5 +437,97 @@ export class ProfessionalDashboardComponent implements OnInit {
         });
       }
     }
+  }
+
+  loadUpcomingEvents(): void {
+    const googleCalendarService = this.injector.get(GoogleCalendarService);
+    googleCalendarService.getEvents().subscribe({
+      next: (response: any) => {
+        const events = response.events || response || [];
+        const now = new Date();
+        
+        // Filtrar y formatear próximos eventos
+        const upcomingEvents = events
+          .filter((event: any) => {
+            const eventStart = new Date(event.start?.dateTime || event.start?.date);
+            return eventStart > now;
+          })
+          .sort((a: any, b: any) => {
+            const dateA = new Date(a.start?.dateTime || a.start?.date);
+            const dateB = new Date(b.start?.dateTime || b.start?.date);
+            return dateA.getTime() - dateB.getTime();
+          })
+          .slice(0, 3)
+          .map((event: any) => ({
+            title: event.summary || 'Sin título',
+            description: event.description,
+            start: new Date(event.start?.dateTime || event.start?.date),
+            type: this.getEventType(event.summary)
+          }));
+        
+        this.upcomingEvents = upcomingEvents;
+      },
+      error: (error) => {
+        console.error('Error cargando eventos:', error);
+        this.upcomingEvents = [];
+      }
+    });
+  }
+
+  getEventType(title: string): string {
+    if (!title) return 'Evento';
+    const lowerTitle = title.toLowerCase();
+    if (lowerTitle.includes('consulta') || lowerTitle.includes('cita') || lowerTitle.includes('paciente')) {
+      return 'Consulta';
+    }
+    if (lowerTitle.includes('reunión') || lowerTitle.includes('meeting')) {
+      return 'Reunión';
+    }
+    return 'Evento';
+  }
+
+  getEventTypeClass(type: string): string {
+    switch(type) {
+      case 'Consulta': return 'event-medical';
+      case 'Reunión': return 'event-meeting';
+      default: return 'event-general';
+    }
+  }
+
+  loadLastEvent(): void {
+    const googleCalendarService = this.injector.get(GoogleCalendarService);
+    googleCalendarService.getEvents().subscribe({
+      next: (response: any) => {
+        const events = response.events || response || [];
+        const now = new Date();
+        
+        const pastEvents = events
+          .filter((event: any) => {
+            const eventStart = new Date(event.start?.dateTime || event.start?.date);
+            return eventStart < now;
+          })
+          .sort((a: any, b: any) => {
+            const dateA = new Date(a.start?.dateTime || a.start?.date);
+            const dateB = new Date(b.start?.dateTime || b.start?.date);
+            return dateB.getTime() - dateA.getTime();
+          });
+        
+        if (pastEvents.length > 0) {
+          const lastEvent = pastEvents[0];
+          this.lastEvent = {
+            title: lastEvent.summary || 'Sin título',
+            description: lastEvent.description,
+            start: new Date(lastEvent.start?.dateTime || lastEvent.start?.date),
+            type: this.getEventType(lastEvent.summary)
+          };
+        } else {
+          this.lastEvent = null;
+        }
+      },
+      error: (error) => {
+        console.error('Error cargando último evento:', error);
+        this.lastEvent = null;
+      }
+    });
   }
 }

@@ -4,9 +4,68 @@
       <button class="btn-back" routerLink="/app/professional-dashboard">← Volver al Dashboard</button>
       <h1>👥 Mi Cartilla de Pacientes</h1>
     </div>
-    <button class="btn-add" (click)="showAddPatient = !showAddPatient">
-      {{ showAddPatient ? 'Cancelar' : '+ Agregar Paciente' }}
-    </button>
+    <div class="header-actions">
+      <button class="btn-search" (click)="toggleSearchPatients()">
+        {{ showSearchPatients ? 'Cancelar' : '🔍 Buscar Paciente' }}
+      </button>
+      <button class="btn-add" (click)="showAddPatient = !showAddPatient">
+        {{ showAddPatient ? 'Cancelar' : '+ Crear Paciente' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Search Patients Modal -->
+  <div class="search-patients-modal" *ngIf="showSearchPatients">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>🔍 Buscar Paciente Existente</h3>
+        <button class="btn-close" (click)="showSearchPatients = false">✕</button>
+      </div>
+      
+      <div class="search-section">
+        <div class="search-box">
+          <input 
+            type="text" 
+            [(ngModel)]="patientSearchTerm" 
+            (input)="onPatientSearchChange()"
+            placeholder="Buscar por nombre, apellido, DNI o email..." 
+            class="search-input"
+          >
+          <span class="search-icon">🔍</span>
+        </div>
+        
+        <div class="search-results" *ngIf="searchResults.length > 0">
+          <div class="patient-result" *ngFor="let patient of searchResults">
+            <div class="patient-info">
+              <div class="patient-avatar">
+                {{ patient.firstName?.charAt(0) }}{{ patient.lastName?.charAt(0) }}
+              </div>
+              <div class="patient-details">
+                <h4>{{ patient.firstName }} {{ patient.lastName }}</h4>
+                <p>DNI: {{ patient.dni }}</p>
+                <p>Email: {{ patient.email }}</p>
+                <p *ngIf="patient.phone">Tel: {{ patient.phone }}</p>
+              </div>
+            </div>
+            <button class="btn-add-small" (click)="addPatientToCartilla(patient)">
+              + Agregar
+            </button>
+          </div>
+        </div>
+        
+        <div class="no-results" *ngIf="patientSearchTerm.length >= 2 && searchResults.length === 0">
+          <p>No se encontraron pacientes con "{{ patientSearchTerm }}"</p>
+          <p>¿Quieres crear un nuevo paciente?</p>
+          <button class="btn-create-new" (click)="showAddPatient = true; showSearchPatients = false">
+            Crear Nuevo Paciente
+          </button>
+        </div>
+        
+        <div class="search-help" *ngIf="patientSearchTerm.length < 2">
+          <p>Escribe al menos 2 caracteres para buscar</p>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Add Patient Modal -->
@@ -91,7 +150,7 @@
         <input 
           type="text" 
           [(ngModel)]="searchTerm" 
-          placeholder="Buscar por nombre o DNI..." 
+          placeholder="Filtrar mis pacientes..." 
           class="search-input"
         >
         <span class="search-icon">🔍</span>

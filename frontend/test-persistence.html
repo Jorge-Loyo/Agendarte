@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Persistencia</title>
+</head>
+<body>
+    <h1>Test de Persistencia de Token</h1>
+    <div id="status"></div>
+    <button onclick="testToken()">Verificar Token</button>
+    <button onclick="clearStorage()">Limpiar Storage</button>
+    
+    <script>
+        function testToken() {
+            const token = localStorage.getItem('token');
+            const user = localStorage.getItem('user');
+            
+            document.getElementById('status').innerHTML = `
+                <p><strong>Token:</strong> ${token ? 'Existe' : 'No existe'}</p>
+                <p><strong>Usuario:</strong> ${user ? JSON.parse(user).email : 'No existe'}</p>
+                <p><strong>Timestamp:</strong> ${new Date().toLocaleString()}</p>
+            `;
+        }
+        
+        function clearStorage() {
+            localStorage.clear();
+            document.getElementById('status').innerHTML = '<p>Storage limpiado</p>';
+        }
+        
+        // Test automático al cargar
+        testToken();
+    </script>
+</body>
+</html>

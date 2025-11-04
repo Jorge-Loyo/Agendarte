@@ -142,6 +142,17 @@ User.belongsToMany(Professional, {
   as: 'professionals'
 });
 
+// Asociaciones directas para ProfessionalPatient
+ProfessionalPatient.belongsTo(User, {
+  foreignKey: 'patientId',
+  as: 'patient'
+});
+
+ProfessionalPatient.belongsTo(Professional, {
+  foreignKey: 'professionalId',
+  as: 'professional'
+});
+
 module.exports = {
   User,
   Profile,

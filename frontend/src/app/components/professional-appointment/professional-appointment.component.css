@@ -339,6 +339,79 @@
   color: var(--text-secondary);
 }
 
+.google-calendar-section {
+  background: rgba(66, 165, 245, 0.1);
+  border: 2px solid rgba(66, 165, 245, 0.2);
+  border-radius: 15px;
+  padding: 25px;
+  margin-bottom: 30px;
+}
+
+.calendar-header {
+  margin-bottom: 20px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--primary-dark);
+  cursor: pointer;
+  user-select: none;
+}
+
+.calendar-checkbox {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--primary-color);
+  cursor: pointer;
+}
+
+.checkmark {
+  position: relative;
+}
+
+.calendar-fields {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(66, 165, 245, 0.2);
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  color: var(--primary-dark);
+  margin-bottom: 8px;
+}
+
+.form-input, .form-textarea {
+  width: 100%;
+  padding: 12px 15px;
+  border: 2px solid rgba(74, 144, 164, 0.2);
+  border-radius: 10px;
+  font-size: 1rem;
+  background: rgba(255, 255, 255, 0.9);
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.form-input:focus, .form-textarea:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(74, 144, 164, 0.1);
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
 @media (max-width: 768px) {
   .appointment-container {
     padding: 20px;
@@ -351,5 +424,9 @@
   
   .confirm-buttons {
     flex-direction: column;
+  }
+  
+  .google-calendar-section {
+    padding: 20px;
   }
 }

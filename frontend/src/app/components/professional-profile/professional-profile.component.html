@@ -78,12 +78,16 @@
         <div class="form-grid">
           <div class="form-group">
             <label for="specialty">Especialidad</label>
-            <input 
-              type="text" 
+            <select 
               id="specialty" 
               name="specialty"
               [(ngModel)]="profile.specialty" 
               required>
+              <option value="">Seleccionar especialidad</option>
+              <option *ngFor="let specialty of specialties" [value]="specialty.name">
+                {{ specialty.name }}
+              </option>
+            </select>
           </div>
           <div class="form-group">
             <label for="subspecialty">Sub-especialidad</label>

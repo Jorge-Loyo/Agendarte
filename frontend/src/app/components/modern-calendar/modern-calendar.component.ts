@@ -23,6 +23,8 @@ export class ModernCalendarComponent implements OnInit, AfterViewInit {
   // Modales
   showEventModal = false;
   showEditModal = false;
+  showEventTypeModal = false;
+  showCreateEventModal = false;
 
   constructor(
     private googleCalendarService: GoogleCalendarService,
@@ -105,9 +107,9 @@ export class ModernCalendarComponent implements OnInit, AfterViewInit {
       });
       
       this.calendar.render();
-      console.log('FullCalendar renderizado exitosamente');
+
     } else {
-      console.log('FullCalendar no disponible, reintentando...');
+
       setTimeout(() => this.renderCalendar(), 500);
     }
   }
@@ -116,34 +118,59 @@ export class ModernCalendarComponent implements OnInit, AfterViewInit {
     try {
       const response = await this.googleCalendarService.getCalendars().toPromise();
       this.isAuthenticated = true;
-      this.showStatus('✅ Ya estás conectado con Google', 'success');
+      // Cargar eventos silenciosamente
+      this.loadCalendarSilent();
     } catch (error) {
       this.isAuthenticated = false;
     }
   }
 
   async authenticate() {
-    try {
-      const response = await this.googleCalendarService.getAuthUrl().toPromise();
-      window.location.href = response.authUrl;
-    } catch (error) {
-      this.showStatus('❌ Error en la conexión', 'error');
-    }
+    // Redirigir a la página de autenticación personalizada
+    window.location.href = '/google-auth';
   }
+
+
 
   async loadCalendar() {
     if (!this.isAuthenticated) {
       this.showStatus('⚠️ Primero debes conectarte con Google', 'error');
       return;
     }
+    await this.loadCalendarSilent();
+    this.showStatus('✅ Eventos cargados', 'success');
+  }
+
+  async loadCalendarSilent() {
+    if (!this.isAuthenticated) return;
 
     try {
-      // Aquí cargarías los eventos desde Google Calendar
-      // Por ahora simulamos la carga
-      this.events = [];
-      this.showStatus('✅ Eventos cargados', 'success');
+      // Obtener eventos reales de Google Calendar
+      const response = await this.googleCalendarService.getEvents().toPromise();
+      
+      // Convertir eventos de Google al formato FullCalendar
+      const googleEvents = response.events.map((event: any) => ({
+        title: event.summary || 'Sin título',
+        start: event.start.dateTime || event.start.date,
+        end: event.end.dateTime || event.end.date,
+        description: event.description || '',
+        color: '#4285f4',
+        extendedProps: {
+          googleEventId: event.id,
+          location: event.location,
+          attendees: event.attendees
+        }
+      }));
+      
+      // Agregar eventos al calendario
+      if (this.calendar) {
+        this.calendar.removeAllEvents();
+        this.calendar.addEventSource(googleEvents);
+      }
+      
+      this.events = googleEvents;
     } catch (error) {
-      this.showStatus('❌ Error cargando eventos', 'error');
+
     }
   }
 
@@ -166,19 +193,144 @@ export class ModernCalendarComponent implements OnInit, AfterViewInit {
     this.showEditModal = false;
   }
 
+  showEventTypeModalDialog() {
+    if (!this.isAuthenticated) {
+      this.showStatus('⚠️ Primero debes conectarte con Google', 'error');
+      return;
+    }
+    this.showEventTypeModal = true;
+  }
+
+  closeEventTypeModal() {
+    this.showEventTypeModal = false;
+  }
+
+  async loadGoogleEvents() {
+    this.closeEventTypeModal();
+    await this.loadCalendarSilent();
+    this.showStatus('✅ Eventos de Google Calendar cargados', 'success');
+  }
+
+  async loadEventType(type: 'evento' | 'cita') {
+    this.closeEventTypeModal();
+    
+    if (type === 'evento') {
+      this.showCreateEventModal = true;
+    } else {
+      window.location.href = '/app/professional-appointment';
+    }
+  }
+
+  async loadMedicalAppointments() {
+    try {
+      // Cargar citas médicas del sistema Agendarte
+      const response = await fetch('/api/appointments/professional', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        const medicalEvents = data.appointments.map((apt: any) => ({
+          title: `🩺 ${apt.patientName || 'Paciente'}`,
+          start: `${apt.appointmentDate}T${apt.time}`,
+          end: `${apt.appointmentDate}T${this.addHour(apt.time)}`,
+          description: apt.reason || 'Cita médica',
+          color: '#34a853',
+          extendedProps: {
+            type: 'medical',
+            appointmentId: apt.id,
+            patientName: apt.patientName,
+            status: apt.status
+          }
+        }));
+        
+        if (this.calendar) {
+          this.calendar.removeAllEvents();
+          this.calendar.addEventSource(medicalEvents);
+        }
+        
+        this.events = medicalEvents;
+      }
+    } catch (error) {
+
+      this.showStatus('❌ Error cargando citas médicas', 'error');
+    }
+  }
+
+  private addHour(time: string): string {
+    const [hours, minutes] = time.split(':');
+    const newHour = (parseInt(hours) + 1).toString().padStart(2, '0');
+    return `${newHour}:${minutes}`;
+  }
+
+  closeCreateEventModal() {
+    this.showCreateEventModal = false;
+  }
+
+  async createGoogleEvent(form: any) {
+    if (!form.valid) {
+      this.showStatus('⚠️ Por favor completa todos los campos requeridos', 'error');
+      return;
+    }
+
+    const formData = form.value;
+    
+    try {
+      const eventData = {
+        title: formData.title,
+        description: formData.description || '',
+        startTime: new Date(formData.startTime).toISOString(),
+        endTime: new Date(formData.endTime).toISOString()
+      };
+
+      const response = await this.googleCalendarService.createEvent(eventData).toPromise();
+      
+      this.closeCreateEventModal();
+      this.showStatus('✅ Evento creado exitosamente en Google Calendar', 'success');
+      
+      // Recargar eventos para mostrar el nuevo
+      await this.loadCalendarSilent();
+      
+    } catch (error) {
+
+      this.showStatus('❌ Error creando evento en Google Calendar', 'error');
+    }
+  }
+
   async deleteEvent() {
     if (!this.currentEvent || !confirm('¿Estás seguro de que quieres eliminar este evento?')) return;
     
     try {
-      // Implementar eliminación
+      const eventId = this.currentEvent.extendedProps?.googleEventId;
+      
+      if (eventId) {
+        try {
+          await this.googleCalendarService.deleteEvent(eventId).toPromise();
+        } catch (apiError) {
+  
+        }
+      }
+      
+      // Eliminar del calendario visual
+      this.currentEvent.remove();
+      
+      // Eliminar del array local
+      this.events = this.events.filter(event => event !== this.currentEvent);
+      
       this.closeModal();
-      this.showStatus('✅ Evento eliminado exitosamente', 'success');
+      this.showStatus('✅ Evento eliminado del calendario', 'success');
     } catch (error) {
+
       this.showStatus('❌ Error eliminando evento', 'error');
     }
   }
 
   clearCalendar() {
+    if (this.calendar) {
+      this.calendar.removeAllEvents();
+    }
     this.events = [];
     this.showStatus('🗑️ Calendario limpiado', 'success');
   }

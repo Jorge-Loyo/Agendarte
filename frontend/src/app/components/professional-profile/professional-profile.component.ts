@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
+import { SpecialtyService, Specialty } from '../../services/specialty.service';
 
 @Component({
   selector: 'app-professional-profile',
@@ -38,11 +39,16 @@ export class ProfessionalProfileComponent implements OnInit {
   isLoading = false;
   message = '';
   messageType = '';
+  specialties: Specialty[] = [];
 
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private specialtyService: SpecialtyService
+  ) {}
 
   ngOnInit() {
     this.loadProfile();
+    this.loadSpecialties();
   }
 
   loadProfile() {
@@ -143,6 +149,17 @@ export class ProfessionalProfileComponent implements OnInit {
       };
       reader.readAsDataURL(file);
     }
+  }
+
+  loadSpecialties() {
+    this.specialtyService.getSpecialties().subscribe({
+      next: (response: any) => {
+        this.specialties = response.specialties || response || [];
+      },
+      error: (error) => {
+        console.error('Error loading specialties:', error);
+      }
+    });
   }
 
   private showMessage(text: string, type: string) {

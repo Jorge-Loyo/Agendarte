@@ -7,12 +7,12 @@
       </div>
       <div class="welcome-info">
         <h1>{{ currentUser?.profile?.firstName || 'Profesional' }} {{ currentUser?.profile?.lastName || '' }}</h1>
-        <p class="specialty">{{ currentUser?.profile?.specialty || 'Especialidad no definida' }}</p>
-        <p class="today-date">{{ currentDate | date:'fullDate' }}</p>
+        <p class="specialty">{{ currentUser?.professional?.specialty || 'Especialidad no definida' }}</p>
+        <p class="today-date">{{ getFormattedDate() }}</p>
       </div>
       <div class="quick-stats">
         <div class="stat-item">
-          <span class="stat-number">{{ todayAppointments.length }}</span>
+          <span class="stat-number">{{ realTodayAppointments }}</span>
           <span class="stat-label">Citas Hoy</span>
         </div>
       </div>
@@ -90,30 +90,58 @@
       </div>
     </div>
 
-    <!-- Recent Patients -->
-    <div class="recent-patients">
+    <!-- Upcoming Events -->
+    <div class="upcoming-events">
       <div class="section-header">
-        <h2>👥 Pacientes Recientes</h2>
-        <button class="btn-view-all">Ver Todos</button>
+        <h2>📅 Próximos Eventos</h2>
+        <button class="btn-view-all" (click)="loadUpcomingEvents()">Actualizar</button>
       </div>
       
-      <div class="patients-list">
-        <div class="patient-card" *ngFor="let patient of recentPatients">
-          <div class="patient-avatar">
-            {{ patient.name.charAt(0) }}
+      <div class="events-list" *ngIf="upcomingEvents.length > 0">
+        <div class="event-card" *ngFor="let event of upcomingEvents">
+          <div class="event-time">
+            <div class="event-date">{{ event.start | date:'dd/MM' }}</div>
+            <div class="event-hour">{{ event.start | date:'HH:mm' }}</div>
           </div>
-          <div class="patient-info">
-            <h3>{{ patient.name }}</h3>
-            <p class="last-visit">Última visita: {{ patient.lastVisit | date:'dd/MM/yyyy' }}</p>
-            <p class="condition">{{ patient.condition }}</p>
+          <div class="event-info">
+            <h3>{{ event.title }}</h3>
+            <p class="event-description">{{ event.description || 'Sin descripción' }}</p>
           </div>
-          <div class="patient-status" [class]="getPatientStatusClass(patient.status)">
-            {{ patient.status }}
-          </div>
-          <div class="patient-actions">
-            <button class="btn-view-history" (click)="viewPatientHistory(patient.id)">Ver Historial</button>
+          <div class="event-type" [class]="getEventTypeClass(event.type)">
+            {{ event.type || 'Evento' }}
           </div>
         </div>
+      </div>
+      
+      <div class="no-events" *ngIf="upcomingEvents.length === 0">
+        <p>No hay eventos próximos</p>
+        <button class="btn-connect" (click)="connectGoogleCalendar()">Conectar Google Calendar</button>
+      </div>
+    </div>
+
+    <!-- Last Event -->
+    <div class="recent-patients">
+      <h2>📅 Último Evento</h2>
+      
+      <div class="last-event" *ngIf="lastEvent">
+        <div class="event-card">
+          <div class="event-time">
+            <div class="event-date">{{ lastEvent.start | date:'dd/MM' }}</div>
+            <div class="event-hour">{{ lastEvent.start | date:'HH:mm' }}</div>
+          </div>
+          <div class="event-info">
+            <h3>{{ lastEvent.title }}</h3>
+            <p class="event-description">{{ lastEvent.description || 'Sin descripción' }}</p>
+            <p class="event-date-full">{{ formatSpanishDate(lastEvent.start) }}</p>
+          </div>
+          <div class="event-type" [class]="getEventTypeClass(lastEvent.type)">
+            {{ lastEvent.type || 'Evento' }}
+          </div>
+        </div>
+      </div>
+      
+      <div class="no-events" *ngIf="!lastEvent">
+        <p>No hay eventos pasados</p>
       </div>
     </div>
 

@@ -73,7 +73,9 @@ app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
     ? process.env.FRONTEND_URL?.split(',') || []
     : ['http://localhost:4200', 'http://[::1]:4200', 'http://127.0.0.1:4200', 'http://localhost:52632'],
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 // Body parsing

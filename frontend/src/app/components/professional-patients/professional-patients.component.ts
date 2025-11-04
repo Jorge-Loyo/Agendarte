@@ -14,10 +14,12 @@ import { AuthService } from '../../services/auth.service';
 })
 export class ProfessionalPatientsComponent implements OnInit {
   myPatients: any[] = [];
-  availablePatients: any[] = [];
+  searchResults: any[] = [];
   loading = false;
   showAddPatient = false;
+  showSearchPatients = false;
   searchTerm = '';
+  patientSearchTerm = '';
   currentUser: any;
   whatsappLink = '';
   
@@ -41,7 +43,6 @@ export class ProfessionalPatientsComponent implements OnInit {
   ngOnInit() {
     this.currentUser = this.authService.getCurrentUser();
     this.loadMyPatients();
-    this.loadAvailablePatients();
   }
 
   loadMyPatients() {
@@ -60,15 +61,21 @@ export class ProfessionalPatientsComponent implements OnInit {
     });
   }
 
-  loadAvailablePatients() {
-    this.professionalService.getAvailablePatients().subscribe({
-      next: (patients: any) => {
-        this.availablePatients = patients.filter((p: any) => 
+  searchPatients() {
+    if (this.patientSearchTerm.length < 2) {
+      this.searchResults = [];
+      return;
+    }
+
+    this.professionalService.searchPatients(this.patientSearchTerm).subscribe({
+      next: (response: any) => {
+        this.searchResults = (response.patients || []).filter((p: any) => 
           !this.myPatients.some(mp => mp.id === p.id)
         );
       },
       error: (error: any) => {
-        console.error('Error loading available patients:', error);
+        console.error('Error searching patients:', error);
+        this.searchResults = [];
       }
     });
   }
@@ -77,11 +84,12 @@ export class ProfessionalPatientsComponent implements OnInit {
     this.professionalService.addPatientToCartilla(patient.id).subscribe({
       next: () => {
         this.loadMyPatients();
-        this.loadAvailablePatients();
-        this.showAddPatient = false;
+        this.searchPatients(); // Actualizar resultados de búsqueda
+        alert(`${patient.firstName} ${patient.lastName} agregado a tu cartilla`);
       },
       error: (error: any) => {
         console.error('Error adding patient:', error);
+        alert('Error al agregar paciente a la cartilla');
       }
     });
   }
@@ -128,25 +136,7 @@ export class ProfessionalPatientsComponent implements OnInit {
     });
         
         // Si DNI no existe, crear paciente
-        this.loading = true;
-        this.professionalService.createPatient(this.newPatient).subscribe({
-          next: (response: any) => {
-            if (response.existed) {
-              alert('Paciente ya registrado - agregado a tu cartilla');
-            } else {
-              alert('Paciente creado exitosamente');
-            }
-            this.loadMyPatients();
-            this.resetForm();
-            this.showAddPatient = false;
-            this.loading = false;
-          },
-          error: (error: any) => {
-            console.error('Error creating patient:', error);
-            alert(error.error?.message || 'Error al crear paciente');
-            this.loading = false;
-          }
-        });
+
 
   }
   
@@ -192,11 +182,15 @@ export class ProfessionalPatientsComponent implements OnInit {
     );
   }
 
-  get filteredAvailablePatients() {
-    if (!this.searchTerm) return this.availablePatients;
-    return this.availablePatients.filter(patient =>
-      `${patient.firstName} ${patient.lastName}`.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-      patient.dni?.includes(this.searchTerm)
-    );
+  toggleSearchPatients() {
+    this.showSearchPatients = !this.showSearchPatients;
+    if (!this.showSearchPatients) {
+      this.patientSearchTerm = '';
+      this.searchResults = [];
+    }
+  }
+
+  onPatientSearchChange() {
+    this.searchPatients();
   }
 }

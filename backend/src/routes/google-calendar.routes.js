@@ -10,9 +10,18 @@ router.get('/auth-url', authenticateToken, googleCalendarController.getAuthUrl);
 router.get('/callback', googleCalendarController.handleCallback);
 
 // Obtener calendarios del usuario
-router.post('/calendars', authenticateToken, googleCalendarController.getCalendars);
+router.get('/calendars', authenticateToken, googleCalendarController.getCalendars);
+
+// Obtener eventos del usuario
+router.get('/events', authenticateToken, googleCalendarController.getEvents);
+
+// Cerrar sesión de Google
+router.post('/logout', authenticateToken, googleCalendarController.logout);
 
 // Crear evento en Google Calendar
 router.post('/create-event', authenticateToken, googleCalendarController.createEvent);
+
+// Eliminar evento de Google Calendar
+router.delete('/events/:eventId', authenticateToken, googleCalendarController.deleteEvent);
 
 module.exports = router;

@@ -104,13 +104,13 @@
 .dashboard-grid {
   display: grid;
   grid-template-columns: 2fr 1fr;
-  grid-template-rows: auto auto;
+  grid-template-rows: auto auto auto;
   gap: 30px;
 }
 
 .modern-calendar-section {
   grid-column: 1;
-  grid-row: 1 / 3;
+  grid-row: 1 / 4;
   background: #ffffff;
   border-radius: 12px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
@@ -122,9 +122,14 @@
   grid-row: 1;
 }
 
-.recent-patients {
+.upcoming-events {
   grid-column: 2;
   grid-row: 2;
+}
+
+.recent-patients {
+  grid-column: 2;
+  grid-row: 3;
 }
 
 /* Section Styles */
@@ -333,7 +338,7 @@
 @media (max-width: 1024px) {
   .dashboard-grid {
     grid-template-columns: 1fr;
-    grid-template-rows: auto auto auto;
+    grid-template-rows: auto auto auto auto;
   }
   
   .modern-calendar-section {
@@ -346,10 +351,135 @@
     grid-row: 2;
   }
   
-  .recent-patients {
+  .upcoming-events {
     grid-column: 1;
     grid-row: 3;
   }
+  
+  .recent-patients {
+    grid-column: 1;
+    grid-row: 4;
+  }
+}
+
+.upcoming-events {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(25px);
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.events-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.event-card {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 15px;
+  border-left: 4px solid #4facfe;
+  transition: all 0.3s ease;
+}
+
+.event-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(79, 172, 254, 0.15);
+}
+
+.event-time {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 60px;
+  padding: 10px;
+  background: linear-gradient(135deg, #4facfe, #00f2fe);
+  color: white;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.event-date {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.event-hour {
+  font-size: 0.8rem;
+  opacity: 0.9;
+}
+
+.event-info {
+  flex: 1;
+}
+
+.event-info h3 {
+  margin: 0 0 5px 0;
+  color: #2d3748;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.event-description {
+  margin: 0;
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.event-type {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.event-medical {
+  background: rgba(72, 187, 120, 0.2);
+  color: #22543d;
+}
+
+.event-meeting {
+  background: rgba(66, 165, 245, 0.2);
+  color: #1565c0;
+}
+
+.event-general {
+  background: rgba(156, 163, 175, 0.2);
+  color: #374151;
+}
+
+.no-events {
+  text-align: center;
+  padding: 40px 20px;
+  color: #6b7280;
+}
+
+.no-events p {
+  margin-bottom: 20px;
+  font-size: 1.1rem;
+}
+
+.btn-connect {
+  background: linear-gradient(135deg, #4facfe, #00f2fe);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-connect:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(79, 172, 254, 0.3);
 }
 
 @media (max-width: 768px) {
@@ -369,5 +499,19 @@
   
   .actions-grid {
     grid-template-columns: 1fr 1fr;
+  }
+  
+  .event-card {
+    flex-direction: column;
+    text-align: center;
+    gap: 15px;
+  }
+  
+  .event-time {
+    min-width: auto;
+    width: 100%;
+    flex-direction: row;
+    justify-content: center;
+    gap: 10px;
   }
 }

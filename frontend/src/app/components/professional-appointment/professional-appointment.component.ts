@@ -6,6 +6,7 @@ import { AppointmentService } from '../../services/appointment.service';
 import { NotificationService } from '../../services/notification.service';
 import { AuthService } from '../../services/auth.service';
 import { ProfessionalService } from '../../services/professional.service';
+import { GoogleCalendarService } from '../../services/google-calendar.service';
 
 @Component({
   selector: 'app-professional-appointment',
@@ -24,6 +25,11 @@ export class ProfessionalAppointmentComponent implements OnInit {
   notes = '';
   loading = false;
   currentUser: any = null;
+  
+  // Google Calendar fields
+  addToGoogleCalendar = false;
+  googleEventTitle = '';
+  googleEventDescription = '';
 
   availableTimes: string[] = [];
   consultationDuration = 60; // Por defecto 60 minutos
@@ -33,7 +39,8 @@ export class ProfessionalAppointmentComponent implements OnInit {
     private appointmentService: AppointmentService,
     private notificationService: NotificationService,
     private authService: AuthService,
-    private professionalService: ProfessionalService
+    private professionalService: ProfessionalService,
+    private googleCalendarService: GoogleCalendarService
   ) {}
 
   ngOnInit() {
@@ -128,6 +135,9 @@ export class ProfessionalAppointmentComponent implements OnInit {
 
   selectDateTime() {
     if (this.selectedDate && this.selectedTime) {
+      // Pre-llenar datos de Google Calendar
+      this.googleEventTitle = `Consulta - ${this.selectedPatient.firstName} ${this.selectedPatient.lastName}`;
+      this.googleEventDescription = `Consulta médica con ${this.selectedPatient.firstName} ${this.selectedPatient.lastName}`;
       this.step = 3;
     }
   }
@@ -144,11 +154,12 @@ export class ProfessionalAppointmentComponent implements OnInit {
     this.loading = true;
     this.appointmentService.createProfessionalAppointment(appointmentData).subscribe({
       next: (response) => {
-        this.notificationService.success(
-          'Turno agendado',
-          `Turno agendado para ${this.selectedPatient.firstName} ${this.selectedPatient.lastName}`
-        );
-        this.router.navigate(['/app/professional-dashboard']);
+        // Si se seleccionó agregar a Google Calendar
+        if (this.addToGoogleCalendar) {
+          this.createGoogleCalendarEvent(response.appointment);
+        } else {
+          this.showSuccessAndRedirect();
+        }
       },
       error: (error) => {
         this.loading = false;
@@ -158,6 +169,42 @@ export class ProfessionalAppointmentComponent implements OnInit {
         );
       }
     });
+  }
+
+  createGoogleCalendarEvent(appointment: any) {
+    const startDateTime = new Date(`${this.selectedDate}T${this.selectedTime}:00`);
+    const endDateTime = new Date(startDateTime.getTime() + (this.consultationDuration * 60000));
+
+    const eventData = {
+      title: this.googleEventTitle,
+      description: this.googleEventDescription,
+      startTime: startDateTime.toISOString(),
+      endTime: endDateTime.toISOString(),
+      appointmentId: appointment.id
+    };
+
+    this.googleCalendarService.createEvent(eventData).subscribe({
+      next: (response) => {
+        this.notificationService.success(
+          'Turno agendado',
+          `Turno agendado y agregado a Google Calendar`
+        );
+        this.showSuccessAndRedirect();
+      },
+      error: (error) => {
+        console.error('Error creating Google Calendar event:', error);
+        this.notificationService.warning(
+          'Turno agendado',
+          'Turno agendado correctamente, pero no se pudo agregar a Google Calendar'
+        );
+        this.showSuccessAndRedirect();
+      }
+    });
+  }
+
+  showSuccessAndRedirect() {
+    this.loading = false;
+    this.router.navigate(['/app/professional-dashboard']);
   }
 
   goBack() {
