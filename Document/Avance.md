@@ -14,7 +14,7 @@
 - **HU Pendientes:** 0 ❌
 - **Progreso General:** **100%** (21/21 HU completadas)
 - **Puntos Completados:** 272/234 pts (**116.2%**)
-- **Funcionalidades Adicionales:** Perfil Profesional, Notificaciones Avanzadas, Sistema de Permisos
+- **Funcionalidades Premium:** Historias Clínicas, Google Calendar, Cartilla Persistente, Perfil Profesional, Sistema de Permisos
 
 ---
 
@@ -452,4 +452,4 @@ El proyecto Agendarte ha alcanzado un **100% de progreso** con **19 HU completad
 **Próximas Prioridades:**
 - ⭐ **Sistema de reseñas:** HU-19, HU-20, HU-21 (21 pts)
 
-**El proyecto Agendarte está 100% COMPLETADO con TODAS las historias de usuario implementadas exitosamente. El sistema incluye funcionalidades completas de gestión de turnos, pagos, notificaciones, administración, sistema completo de reseñas, formulario de perfil profesional avanzado, configuración de notificaciones personalizable y sistema de permisos dinámico.**
+**El proyecto Agendarte está 100% COMPLETADO con TODAS las historias de usuario implementadas exitosamente. El sistema incluye funcionalidades completas de gestión de turnos, pagos, notificaciones, administración, sistema completo de reseñas, formulario de perfil profesional avanzado, configuración de notificaciones personalizable, sistema de permisos dinámico, historias clínicas médicas completas, cartilla de pacientes persistente con búsqueda avanzada, e integración con Google Calendar para sincronización automática de turnos.**
