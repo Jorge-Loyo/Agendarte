@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AppointmentService } from '../../services/appointment.service';
 import { NotificationService } from '../../services/notification.service';
+import { GoogleCalendarService } from '../../services/google-calendar.service';
 
 @Component({
   selector: 'app-professional-appointments',
@@ -17,7 +18,8 @@ export class ProfessionalAppointmentsComponent implements OnInit {
 
   constructor(
     private appointmentService: AppointmentService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private googleCalendarService: GoogleCalendarService
   ) {}
 
   ngOnInit() {
@@ -58,5 +60,51 @@ export class ProfessionalAppointmentsComponent implements OnInit {
       case 'completed': return 'Completada';
       default: return status;
     }
+  }
+
+  deleteAppointment(appointment: any) {
+    if (!confirm(`¿Estás seguro de eliminar la cita con ${appointment.patient || appointment.patientName}?`)) {
+      return;
+    }
+
+    this.appointmentService.cancelProfessionalAppointment(appointment.id, 'Eliminada por profesional').subscribe({
+      next: () => {
+        // Intentar eliminar de Google Calendar si existe
+        this.deleteFromGoogleCalendar(appointment);
+        this.loadAppointments();
+        this.notificationService.success('Éxito', 'Cita eliminada correctamente');
+      },
+      error: (error) => {
+        this.notificationService.error('Error', 'No se pudo eliminar la cita');
+      }
+    });
+  }
+
+  private deleteFromGoogleCalendar(appointment: any) {
+    // Buscar evento en Google Calendar por título
+    this.googleCalendarService.getEvents().subscribe({
+      next: (response: any) => {
+        const events = response.events || [];
+        const patientName = appointment.patient || appointment.patientName;
+        const appointmentDate = appointment.appointmentDate;
+        
+        const matchingEvent = events.find((event: any) => {
+          const eventDate = new Date(event.start?.dateTime || event.start?.date).toISOString().split('T')[0];
+          return event.summary?.includes(patientName) && eventDate === appointmentDate;
+        });
+        
+        if (matchingEvent) {
+          this.googleCalendarService.deleteEvent(matchingEvent.id).subscribe({
+            next: () => console.log('Evento eliminado de Google Calendar'),
+            error: (error) => console.log('No se pudo eliminar de Google Calendar:', error)
+          });
+        }
+      },
+      error: (error) => console.log('Error buscando eventos:', error)
+    });
+  }
+
+  navigateToNewAppointment() {
+    window.location.href = '/app/professional-appointment';
   }
 }

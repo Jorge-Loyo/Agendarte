@@ -88,6 +88,12 @@ export const routes: Routes = [
         data: { requiredPermissions: ['manage_appointments'] }
       },
       { 
+        path: 'meet-config', 
+        loadComponent: () => import('./components/meet-config/meet-config.component').then(m => m.MeetConfigComponent),
+        canActivate: [professionalPermissionsGuard],
+        data: { requiredPermissions: ['professional_dashboard'] }
+      },
+      { 
         path: 'my-patients', 
         loadComponent: () => import('./components/professional-patients/professional-patients.component').then(m => m.ProfessionalPatientsComponent),
         canActivate: [professionalPermissionsGuard],

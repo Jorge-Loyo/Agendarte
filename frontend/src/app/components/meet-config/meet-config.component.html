@@ -1,0 +1,66 @@
+<div class="meet-config-container">
+  <div class="header">
+    <h1>🎥 Configuración de Google Meet</h1>
+    <p>Configura tu sala fija de Google Meet para las sesiones</p>
+  </div>
+
+  <div class="config-card">
+    <div class="form-section">
+      <h2>Enlace de tu Sala de Meet</h2>
+      <p class="description">
+        Ingresa el enlace permanente de tu sala de Google Meet que usarás para todas las consultas.
+      </p>
+      
+      <div class="form-group">
+        <label for="meetLink">Enlace de Google Meet:</label>
+        <input 
+          type="url" 
+          id="meetLink"
+          [(ngModel)]="meetLink"
+          placeholder="https://meet.google.com/abc-defg-hij"
+          class="meet-input">
+      </div>
+
+      <div class="button-group">
+        <button 
+          class="btn-save" 
+          (click)="saveMeetConfig()"
+          [disabled]="loading">
+          {{ loading ? 'Guardando...' : '💾 Guardar Configuración' }}
+        </button>
+        
+        <button 
+          class="btn-test" 
+          (click)="openMeet()"
+          [disabled]="!meetLink">
+          🚀 Probar Enlace
+        </button>
+        
+        <button 
+          class="btn-clear" 
+          (click)="clearMeetConfig()"
+          [disabled]="!meetLink">
+          🗑️ Limpiar
+        </button>
+      </div>
+    </div>
+
+    <div class="info-section">
+      <h3>ℹ️ Información</h3>
+      <ul>
+        <li>Este enlace se usará como sala fija para todas tus consultas</li>
+        <li>Los pacientes recibirán este enlace en sus citas</li>
+        <li>Puedes cambiar el enlace cuando quieras</li>
+        <li>Solo acepta enlaces válidos de Google Meet</li>
+      </ul>
+    </div>
+
+    <div class="current-config" *ngIf="meetLink">
+      <h3>🔗 Configuración Actual</h3>
+      <div class="current-link">
+        <span>{{ meetLink }}</span>
+        <button class="btn-copy" (click)="openMeet()">Abrir</button>
+      </div>
+    </div>
+  </div>
+</div>

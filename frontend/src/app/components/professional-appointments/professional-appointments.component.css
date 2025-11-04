@@ -5,9 +5,16 @@
 }
 
 .header {
-  text-align: center;
   margin-bottom: 30px;
   color: white;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 800px;
+  margin: 0 auto;
 }
 
 .header h1 {
@@ -20,6 +27,23 @@
   font-size: 1.1rem;
   opacity: 0.9;
   margin: 0;
+}
+
+.btn-new-appointment {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.btn-new-appointment:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
 }
 
 .loading {
@@ -99,10 +123,27 @@
   font-size: 0.9rem;
 }
 
-.appointment-status {
+.appointment-actions {
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 10px;
+}
+
+.btn-delete {
+  background: rgba(239, 68, 68, 0.1);
+  color: #e53e3e;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1.1rem;
+}
+
+.btn-delete:hover {
+  background: rgba(239, 68, 68, 0.2);
+  transform: scale(1.1);
 }
 
 .status-badge {
@@ -187,6 +228,12 @@
 @media (max-width: 768px) {
   .appointments-container {
     padding: 20px;
+  }
+  
+  .header-content {
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
   }
   
   .appointment-card {

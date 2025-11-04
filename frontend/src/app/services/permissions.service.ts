@@ -185,6 +185,14 @@ export class PermissionsService {
       route: '/app/notification-preferences',
       requiredPermissions: ['notification_preferences'],
       requiredRoles: ['professional']
+    },
+    {
+      key: 'meet_config',
+      label: 'Meet',
+      icon: '🎥',
+      route: '/app/meet-config',
+      requiredPermissions: ['professional_dashboard'],
+      requiredRoles: ['professional']
     }
   ];
 
