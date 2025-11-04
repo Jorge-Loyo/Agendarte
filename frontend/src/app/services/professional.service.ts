@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 export interface Professional {
   id: number;
@@ -75,9 +76,14 @@ export class ProfessionalService {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     });
   }
-
   // Mantener compatibilidad con código existente
   getAvailablePatients(): Observable<any> {
-    return this.searchPatients('');
+    return this.searchPatients('').pipe(
+      catchError(err => {
+        console.error('Failed to fetch available patients', err);
+        // Return a safe default (empty array) so callers can continue gracefully
+        return of([]);
+      })
+    );
   }
 }
