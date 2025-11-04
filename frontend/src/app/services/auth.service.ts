@@ -26,16 +26,58 @@ export class AuthService {
   public currentUser$ = this.currentUserSubject.asObservable();
 
   constructor(private http: HttpClient) {
-    // Verificar si hay token guardado
-    const token = localStorage.getItem('token');
-    if (token) {
+    this.initializeAuth();
+  }
+
+  private initializeAuth(): void {
+    const token = this.getStoredToken();
+    const userData = this.getStoredUser();
+    
+    if (token && userData) {
+      // Restaurar usuario desde cache
+      this.currentUserSubject.next(userData);
+      
+      // Verificar token válido
       this.getProfile().subscribe({
+        next: (response: any) => {
+          this.storeUser(response.user);
+        },
         error: () => {
-          // Si el token es inválido, limpiar
-          this.logout();
+          this.clearAuth();
         }
       });
     }
+  }
+
+  private getStoredToken(): string | null {
+    return localStorage.getItem('token') || sessionStorage.getItem('token');
+  }
+
+  private getStoredUser(): User | null {
+    const userData = localStorage.getItem('user') || sessionStorage.getItem('user');
+    return userData ? JSON.parse(userData) : null;
+  }
+
+  private storeAuth(token: string, user: User, remember: boolean = true): void {
+    const storage = remember ? localStorage : sessionStorage;
+    storage.setItem('token', token);
+    storage.setItem('user', JSON.stringify(user));
+    storage.setItem('authTime', Date.now().toString());
+  }
+
+  private storeUser(user: User): void {
+    const storage = localStorage.getItem('token') ? localStorage : sessionStorage;
+    storage.setItem('user', JSON.stringify(user));
+  }
+
+  private clearAuth(): void {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    localStorage.removeItem('authTime');
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('user');
+    sessionStorage.removeItem('authTime');
+    this.currentUserSubject.next(null);
   }
 
   register(userData: any): Observable<AuthResponse> {

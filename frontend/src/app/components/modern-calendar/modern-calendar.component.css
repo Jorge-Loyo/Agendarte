@@ -88,67 +88,8 @@
   padding: 32px; 
   height: 700px;
   background: #ffffff;
-}
-
-/* Estilos personalizados para FullCalendar */
-.fc {
-  background: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-  border: 1px solid #e2e8f0;
-}
-
-.fc-header-toolbar {
-  padding: 20px 24px !important;
-  background: #f8fafc !important;
-  border-radius: 12px 12px 0 0 !important;
-  border-bottom: 1px solid #e2e8f0 !important;
-}
-
-.fc-button {
-  background: #64748b !important;
-  border: none !important;
-  border-radius: 6px !important;
-  padding: 8px 16px !important;
-  font-weight: 500 !important;
-  transition: all 0.2s ease !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
-}
-
-.fc-button:hover {
-  background: #475569 !important;
-  transform: translateY(-1px) !important;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;
-}
-
-.fc-button-active {
-  background: #374151 !important;
-}
-
-.fc-event {
-  border-radius: 6px !important;
-  border: none !important;
-  padding: 2px 6px !important;
-  font-weight: 500 !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
-  transition: all 0.2s ease !important;
-}
-
-.fc-event:hover {
-  transform: translateY(-1px) !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
-}
-
-.fc-daygrid-day {
-  transition: background-color 0.2s ease !important;
-}
-
-.fc-daygrid-day:hover {
-  background-color: #f1f5f9 !important;
-}
-
-.fc-today {
-  background-color: #e0f2fe !important;
+  min-height: 600px;
+  width: 100%;
 }
 
 .loading { 

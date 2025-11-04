@@ -13,6 +13,7 @@ export const routes: Routes = [
   { path: 'home', component: HomeComponent },
   { path: 'login', component: Login },
   { path: 'register', component: Register },
+  { path: 'callback', loadComponent: () => import('./components/google-callback/google-callback.component').then(m => m.GoogleCallbackComponent) },
 
   {
     path: 'app',

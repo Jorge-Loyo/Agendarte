@@ -3,18 +3,23 @@ const { google } = require('googleapis');
 const oauth2Client = new google.auth.OAuth2(
   process.env.GOOGLE_CLIENT_ID,
   process.env.GOOGLE_CLIENT_SECRET,
-  process.env.GOOGLE_REDIRECT_URI || 'http://localhost:3000/api/google-calendar/callback'
+  process.env.GOOGLE_REDIRECT_URI || 'http://localhost:3000/callback'
 );
 
 const getAuthUrl = async (req, res) => {
   try {
     const scopes = ['https://www.googleapis.com/auth/calendar'];
     
+    console.log('🔧 REDIRECT_URI configurada:', process.env.GOOGLE_REDIRECT_URI);
+    console.log('🔧 OAuth2Client redirect_uri:', oauth2Client._clientId);
+    
     const authUrl = oauth2Client.generateAuthUrl({
       access_type: 'offline',
       scope: scopes,
-      state: req.user.id // Para identificar al usuario
+      state: req.user.id
     });
+    
+    console.log('🔗 URL generada:', authUrl);
     
     res.json({
       message: 'URL de autorización generada',
@@ -28,29 +33,44 @@ const getAuthUrl = async (req, res) => {
 
 const handleCallback = async (req, res) => {
   try {
-    const { code, state } = req.query;
+    const { code, state, error } = req.query;
+    
+    if (error) {
+      console.error('Error de autorización:', error);
+      return res.redirect('http://localhost:4200/app/professional-dashboard?calendar=error');
+    }
+    
+    if (!code) {
+      console.error('No se recibió código de autorización');
+      return res.redirect('http://localhost:4200/app/professional-dashboard?calendar=error');
+    }
+    
     const userId = state;
+    console.log('🔄 Procesando callback para usuario:', userId);
     
     const { tokens } = await oauth2Client.getToken(code);
+    console.log('✅ Tokens obtenidos exitosamente');
     
-    // Guardar tokens en BD (simplificado - usar UserPreference)
+    // Guardar tokens en BD
     const { UserPreference } = require('../models');
-    await UserPreference.findOrCreate({
+    const [pref, created] = await UserPreference.findOrCreate({
       where: { userId },
       defaults: {
         userId,
         googleTokens: JSON.stringify(tokens)
       }
-    }).then(([pref, created]) => {
-      if (!created) {
-        pref.update({ googleTokens: JSON.stringify(tokens) });
-      }
     });
+    
+    if (!created) {
+      await pref.update({ googleTokens: JSON.stringify(tokens) });
+    }
+    
+    console.log('✅ Tokens guardados en BD');
     
     res.redirect('http://localhost:4200/app/professional-dashboard?calendar=connected');
   } catch (error) {
     console.error('Error en callback:', error);
-    res.status(500).json({ message: 'Error procesando autorización' });
+    res.redirect('http://localhost:4200/app/professional-dashboard?calendar=error');
   }
 };
 

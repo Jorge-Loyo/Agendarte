@@ -8,11 +8,12 @@ import { NotificationService } from '../../services/notification.service';
 import { StatsService } from '../../services/stats.service';
 import { GoogleCalendarService } from '../../services/google-calendar.service';
 import { Injector } from '@angular/core';
+import { ModernCalendarComponent } from '../modern-calendar/modern-calendar.component';
 
 @Component({
   selector: 'app-professional-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, ModernCalendarComponent],
   templateUrl: './professional-dashboard.component.html',
   styleUrls: ['./professional-dashboard.component.css']
 })
@@ -59,7 +60,18 @@ export class ProfessionalDashboardComponent implements OnInit {
         this.loadRecentPatients();
       }
     });
-    // Navegar a la fecha de la primera cita si existe
+    
+    // Verificar si viene de Google Calendar
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('calendar') === 'connected') {
+      this.notificationService.success('Éxito', 'Google Calendar conectado exitosamente');
+      // Limpiar URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+    } else if (urlParams.get('calendar') === 'error') {
+      this.notificationService.error('Error', 'No se pudo conectar con Google Calendar');
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+    
     this.loadAppointments();
   }
 
@@ -304,7 +316,8 @@ export class ProfessionalDashboardComponent implements OnInit {
     const googleCalendarService = this.injector.get(GoogleCalendarService);
     googleCalendarService.getAuthUrl().subscribe({
       next: (response: any) => {
-        window.open(response.authUrl, '_blank');
+        // Abrir en la misma ventana para evitar problemas de popup
+        window.location.href = response.authUrl;
       },
       error: (error: any) => {
         this.notificationService.error('Error', 'No se pudo conectar con Google Calendar');

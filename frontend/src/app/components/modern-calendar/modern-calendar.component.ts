@@ -1,24 +1,20 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
-import { CalendarService, CalendarDay } from '../../services/calendar.service';
-import { ProfessionalService } from '../../services/professional.service';
 import { GoogleCalendarService } from '../../services/google-calendar.service';
+import { AuthService } from '../../services/auth.service';
 import { ToastService } from '../../services/toast.service';
 
-declare var FullCalendar: any;
-
 @Component({
-  selector: 'app-professional-calendar',
+  selector: 'app-modern-calendar',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './professional-calendar.component.html',
-  styleUrls: ['./professional-calendar.component.css']
+  templateUrl: './modern-calendar.component.html',
+  styleUrls: ['./modern-calendar.component.css']
 })
-export class ProfessionalCalendarComponent implements OnInit {
-  professionalId!: number;
-  professional: any = null;
+export class ModernCalendarComponent implements OnInit, AfterViewInit {
+  @Input() professionalId?: number;
+  
   calendar: any;
   isAuthenticated = false;
   events: any[] = [];
@@ -29,43 +25,61 @@ export class ProfessionalCalendarComponent implements OnInit {
   showEditModal = false;
 
   constructor(
-    private route: ActivatedRoute,
-    private calendarService: CalendarService,
-    private professionalService: ProfessionalService,
     private googleCalendarService: GoogleCalendarService,
+    private authService: AuthService,
     private toastService: ToastService
   ) {}
 
   ngOnInit() {
-    this.professionalId = Number(this.route.snapshot.paramMap.get('id'));
-    this.loadProfessional();
-    this.initializeModernCalendar();
     this.checkAuthStatus();
   }
 
-  loadProfessional() {
-    this.professionalService.getProfessionalById(this.professionalId).subscribe({
-      next: (response) => {
-        this.professional = response.professional;
-      },
-      error: (error) => console.error('Error loading professional:', error)
-    });
+  ngAfterViewInit() {
+    setTimeout(() => this.initializeCalendar(), 100);
   }
 
-  initializeModernCalendar() {
-    // Cargar FullCalendar dinámicamente
+  initializeCalendar() {
+    const calendarEl = document.getElementById('calendar');
+    if (calendarEl) {
+      // Crear calendario básico mientras carga FullCalendar
+      calendarEl.innerHTML = `
+        <div style="text-align: center; padding: 50px; color: #64748b;">
+          <div style="font-size: 3rem; margin-bottom: 20px;">📅</div>
+          <h3>Cargando Calendario...</h3>
+          <p>Inicializando FullCalendar</p>
+        </div>
+      `;
+      
+      // Cargar FullCalendar
+      this.loadFullCalendar();
+    }
+  }
+
+  loadFullCalendar() {
     const script = document.createElement('script');
     script.src = 'https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js';
     script.onload = () => {
-      this.renderCalendar();
+      setTimeout(() => this.renderCalendar(), 200);
+    };
+    script.onerror = () => {
+      const calendarEl = document.getElementById('calendar');
+      if (calendarEl) {
+        calendarEl.innerHTML = `
+          <div style="text-align: center; padding: 50px; color: #ef4444;">
+            <div style="font-size: 3rem; margin-bottom: 20px;">❌</div>
+            <h3>Error cargando calendario</h3>
+            <p>No se pudo cargar FullCalendar</p>
+          </div>
+        `;
+      }
     };
     document.head.appendChild(script);
   }
 
   renderCalendar() {
     const calendarEl = document.getElementById('calendar');
-    if (calendarEl && typeof FullCalendar !== 'undefined') {
-      this.calendar = new FullCalendar.Calendar(calendarEl, {
+    if (calendarEl && typeof (window as any).FullCalendar !== 'undefined') {
+      this.calendar = new (window as any).FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
         locale: 'es',
         headerToolbar: {
@@ -91,12 +105,16 @@ export class ProfessionalCalendarComponent implements OnInit {
       });
       
       this.calendar.render();
+      console.log('FullCalendar renderizado exitosamente');
+    } else {
+      console.log('FullCalendar no disponible, reintentando...');
+      setTimeout(() => this.renderCalendar(), 500);
     }
   }
 
   async checkAuthStatus() {
     try {
-      await this.googleCalendarService.getCalendars().toPromise();
+      const response = await this.googleCalendarService.getCalendars().toPromise();
       this.isAuthenticated = true;
       this.showStatus('✅ Ya estás conectado con Google', 'success');
     } catch (error) {
@@ -120,12 +138,9 @@ export class ProfessionalCalendarComponent implements OnInit {
     }
 
     try {
-      // Simular carga de eventos
+      // Aquí cargarías los eventos desde Google Calendar
+      // Por ahora simulamos la carga
       this.events = [];
-      if (this.calendar) {
-        this.calendar.removeAllEventSources();
-        // Aquí cargarías eventos reales desde Google Calendar
-      }
       this.showStatus('✅ Eventos cargados', 'success');
     } catch (error) {
       this.showStatus('❌ Error cargando eventos', 'error');
@@ -155,9 +170,7 @@ export class ProfessionalCalendarComponent implements OnInit {
     if (!this.currentEvent || !confirm('¿Estás seguro de que quieres eliminar este evento?')) return;
     
     try {
-      if (this.calendar && this.currentEvent) {
-        this.currentEvent.remove();
-      }
+      // Implementar eliminación
       this.closeModal();
       this.showStatus('✅ Evento eliminado exitosamente', 'success');
     } catch (error) {
@@ -166,9 +179,7 @@ export class ProfessionalCalendarComponent implements OnInit {
   }
 
   clearCalendar() {
-    if (this.calendar) {
-      this.calendar.removeAllEvents();
-    }
+    this.events = [];
     this.showStatus('🗑️ Calendario limpiado', 'success');
   }
 

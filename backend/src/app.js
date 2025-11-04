@@ -98,6 +98,10 @@ app.use("/api/notes", require("./routes/notes.routes"));
 app.use("/api/admin", require("./routes/admin.routes"));
 app.use("/api/reviews", require("./routes/review.routes"));
 app.use("/api/google-calendar", require("./routes/google-calendar.routes"));
+
+// Ruta directa para callback de Google (sin /api)
+const googleCalendarController = require('./controllers/google-calendar.controller');
+app.get('/callback', googleCalendarController.handleCallback);
 // Debug: Cargar rutas de horarios
 console.log('Cargando rutas de schedules...');
 app.use("/api/schedules", require("./routes/schedule.routes"));
