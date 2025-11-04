@@ -52,6 +52,9 @@
         <h2>📅 Mi Agenda</h2>
         <div class="calendar-controls">
           <button class="btn-schedule" (click)="openScheduleModal()">+ Agendar</button>
+          <button class="btn-google-calendar" (click)="connectGoogleCalendar()" title="Conectar Google Calendar">
+            📅 Google Calendar
+          </button>
           <select [(ngModel)]="currentView" class="view-selector">
             <option value="day">Vista Diaria</option>
             <option value="week">Vista Semanal</option>

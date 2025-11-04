@@ -7,6 +7,7 @@ const Schedule = require('./Schedule');
 const Notification = require('./Notification');
 const UserPreference = require('./UserPreference');
 const Review = require('./Review');
+const ProfessionalPatient = require('./ProfessionalPatient');
 
 // Asociaciones User - Profile
 User.hasOne(Profile, { 
@@ -126,6 +127,21 @@ Review.belongsTo(Professional, {
   as: 'professional' 
 });
 
+// Asociaciones ProfessionalPatient
+Professional.belongsToMany(User, {
+  through: ProfessionalPatient,
+  foreignKey: 'professionalId',
+  otherKey: 'patientId',
+  as: 'patients'
+});
+
+User.belongsToMany(Professional, {
+  through: ProfessionalPatient,
+  foreignKey: 'patientId',
+  otherKey: 'professionalId',
+  as: 'professionals'
+});
+
 module.exports = {
   User,
   Profile,
@@ -135,5 +151,6 @@ module.exports = {
   Schedule,
   Notification,
   UserPreference,
-  Review
+  Review,
+  ProfessionalPatient
 };

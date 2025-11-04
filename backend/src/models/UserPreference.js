@@ -26,6 +26,10 @@ const UserPreference = sequelize.define('UserPreference', {
     type: DataTypes.INTEGER,
     defaultValue: 24,
     field: 'reminder_hours'
+  },
+  googleTokens: {
+    type: DataTypes.TEXT,
+    field: 'google_tokens'
   }
 }, {
   tableName: 'user_preferences',

@@ -25,10 +25,8 @@ export class ProfessionalAppointmentComponent implements OnInit {
   loading = false;
   currentUser: any = null;
 
-  availableTimes = [
-    '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
-    '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00'
-  ];
+  availableTimes: string[] = [];
+  consultationDuration = 60; // Por defecto 60 minutos
 
   constructor(
     private router: Router,
@@ -43,6 +41,7 @@ export class ProfessionalAppointmentComponent implements OnInit {
       this.currentUser = user;
     });
     this.loadMyPatients();
+    this.loadScheduleConfig();
   }
   
   loadMyPatients() {
@@ -74,13 +73,51 @@ export class ProfessionalAppointmentComponent implements OnInit {
     this.loadAvailableTimes();
   }
 
+  loadScheduleConfig() {
+    // Por ahora usar configuración por defecto, después se puede cargar del backend
+    this.consultationDuration = 60;
+    this.generateAvailableTimes();
+  }
+
+  generateAvailableTimes() {
+    const times = [];
+    
+    // Horario mañana: 9:00 - 12:00
+    let currentTime = this.parseTime('09:00');
+    const morningEnd = this.parseTime('12:00');
+    
+    while (currentTime < morningEnd) {
+      times.push(this.formatTime(currentTime));
+      currentTime += this.consultationDuration * 60000; // Convertir minutos a ms
+    }
+    
+    // Horario tarde: 14:00 - 18:00
+    currentTime = this.parseTime('14:00');
+    const afternoonEnd = this.parseTime('18:00');
+    
+    while (currentTime < afternoonEnd) {
+      times.push(this.formatTime(currentTime));
+      currentTime += this.consultationDuration * 60000;
+    }
+    
+    this.availableTimes = times;
+  }
+
+  parseTime(timeStr: string): number {
+    const [hours, minutes] = timeStr.split(':').map(Number);
+    return hours * 3600000 + minutes * 60000;
+  }
+
+  formatTime(ms: number): string {
+    const hours = Math.floor(ms / 3600000);
+    const minutes = Math.floor((ms % 3600000) / 60000);
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+  }
+
   loadAvailableTimes() {
     if (this.selectedDate) {
-      // Simular horarios disponibles
-      this.availableTimes = [
-        '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
-        '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00'
-      ];
+      // Los horarios ya están generados según la duración
+      // Aquí se podría filtrar por horarios ocupados
     }
   }
 

@@ -1,4 +1,4 @@
-const { User, Profile, Professional } = require('../models');
+const { User, Profile, Professional, ProfessionalPatient } = require('../models');
 const { Op } = require('sequelize');
 
 const getAllProfessionals = async (req, res) => {
@@ -133,37 +133,49 @@ const getProfessionalById = async (req, res) => {
   }
 };
 
+// Simulación de cartilla por profesional (en memoria)
+const professionalCartillas = new Map();
+
 const getMyPatients = async (req, res) => {
   try {
-    const { Op } = require('sequelize');
-    console.log('👥 Obteniendo pacientes para profesional:', req.user.id);
+    const professionalUserId = req.user.id;
+    console.log('👥 Obteniendo pacientes para profesional:', professionalUserId);
     
-    // Por ahora, devolver todos los pacientes activos
-    // En un sistema real, habría una tabla de relación profesional-paciente
+    // Obtener el profesional
+    const professional = await Professional.findOne({ where: { userId: professionalUserId } });
+    if (!professional) {
+      return res.status(404).json({ message: 'Profesional no encontrado' });
+    }
+
+    // Obtener pacientes desde la base de datos
+    // Obtener pacientes usando la relación many-to-many
     const patients = await User.findAll({
       where: { role: 'patient', isActive: true },
-      include: [{
-        model: Profile,
-        as: 'profile'
-      }],
+      include: [
+        { model: Profile, as: 'profile' },
+        {
+          model: Professional,
+          as: 'professionals',
+          where: { id: professional.id },
+          through: { attributes: [] }
+        }
+      ],
       order: [['created_at', 'DESC']]
     });
 
-    console.log(`📊 Encontrados ${patients.length} pacientes`);
+    console.log(`📊 Encontrados ${patients.length} pacientes en BD`);
 
-    // Obtener el profesional actual
-    const { Professional, Appointment } = require('../models');
-    const professional = await Professional.findOne({ where: { userId: req.user.id } });
-    
+    const { Appointment } = require('../models');
     const formattedPatients = await Promise.all(patients.map(async (patient) => {
+      
       // Verificar si tiene historial con este profesional
-      const hasHistory = professional ? await Appointment.count({
+      const hasHistory = await Appointment.count({
         where: {
           patientId: patient.id,
           professionalId: professional.id,
           status: { [Op.in]: ['completed', 'confirmed'] }
         }
-      }) > 0 : false;
+      }) > 0;
       
       return {
         id: patient.id,
@@ -189,6 +201,45 @@ const getMyPatients = async (req, res) => {
   }
 };
 
+const addPatientToCartilla = async (req, res) => {
+  try {
+    const { patientId } = req.body;
+    const professionalUserId = req.user.id;
+    
+    console.log(`➕ Agregando paciente ${patientId} a cartilla del profesional ${professionalUserId}`);
+    
+    // Obtener el profesional
+    const professional = await Professional.findOne({ where: { userId: professionalUserId } });
+    if (!professional) {
+      return res.status(404).json({ message: 'Profesional no encontrado' });
+    }
+
+    // Verificar que el paciente existe
+    const patient = await User.findByPk(patientId);
+    if (!patient || patient.role !== 'patient') {
+      return res.status(404).json({ message: 'Paciente no encontrado' });
+    }
+
+    // Crear relación en BD (ignorar si ya existe)
+    await ProfessionalPatient.findOrCreate({
+      where: {
+        professionalId: professional.id,
+        patientId: parseInt(patientId)
+      }
+    });
+    
+    res.json({
+      message: 'Paciente agregado a la cartilla exitosamente'
+    });
+  } catch (error) {
+    console.error('Error agregando paciente a cartilla:', error);
+    res.status(500).json({
+      message: 'Error interno del servidor',
+      error: error.message
+    });
+  }
+};
+
 const removePatientFromCartilla = async (req, res) => {
   try {
     const { patientId } = req.params;
@@ -196,8 +247,19 @@ const removePatientFromCartilla = async (req, res) => {
     
     console.log(`🗑️ Removiendo paciente ${patientId} de cartilla del profesional ${professionalUserId}`);
     
-    // Por ahora, como no hay tabla de relación, simplemente confirmamos la eliminación
-    // En un sistema real, eliminaríamos la relación de la tabla profesional_pacientes
+    // Obtener el profesional
+    const professional = await Professional.findOne({ where: { userId: professionalUserId } });
+    if (!professional) {
+      return res.status(404).json({ message: 'Profesional no encontrado' });
+    }
+
+    // Eliminar relación de BD
+    await ProfessionalPatient.destroy({
+      where: {
+        professionalId: professional.id,
+        patientId: parseInt(patientId)
+      }
+    });
     
     res.json({
       message: 'Paciente removido de la cartilla exitosamente'
@@ -215,5 +277,7 @@ module.exports = {
   getAllProfessionals,
   getProfessionalById,
   getMyPatients,
-  removePatientFromCartilla
+  addPatientToCartilla,
+  removePatientFromCartilla,
+  professionalCartillas
 };

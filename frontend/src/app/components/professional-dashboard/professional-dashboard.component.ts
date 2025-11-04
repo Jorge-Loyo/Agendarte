@@ -6,6 +6,8 @@ import { AuthService, User } from '../../services/auth.service';
 import { AppointmentService } from '../../services/appointment.service';
 import { NotificationService } from '../../services/notification.service';
 import { StatsService } from '../../services/stats.service';
+import { GoogleCalendarService } from '../../services/google-calendar.service';
+import { Injector } from '@angular/core';
 
 @Component({
   selector: 'app-professional-dashboard',
@@ -44,7 +46,8 @@ export class ProfessionalDashboardComponent implements OnInit {
     private notificationService: NotificationService,
     private cdr: ChangeDetectorRef,
     private router: Router,
-    private statsService: StatsService
+    private statsService: StatsService,
+    private injector: Injector
   ) {}
 
   ngOnInit() {
@@ -150,14 +153,33 @@ export class ProfessionalDashboardComponent implements OnInit {
 
   generateWeekView() {
     const days = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
-    this.weekDays = days.map(name => ({
-      name,
-      appointments: this.todayAppointments.map(apt => ({
-        time: apt.time,
-        patientName: apt.patient,
-        status: apt.status
-      }))
-    }));
+    
+    // Obtener el inicio de la semana (lunes)
+    const startOfWeek = new Date(this.displayDate);
+    const day = startOfWeek.getDay();
+    const diff = startOfWeek.getDate() - day + (day === 0 ? -6 : 1);
+    startOfWeek.setDate(diff);
+    
+    this.weekDays = days.map((name, index) => {
+      const currentDay = new Date(startOfWeek);
+      currentDay.setDate(startOfWeek.getDate() + index);
+      const dayString = currentDay.toISOString().split('T')[0];
+      
+      // Filtrar citas solo para este día específico
+      const dayAppointments = this.todayAppointments.filter(apt => 
+        apt.appointmentDate === dayString
+      );
+      
+      return {
+        name,
+        date: currentDay,
+        appointments: dayAppointments.map(apt => ({
+          time: apt.time,
+          patientName: apt.patient,
+          status: apt.status
+        }))
+      };
+    });
   }
 
   generateMonthView() {
@@ -236,6 +258,18 @@ export class ProfessionalDashboardComponent implements OnInit {
 
   openScheduleModal() {
     this.router.navigate(['/app/professional-appointment']);
+  }
+
+  connectGoogleCalendar() {
+    const googleCalendarService = this.injector.get(GoogleCalendarService);
+    googleCalendarService.getAuthUrl().subscribe({
+      next: (response: any) => {
+        window.open(response.authUrl, '_blank');
+      },
+      error: (error: any) => {
+        this.notificationService.error('Error', 'No se pudo conectar con Google Calendar');
+      }
+    });
   }
 
   getFormattedDate(): string {

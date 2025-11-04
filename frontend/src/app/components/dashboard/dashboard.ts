@@ -49,37 +49,19 @@ export class Dashboard implements OnInit {
     this.loadUpcomingAppointments();
   }
 
-  async initializeGoogleCalendar() {
-    try {
-      await this.googleCalendar.initializeGapi();
-    } catch (error) {
-      console.error('Error inicializando Google Calendar:', error);
-    }
-  }
-
   async connectGoogleCalendar() {
     try {
-      const success = await this.googleCalendar.signIn();
-      if (success) {
-        console.log('Conectado a Google Calendar');
-        this.syncWithGoogleCalendar();
-      }
+      this.googleCalendar.getAuthUrl().subscribe({
+        next: (response: any) => {
+          window.open(response.authUrl, '_blank');
+        },
+        error: (error: any) => {
+          console.error('Error conectando con Google Calendar:', error);
+        }
+      });
     } catch (error) {
       console.error('Error conectando con Google Calendar:', error);
     }
-  }
-
-  async syncWithGoogleCalendar() {
-    try {
-      const events = await this.googleCalendar.getEvents();
-      console.log('Eventos de Google Calendar:', events);
-    } catch (error) {
-      console.error('Error sincronizando eventos:', error);
-    }
-  }
-
-  isGoogleConnected(): boolean {
-    return this.googleCalendar.isUserSignedIn();
   }
 
   generateMockAppointments() {

@@ -53,13 +53,13 @@ export class AppointmentService {
   }
 
   getProfessionalAppointments(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/professional/appointments`, {
+    return this.http.get(`${this.baseUrl}/professional-appointments`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     });
   }
 
   getRecentPatients(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/professional/recent-patients`, {
+    return this.http.get(`${this.baseUrl}/recent-patients`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     });
   }

@@ -108,6 +108,24 @@ const createAppointment = async (req, res) => {
     const notificationService = require('../services/notification.service');
     await notificationService.createNotificationsForAppointment(appointment.id);
 
+    // Crear evento en Google Calendar
+    try {
+      const startDateTime = new Date(`${date}T${time}`);
+      const endDateTime = new Date(startDateTime.getTime() + 60 * 60 * 1000); // +1 hora
+      
+      const googleCalendarService = require('../services/google-calendar.service');
+      await googleCalendarService.createAppointmentEvent({
+        appointmentId: appointment.id,
+        professionalId,
+        title: `Consulta - Paciente ID: ${patientId}`,
+        startTime: startDateTime.toISOString(),
+        endTime: endDateTime.toISOString(),
+        description: notes || 'Consulta médica'
+      });
+    } catch (gcalError) {
+      console.log('⚠️ Google Calendar no disponible:', gcalError.message);
+    }
+
     // Obtener la cita creada con datos del profesional
     const createdAppointment = await Appointment.findByPk(appointment.id, {
       include: [{
@@ -435,11 +453,15 @@ const rescheduleProfessionalAppointment = async (req, res) => {
 const getProfessionalAppointments = async (req, res) => {
   try {
     const professionalUserId = req.user.id;
+    console.log('🔍 Buscando citas para profesional userId:', professionalUserId);
     
     const professional = await Professional.findOne({ where: { userId: professionalUserId } });
     if (!professional) {
+      console.log('❌ Profesional no encontrado para userId:', professionalUserId);
       return res.status(404).json({ message: 'Profesional no encontrado' });
     }
+
+    console.log('✅ Profesional encontrado, ID:', professional.id);
 
     const appointments = await Appointment.findAll({
       where: { 
@@ -454,6 +476,8 @@ const getProfessionalAppointments = async (req, res) => {
       order: [['appointmentDate', 'ASC'], ['appointmentTime', 'ASC']]
     });
 
+    console.log(`📅 Encontradas ${appointments.length} citas`);
+
     const formattedAppointments = appointments.map(apt => ({
       id: apt.id,
       time: apt.appointmentTime,
@@ -461,9 +485,11 @@ const getProfessionalAppointments = async (req, res) => {
       patientName: `${apt.patient.profile.firstName} ${apt.patient.profile.lastName}`,
       reason: apt.notes || 'Consulta',
       status: apt.status,
-      duration: 30,
+      duration: 60,
       appointmentDate: apt.appointmentDate
     }));
+
+    console.log('📤 Enviando citas:', formattedAppointments);
 
     res.json({
       message: 'Citas obtenidas exitosamente',
@@ -471,7 +497,7 @@ const getProfessionalAppointments = async (req, res) => {
     });
   } catch (error) {
     console.error('Error obteniendo citas del profesional:', error);
-    res.status(500).json({ message: 'Error interno del servidor' });
+    res.status(500).json({ message: 'Error interno del servidor', appointments: [] });
   }
 };
 

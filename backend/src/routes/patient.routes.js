@@ -5,6 +5,44 @@ const { User, Profile } = require('../models');
 const { authenticateToken, authorizeRoles } = require('../middleware/auth');
 const { Op } = require('sequelize');
 
+// Obtener todos los pacientes (para profesionales)
+router.get('/', authenticateToken, authorizeRoles('professional', 'admin'), async (req, res) => {
+  try {
+    const patients = await User.findAll({
+      where: { 
+        role: 'patient',
+        isActive: true 
+      },
+      include: [{
+        model: Profile,
+        as: 'profile',
+        required: false
+      }],
+      order: [['id', 'ASC']]
+    });
+
+    const formattedPatients = patients.map(patient => ({
+      id: patient.id,
+      firstName: patient.profile?.firstName || 'Sin nombre',
+      lastName: patient.profile?.lastName || '',
+      dni: patient.profile?.dni || 'Sin DNI',
+      phone: patient.profile?.phone || 'Sin teléfono',
+      email: patient.email,
+      address: patient.profile?.address || '',
+      gender: patient.profile?.gender || '',
+      birthDate: patient.profile?.birthDate || null
+    }));
+
+    res.json(formattedPatients);
+  } catch (error) {
+    console.error('Error getting patients:', error);
+    res.status(500).json({
+      message: 'Error interno del servidor',
+      error: error.message
+    });
+  }
+});
+
 // Crear paciente (solo para profesionales)
 router.post('/create', authenticateToken, authorizeRoles('professional'), async (req, res) => {
   try {
@@ -18,6 +56,21 @@ router.post('/create', authenticateToken, authorizeRoles('professional'), async 
     
     if (existingUser) {
       // Si el usuario ya existe, agregarlo a la cartilla del profesional
+      const professionalUserId = req.user.id;
+      const { Professional, ProfessionalPatient } = require('../models');
+      
+      const professional = await Professional.findOne({ where: { userId: professionalUserId } });
+      if (professional) {
+        await ProfessionalPatient.findOrCreate({
+          where: {
+            professionalId: professional.id,
+            patientId: existingUser.id
+          }
+        });
+      }
+      
+      console.log(`➕ Paciente existente ${existingUser.id} agregado a cartilla del profesional ${professionalUserId}`);
+      
       return res.json({
         message: 'Paciente ya registrado - agregado a tu cartilla',
         patient: {
@@ -61,7 +114,17 @@ router.post('/create', authenticateToken, authorizeRoles('professional'), async 
     });
 
     // Agregar el paciente a la cartilla del profesional automáticamente
-    // (Simulamos que se agrega a la cartilla - en un sistema real habría una tabla de relación)
+    const professionalUserId = req.user.id;
+    const { Professional, ProfessionalPatient } = require('../models');
+    
+    const professional = await Professional.findOne({ where: { userId: professionalUserId } });
+    if (professional) {
+      await ProfessionalPatient.create({
+        professionalId: professional.id,
+        patientId: user.id
+      });
+    }
+    console.log(`➕ Paciente nuevo ${user.id} agregado automáticamente a cartilla del profesional ${professionalUserId}`);
     
     res.json({
       message: 'Paciente creado exitosamente y agregado a tu cartilla',
