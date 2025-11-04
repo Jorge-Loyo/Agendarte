@@ -11,20 +11,14 @@ export class GoogleCalendarService {
   constructor(private http: HttpClient) {}
 
   getAuthUrl(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/auth-url`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-    });
+    return this.http.get(`${this.baseUrl}/auth-url`);
   }
 
   createEvent(eventData: any): Observable<any> {
-    return this.http.post(`${this.baseUrl}/create-event`, eventData, {
-      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-    });
+    return this.http.post(`${this.baseUrl}/create-event`, eventData);
   }
 
   getCalendars(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/calendars`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-    });
+    return this.http.get(`${this.baseUrl}/calendars`);
   }
 }

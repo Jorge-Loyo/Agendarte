@@ -13,6 +13,7 @@ import { AuthService } from '../../services/auth.service';
 export class Login {
   email = '';
   password = '';
+  rememberMe = true;
   loading = false;
   error = '';
 
@@ -37,7 +38,7 @@ export class Login {
 
     console.log('Intentando login con:', { email: this.email, password: '***' });
 
-    this.authService.login(this.email, this.password).subscribe({
+    this.authService.login(this.email, this.password, this.rememberMe).subscribe({
       next: (response) => {
         console.log('Login exitoso:', response);
         const user = this.authService.getCurrentUser();

@@ -84,41 +84,52 @@ export class AuthService {
     return this.http.post<AuthResponse>(`${this.baseUrl}/register`, userData)
       .pipe(
         tap(response => {
-          localStorage.setItem('token', response.token);
+          this.storeAuth(response.token, response.user, true);
           this.currentUserSubject.next(response.user);
         })
       );
   }
 
-  login(email: string, password: string): Observable<AuthResponse> {
+  login(email: string, password: string, remember: boolean = true): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.baseUrl}/login`, { email, password })
       .pipe(
         tap(response => {
-          localStorage.setItem('token', response.token);
+          this.storeAuth(response.token, response.user, remember);
           this.currentUserSubject.next(response.user);
         })
       );
   }
 
   logout(): void {
-    localStorage.removeItem('token');
-    this.currentUserSubject.next(null);
+    this.clearAuth();
   }
 
   getProfile(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/profile`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-    }).pipe(
+    return this.http.get(`${this.baseUrl}/profile`).pipe(
       tap((response: any) => {
+        this.storeUser(response.user);
         this.currentUserSubject.next(response.user);
       })
     );
   }
 
   isAuthenticated(): boolean {
-    const token = localStorage.getItem('token');
+    const token = this.getStoredToken();
     const user = this.getCurrentUser();
-    return !!(token && user);
+    const authTime = localStorage.getItem('authTime') || sessionStorage.getItem('authTime');
+    
+    if (!token || !user || !authTime) return false;
+    
+    // Verificar si el token no ha expirado (24 horas)
+    const tokenAge = Date.now() - parseInt(authTime);
+    const maxAge = 24 * 60 * 60 * 1000; // 24 horas
+    
+    if (tokenAge > maxAge) {
+      this.clearAuth();
+      return false;
+    }
+    
+    return true;
   }
 
   getCurrentUser(): User | null {
@@ -140,11 +151,8 @@ export class AuthService {
   }
 
   updateProfile(userData: any): Observable<any> {
-    return this.http.put(`${this.baseUrl}/profile`, userData, {
-      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-    }).pipe(
+    return this.http.put(`${this.baseUrl}/profile`, userData).pipe(
       tap((response: any) => {
-        // Recargar perfil después de actualizar
         this.getProfile().subscribe();
       })
     );
@@ -152,10 +160,11 @@ export class AuthService {
 
   changePassword(currentPassword: string, newPassword: string): Observable<any> {
     return this.http.put(`${this.baseUrl}/change-password`, 
-      { currentPassword, newPassword }, 
-      {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-      }
+      { currentPassword, newPassword }
     );
+  }
+
+  getToken(): string | null {
+    return this.getStoredToken();
   }
 }
