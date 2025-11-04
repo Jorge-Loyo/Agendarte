@@ -7,6 +7,7 @@ import { NotificationService } from '../../services/notification.service';
 import { AuthService } from '../../services/auth.service';
 import { ProfessionalService } from '../../services/professional.service';
 import { GoogleCalendarService } from '../../services/google-calendar.service';
+import { GoogleMeetService } from '../../services/google-meet.service';
 
 @Component({
   selector: 'app-professional-appointment',
@@ -30,6 +31,7 @@ export class ProfessionalAppointmentComponent implements OnInit {
   addToGoogleCalendar = false;
   googleEventTitle = '';
   googleEventDescription = '';
+  createGoogleMeet = false;
 
   availableTimes: string[] = [];
   consultationDuration = 60; // Por defecto 60 minutos
@@ -40,7 +42,8 @@ export class ProfessionalAppointmentComponent implements OnInit {
     private notificationService: NotificationService,
     private authService: AuthService,
     private professionalService: ProfessionalService,
-    private googleCalendarService: GoogleCalendarService
+    private googleCalendarService: GoogleCalendarService,
+    private googleMeetService: GoogleMeetService
   ) {}
 
   ngOnInit() {
@@ -175,31 +178,58 @@ export class ProfessionalAppointmentComponent implements OnInit {
     const startDateTime = new Date(`${this.selectedDate}T${this.selectedTime}:00`);
     const endDateTime = new Date(startDateTime.getTime() + (this.consultationDuration * 60000));
 
-    const eventData = {
-      title: this.googleEventTitle,
-      description: this.googleEventDescription,
-      startTime: startDateTime.toISOString(),
-      endTime: endDateTime.toISOString(),
-      appointmentId: appointment.id
-    };
+    if (this.createGoogleMeet) {
+      // Usar API específica de Google Meet
+      const meetingData = {
+        title: this.googleEventTitle,
+        description: this.googleEventDescription,
+        startTime: startDateTime.toISOString(),
+        endTime: endDateTime.toISOString(),
+        attendees: [this.selectedPatient.email].filter(Boolean)
+      };
 
-    this.googleCalendarService.createEvent(eventData).subscribe({
-      next: (response) => {
-        this.notificationService.success(
-          'Turno agendado',
-          `Turno agendado y agregado a Google Calendar`
-        );
-        this.showSuccessAndRedirect();
-      },
-      error: (error) => {
-        console.error('Error creating Google Calendar event:', error);
-        this.notificationService.warning(
-          'Turno agendado',
-          'Turno agendado correctamente, pero no se pudo agregar a Google Calendar'
-        );
-        this.showSuccessAndRedirect();
-      }
-    });
+      this.googleMeetService.createMeeting(meetingData).subscribe({
+        next: (response) => {
+          this.notificationService.success(
+            'Turno agendado',
+            `Turno agendado con Google Meet creado. Link: ${response.meetLink}`
+          );
+          this.showSuccessAndRedirect();
+        },
+        error: (error) => {
+          console.error('Error creating Google Meet:', error);
+          this.notificationService.warning(
+            'Turno agendado',
+            'Turno agendado correctamente, pero no se pudo crear Google Meet'
+          );
+          this.showSuccessAndRedirect();
+        }
+      });
+    } else {
+      // Usar API de Google Calendar normal
+      const eventData = {
+        title: this.googleEventTitle,
+        description: this.googleEventDescription,
+        startTime: startDateTime.toISOString(),
+        endTime: endDateTime.toISOString(),
+        appointmentId: appointment.id
+      };
+
+      this.googleCalendarService.createEvent(eventData).subscribe({
+        next: (response) => {
+          this.notificationService.success('Turno agendado', 'Turno agendado y agregado a Google Calendar');
+          this.showSuccessAndRedirect();
+        },
+        error: (error) => {
+          console.error('Error creating Google Calendar event:', error);
+          this.notificationService.warning(
+            'Turno agendado',
+            'Turno agendado correctamente, pero no se pudo agregar a Google Calendar'
+          );
+          this.showSuccessAndRedirect();
+        }
+      });
+    }
   }
 
   showSuccessAndRedirect() {

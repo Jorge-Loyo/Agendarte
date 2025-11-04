@@ -64,8 +64,18 @@ const getProfessionalStats = async (req, res) => {
       col: 'patientId'
     });
 
-    // Ingresos del mes (simulado)
-    const monthlyRevenue = weeklyTotal * (professional.consultationPrice || 5000);
+    // Ingresos reales del mes
+    const monthlyPaidAppointments = await Appointment.findAll({
+      where: {
+        professionalId: professional.id,
+        appointmentDate: {
+          [Op.between]: [startOfMonth.toISOString().split('T')[0], endOfMonth.toISOString().split('T')[0]]
+        },
+        paymentStatus: 'paid'
+      }
+    });
+    
+    const monthlyRevenue = monthlyPaidAppointments.length * (professional.consultationPrice || 5000);
 
     res.json({
       message: 'Estadísticas obtenidas exitosamente',
@@ -74,7 +84,8 @@ const getProfessionalStats = async (req, res) => {
         weeklyConfirmed,
         weeklyTotal,
         weeklyPatients,
-        monthlyRevenue: monthlyRevenue || 0
+        monthlyRevenue: monthlyRevenue || 0,
+        monthlyPaidCount: monthlyPaidAppointments.length
       }
     });
   } catch (error) {

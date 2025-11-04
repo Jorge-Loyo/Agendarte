@@ -40,6 +40,13 @@
           <div class="action-icon">📈</div>
           <span>Reportes</span>
         </button>
+        
+        <button class="action-btn meet" (click)="joinNextMeet()">
+          <div class="action-icon">
+            <img src="https://w7.pngwing.com/pngs/584/914/png-transparent-google-logo-meet-new-google-new-logos-icon-thumbnail.png" alt="Google Meet" style="width: 24px; height: 24px;">
+          </div>
+          <span>Unirme a Meet</span>
+        </button>
       </div>
     </div>
   </div>
@@ -68,7 +75,7 @@
           <div class="stat-icon">✅</div>
           <div class="stat-info">
             <span class="stat-value">{{ weeklyStats.weeklyConfirmed }}</span>
-            <span class="stat-title">Confirmados</span>
+            <span class="stat-title">Confirmados Semana</span>
           </div>
         </div>
         
@@ -76,7 +83,7 @@
           <div class="stat-icon">👥</div>
           <div class="stat-info">
             <span class="stat-value">{{ weeklyStats.weeklyPatients }}</span>
-            <span class="stat-title">Pacientes</span>
+            <span class="stat-title">Pacientes Semana</span>
           </div>
         </div>
         
@@ -84,7 +91,7 @@
           <div class="stat-icon">💰</div>
           <div class="stat-info">
             <span class="stat-value">${{ weeklyStats.monthlyRevenue | number }}</span>
-            <span class="stat-title">Ingresos Mes</span>
+            <span class="stat-title">Ingresos Estimados</span>
           </div>
         </div>
       </div>

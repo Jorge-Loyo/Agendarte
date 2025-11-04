@@ -158,7 +158,9 @@ export class ModernCalendarComponent implements OnInit, AfterViewInit {
         extendedProps: {
           googleEventId: event.id,
           location: event.location,
-          attendees: event.attendees
+          attendees: event.attendees,
+          hangoutLink: event.hangoutLink,
+          description: event.description
         }
       }));
       
@@ -333,6 +335,43 @@ export class ModernCalendarComponent implements OnInit, AfterViewInit {
     }
     this.events = [];
     this.showStatus('🗑️ Calendario limpiado', 'success');
+  }
+
+  hasMeetLink(): boolean {
+    if (!this.currentEvent) return false;
+    
+    // Verificar si el evento tiene link de Meet en la descripción o propiedades extendidas
+    const description = this.currentEvent.extendedProps?.description || this.currentEvent.description || '';
+    const hasHangoutLink = this.currentEvent.extendedProps?.hangoutLink;
+    const hasMeetInDescription = description.includes('meet.google.com') || description.includes('hangouts.google.com');
+    
+    return !!(hasHangoutLink || hasMeetInDescription);
+  }
+
+  joinMeet(): void {
+    if (!this.currentEvent) return;
+    
+    let meetLink = '';
+    
+    // Buscar link de Meet en propiedades extendidas
+    if (this.currentEvent.extendedProps?.hangoutLink) {
+      meetLink = this.currentEvent.extendedProps.hangoutLink;
+    } else {
+      // Buscar en la descripción
+      const description = this.currentEvent.extendedProps?.description || this.currentEvent.description || '';
+      const meetRegex = /(https:\/\/meet\.google\.com\/[a-z-]+|https:\/\/hangouts\.google\.com\/[^\s]+)/;
+      const match = description.match(meetRegex);
+      if (match) {
+        meetLink = match[0];
+      }
+    }
+    
+    if (meetLink) {
+      window.open(meetLink, '_blank');
+      this.showStatus('📹 Abriendo Google Meet...', 'success');
+    } else {
+      this.showStatus('⚠️ No se encontró link de Google Meet', 'error');
+    }
   }
 
   private showStatus(message: string, type: 'success' | 'error') {

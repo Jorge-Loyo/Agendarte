@@ -1,0 +1,43 @@
+<div class="appointments-container">
+  <div class="header">
+    <h1>📋 Mis Citas Agendadas</h1>
+    <p>Gestiona todas tus citas médicas</p>
+  </div>
+
+  <div class="loading" *ngIf="loading">
+    <p>Cargando citas...</p>
+  </div>
+
+  <div class="appointments-list" *ngIf="!loading && appointments.length > 0">
+    <div class="appointment-card" *ngFor="let appointment of appointments">
+      <div class="appointment-date">
+        <div class="day">{{ appointment.appointmentDate | date:'dd' }}</div>
+        <div class="month">{{ appointment.appointmentDate | date:'MMM' }}</div>
+      </div>
+      
+      <div class="appointment-info">
+        <h3>{{ appointment.patient || appointment.patientName }}</h3>
+        <p class="time">🕐 {{ appointment.time }}</p>
+        <p class="reason" *ngIf="appointment.reason">{{ appointment.reason }}</p>
+        <p class="notes" *ngIf="appointment.notes">📝 {{ appointment.notes }}</p>
+      </div>
+      
+      <div class="appointment-status">
+        <span class="status-badge" [ngClass]="getStatusClass(appointment.status)">
+          {{ getStatusText(appointment.status) }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div class="no-appointments" *ngIf="!loading && appointments.length === 0">
+    <div class="empty-state">
+      <div class="empty-icon">📅</div>
+      <h3>No tienes citas agendadas</h3>
+      <p>Cuando tengas citas programadas aparecerán aquí</p>
+      <button class="btn-primary" routerLink="/app/professional-appointment">
+        Agendar Nueva Cita
+      </button>
+    </div>
+  </div>
+</div>

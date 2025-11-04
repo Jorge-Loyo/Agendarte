@@ -54,6 +54,7 @@
     <div class="modal-footer">
       <button class="btn" (click)="editEvent()">✏️ Editar</button>
       <button class="btn danger" (click)="deleteEvent()">🗑️ Eliminar</button>
+      <button class="btn success" *ngIf="hasMeetLink()" (click)="joinMeet()">📹 Unirse a Meet</button>
       <button class="btn secondary" (click)="closeModal()">Cerrar</button>
     </div>
   </div>

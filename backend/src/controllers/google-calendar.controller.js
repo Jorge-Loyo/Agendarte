@@ -155,7 +155,7 @@ const handleCallback = async (req, res) => {
 
 const createEvent = async (req, res) => {
   try {
-    const { appointmentId, title, startTime, endTime, description } = req.body;
+    const { appointmentId, title, startTime, endTime, description, createMeet } = req.body;
     const userId = req.user.id;
     
     // Obtener tokens del usuario
@@ -191,16 +191,35 @@ const createEvent = async (req, res) => {
       }
     };
     
+    // Agregar Google Meet si se solicita
+    if (createMeet) {
+      event.conferenceData = {
+        createRequest: {
+          requestId: `meet-${appointmentId}-${Date.now()}`,
+          conferenceSolutionKey: {
+            type: 'hangoutsMeet'
+          }
+        }
+      };
+    }
+    
     const response = await calendar.events.insert({
       calendarId: 'primary',
-      resource: event
+      resource: event,
+      conferenceDataVersion: createMeet ? 1 : 0
     });
     
-    res.json({
-      message: 'Evento creado en Google Calendar',
+    const result = {
+      message: createMeet ? 'Evento creado con Google Meet' : 'Evento creado en Google Calendar',
       eventId: response.data.id,
       eventLink: response.data.htmlLink
-    });
+    };
+    
+    if (createMeet && response.data.conferenceData) {
+      result.meetLink = response.data.conferenceData.entryPoints?.[0]?.uri;
+    }
+    
+    res.json(result);
   } catch (error) {
     console.error('Error creando evento:', error);
     res.status(500).json({ message: 'Error creando evento en Google Calendar' });

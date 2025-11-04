@@ -147,6 +147,14 @@ export class PermissionsService {
       requiredRoles: ['professional']
     },
     {
+      key: 'professional_appointments',
+      label: 'Citas',
+      icon: '📋',
+      route: '/app/professional-appointments',
+      requiredPermissions: ['manage_appointments'],
+      requiredRoles: ['professional']
+    },
+    {
       key: 'admin_panel',
       label: 'Panel Admin',
       icon: '🛡️',

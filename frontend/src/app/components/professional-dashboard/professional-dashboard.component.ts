@@ -55,6 +55,16 @@ export class ProfessionalDashboardComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    // Cargar perfil actualizado desde el servidor
+    this.authService.getProfile().subscribe({
+      next: (response) => {
+        console.log('✅ Perfil cargado:', response.user);
+      },
+      error: (error) => {
+        console.error('❌ Error cargando perfil:', error);
+      }
+    });
+
     this.authService.currentUser$.subscribe(user => {
       this.currentUser = user;
       if (user?.role === 'professional') {
@@ -76,8 +86,6 @@ export class ProfessionalDashboardComponent implements OnInit {
       this.notificationService.error('Error', 'No se pudo conectar con Google Calendar');
       window.history.replaceState({}, document.title, window.location.pathname);
     }
-    
-    this.loadAppointments();
   }
 
   loadStats(): void {
@@ -529,5 +537,50 @@ export class ProfessionalDashboardComponent implements OnInit {
         this.lastEvent = null;
       }
     });
+  }
+
+  joinNextMeet(): void {
+    const googleCalendarService = this.injector.get(GoogleCalendarService);
+    googleCalendarService.getEvents().subscribe({
+      next: (response: any) => {
+        const events = response.events || response || [];
+        const now = new Date();
+        
+        // Buscar próximo evento con Google Meet
+        const nextMeetEvent = events
+          .filter((event: any) => {
+            const eventStart = new Date(event.start?.dateTime || event.start?.date);
+            const hasHangout = event.hangoutLink || (event.description && event.description.includes('meet.google.com'));
+            return eventStart >= now && hasHangout;
+          })
+          .sort((a: any, b: any) => {
+            const dateA = new Date(a.start?.dateTime || a.start?.date);
+            const dateB = new Date(b.start?.dateTime || b.start?.date);
+            return dateA.getTime() - dateB.getTime();
+          })[0];
+        
+        if (nextMeetEvent) {
+          const meetLink = nextMeetEvent.hangoutLink || this.extractMeetLink(nextMeetEvent.description);
+          if (meetLink) {
+            window.open(meetLink, '_blank');
+            this.notificationService.success('Meet', 'Abriendo Google Meet...');
+          } else {
+            this.notificationService.warning('Meet', 'No se encontró link de Google Meet');
+          }
+        } else {
+          this.notificationService.info('Meet', 'No hay próximas reuniones con Google Meet');
+        }
+      },
+      error: (error) => {
+        this.notificationService.error('Error', 'No se pudieron cargar los eventos');
+      }
+    });
+  }
+
+  private extractMeetLink(description: string): string | null {
+    if (!description) return null;
+    const meetRegex = /(https:\/\/meet\.google\.com\/[a-z-]+)/;
+    const match = description.match(meetRegex);
+    return match ? match[0] : null;
   }
 }

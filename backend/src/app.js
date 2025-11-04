@@ -100,6 +100,7 @@ app.use("/api/notes", require("./routes/notes.routes"));
 app.use("/api/admin", require("./routes/admin.routes"));
 app.use("/api/reviews", require("./routes/review.routes"));
 app.use("/api/google-calendar", require("./routes/google-calendar.routes"));
+app.use("/api/google-meet", require("./routes/google-meet.routes"));
 
 // Ruta directa para callback de Google (sin /api)
 const googleCalendarController = require('./controllers/google-calendar.controller');
