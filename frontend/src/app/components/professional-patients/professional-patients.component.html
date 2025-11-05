@@ -38,7 +38,7 @@
           <div class="patient-result" *ngFor="let patient of searchResults">
             <div class="patient-info">
               <div class="patient-avatar">
-                {{ patient.firstName?.charAt(0) }}{{ patient.lastName?.charAt(0) }}
+                {{ patient.firstName.charAt(0) }}{{ patient.lastName.charAt(0) }}
               </div>
               <div class="patient-details">
                 <h4>{{ patient.firstName }} {{ patient.lastName }}</h4>
@@ -161,7 +161,7 @@
       <div class="patient-card active" *ngFor="let patient of filteredPatients">
         <div class="patient-info">
           <div class="patient-avatar">
-            {{ patient.firstName?.charAt(0) }}{{ patient.lastName?.charAt(0) }}
+            {{ patient.firstName.charAt(0) }}{{ patient.lastName.charAt(0) }}
           </div>
           <div class="patient-details">
             <h4>{{ patient.firstName }} {{ patient.lastName }}</h4>

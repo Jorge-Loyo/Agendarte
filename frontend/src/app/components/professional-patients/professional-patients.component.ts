@@ -15,6 +15,7 @@ interface Patient {
   birthDate?: string;
   gender?: string;
   address?: string;
+  hasHistory?: boolean;
 }
 
 interface NewPatient {
