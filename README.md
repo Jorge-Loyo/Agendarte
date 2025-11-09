@@ -5,13 +5,16 @@
 ## 🎯 Estado del Proyecto
 
 **📊 Progreso Actual: 100% Completado + Funcionalidades Premium Avanzadas**
+
 - ✅ **21 HU Completadas** (272/234 puntos - 116.2%)
 - ✅ **8+ Funcionalidades Premium Adicionales**
 - 🎉 **Sistema Empresarial Listo para Producción**
 - 🚀 **Integraciones Google Calendar + Meet Completas**
 
 ### 🚀 **SISTEMA COMPLETO DISPONIBLE**
+
 El sistema cuenta con todas las funcionalidades core y premium:
+
 - ✅ Registro y autenticación completa
 - ✅ Gestión completa de turnos con Google Calendar
 - ✅ Pagos con Mercado Pago integrados
@@ -48,6 +51,7 @@ Agendarte/
 ## ✅ Funcionalidades Implementadas
 
 ### 🩺 **Para Pacientes (95% Completo)**
+
 - ✅ **Registro y Login** (HU-01)
 - ✅ **Búsqueda de Profesionales** con filtros (HU-02)
 - ✅ **Calendario de Disponibilidad** (HU-03)
@@ -56,6 +60,7 @@ Agendarte/
 - ✅ **Recordatorios** por email/WhatsApp (HU-07)
 
 ### 👨⚕️ **Para Profesionales (100% Completo)**
+
 - ✅ **Configuración de Horarios** (HU-08)
 - ✅ **Agenda Profesional** - Vistas día/semana/mes (HU-09)
 - ✅ **Agendar para Pacientes** - Sin pago requerido (HU-10)
@@ -65,6 +70,7 @@ Agendarte/
 - ✅ **Estadísticas Reales** - Dashboard con datos en tiempo real
 
 ### 🔧 **Sistema (100% Completo)**
+
 - ✅ **Autenticación JWT** con roles
 - ✅ **Base de datos PostgreSQL** con seeders
 - ✅ **API RESTful** completa
@@ -76,6 +82,7 @@ Agendarte/
 ## 🛠️ Stack Tecnológico
 
 ### Frontend
+
 - **Angular 20** - Framework principal
 - **TypeScript 5.9** - Lenguaje de programación
 - **Angular Material** - Componentes UI
@@ -84,6 +91,7 @@ Agendarte/
 - **Google APIs** - Integración Calendar y Meet
 
 ### Backend
+
 - **Node.js 18+** - Runtime de JavaScript
 - **Express.js** - Framework web
 - **Sequelize 6.35** - ORM para PostgreSQL
@@ -94,6 +102,7 @@ Agendarte/
 - **Joi + Express Validator** - Validaciones robustas
 
 ### Base de Datos
+
 - **PostgreSQL 15** - Base de datos relacional
 - **12 modelos principales** con relaciones complejas
 - **Migraciones y Seeders** - Gestión de esquema
@@ -101,11 +110,13 @@ Agendarte/
 ## 📋 Instalación Rápida
 
 ### Prerrequisitos
+
 - Node.js (v18+)
 - PostgreSQL (v12+)
 - Angular CLI
 
 ### 1. Clonar e Instalar
+
 ```bash
 git clone https://github.com/Jorge-Loyo/Agendarte.git
 cd Agendarte
@@ -118,6 +129,7 @@ cd ../frontend && npm install
 ```
 
 ### 2. Configurar Base de Datos
+
 ```bash
 # Crear BD PostgreSQL
 createdb agendarte
@@ -128,12 +140,13 @@ cp .env.example .env
 ```
 
 ### 3. Ejecutar
+
 ```bash
 # Terminal 1 - Backend
 cd backend && npm run dev
 
-# Terminal 2 - Frontend  
-cd frontend && ng serve
+# Terminal 2 - Frontend
+cd frontend && npm start
 ```
 
 ## 🌐 URLs de Acceso
@@ -146,6 +159,7 @@ cd frontend && ng serve
   - Master: `jorgenayati@gmail.com` / `Matris94`
 
 ### **Funcionalidades Premium Disponibles:**
+
 - 👨⚕️ **Perfil Profesional Completo**: `/app/professional-profile` - Formulario avanzado con imagen y redes sociales
 - 🔔 **Notificaciones Personalizables**: `/app/notification-preferences` - Configuración independiente email/WhatsApp
 - ⭐ **Sistema de Reseñas Completo**: `/app/my-reviews` - Calificaciones, comentarios, estadísticas
@@ -160,8 +174,9 @@ cd frontend && ng serve
 ## 📊 Historias de Usuario
 
 ### ✅ **Completadas (21/21) - 100%**
+
 - **HU-01**: Registro de Paciente
-- **HU-02**: Ver Profesionales Disponibles  
+- **HU-02**: Ver Profesionales Disponibles
 - **HU-03**: Ver Calendario de Profesional
 - **HU-04**: Pago con Mercado Pago
 - **HU-05**: Ver Mis Turnos
@@ -183,6 +198,7 @@ cd frontend && ng serve
 - **HU-21**: Ver Reseñas al Buscar Profesionales
 
 ### 🎆 **Funcionalidades Premium Adicionales**
+
 - **Google Calendar Integration** - OAuth2 completo
 - **Google Meet Integration** - Videollamadas automatizadas
 - **Sistema de Permisos Dinámico** - Menú adaptativo
@@ -194,6 +210,7 @@ cd frontend && ng serve
 ## 🧪 Testing del Sistema
 
 ### Flujo Completo de Prueba
+
 1. **Registro**: Crear cuenta de paciente
 2. **Búsqueda**: Encontrar profesionales
 3. **Agendado**: Reservar turno
@@ -233,6 +250,7 @@ cd frontend && ng serve
 ## 📈 Roadmap
 
 ### **Corto Plazo (Optimizaciones)**
+
 - ✅ ~~Integración con Google Calendar~~ **COMPLETADO**
 - ✅ ~~Google Meet Integration~~ **COMPLETADO**
 - Notificaciones push en tiempo real (WebSockets)
@@ -240,12 +258,14 @@ cd frontend && ng serve
 - PWA (Progressive Web App)
 
 ### **Mediano Plazo (Expansión)**
+
 - Módulo de facturación avanzado
 - App móvil nativa (React Native/Flutter)
 - Analytics avanzados con métricas de negocio
 - Integración con obras sociales
 
 ### **Largo Plazo (Innovación)**
+
 - IA para diagnósticos asistidos
 - Telemedicina completa
 - Blockchain para historias clínicas
