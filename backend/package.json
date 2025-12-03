@@ -7,6 +7,7 @@
     "start": "node src/app.js",
     "dev": "nodemon src/app.js",
     "build": "echo 'Backend build complete'",
+    "create:master": "node scripts/create-master-user.js",
     "db:start": "docker-compose up -d postgres",
     "db:stop": "docker-compose down",
     "db:reset": "docker-compose down -v && docker-compose up -d postgres",
