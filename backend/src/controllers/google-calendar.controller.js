@@ -126,7 +126,7 @@ const handleCallback = async (req, res) => {
     console.log("✅ Tokens guardados en BD");
 
     const frontendUrl = process.env.NODE_ENV === 'production' 
-      ? 'https://agendarte-frontend.onrender.com'
+      ? 'https://agendarte-x1d9.onrender.com'
       : 'http://localhost:4200';
     res.redirect(`${frontendUrl}/google-auth?success=true`);
   } catch (error) {

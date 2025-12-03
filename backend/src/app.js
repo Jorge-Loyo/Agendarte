@@ -87,7 +87,10 @@ app.use(
   cors({
     origin:
       process.env.NODE_ENV === "production"
-        ? process.env.FRONTEND_URL?.split(",") || []
+        ? [
+            "https://agendarte-x1d9.onrender.com",
+            "https://agendarte-frontend.onrender.com"
+          ]
         : [
             "http://localhost:4200",
             "http://[::1]:4200",
