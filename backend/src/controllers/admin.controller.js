@@ -22,7 +22,7 @@ const getAllUsers = async (req, res) => {
         email: user.email,
         role: user.role,
         isActive: user.isActive,
-        createdAt: user.createdAt,
+        createdAt: user.createdAt || user.created_at || new Date().toISOString(),
         profile: profile ? {
           firstName: profile.firstName,
           lastName: profile.lastName,

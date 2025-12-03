@@ -38,9 +38,7 @@ export class AuthService {
       try {
         const user = JSON.parse(userStr);
         this.currentUserSubject.next(user);
-        console.log('✅ Usuario restaurado desde localStorage:', user.email);
       } catch (error) {
-        console.error('❌ Error parseando usuario:', error);
         this.logout();
       }
     }
@@ -66,7 +64,6 @@ export class AuthService {
           localStorage.setItem('token', response.token);
           localStorage.setItem('user', JSON.stringify(response.user));
           this.currentUserSubject.next(response.user);
-          console.log('✅ Login exitoso, token guardado');
         })
       );
   }

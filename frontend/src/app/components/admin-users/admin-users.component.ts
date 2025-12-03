@@ -76,7 +76,34 @@ export class AdminUsersComponent implements OnInit {
     });
   }
 
+  validatePassword(password: string): { valid: boolean; message: string } {
+    if (password.length < 8) {
+      return { valid: false, message: 'La contraseña debe tener al menos 8 caracteres' };
+    }
+    if (!/[A-Z]/.test(password)) {
+      return { valid: false, message: 'Debe incluir al menos una mayúscula' };
+    }
+    if (!/[a-z]/.test(password)) {
+      return { valid: false, message: 'Debe incluir al menos una minúscula' };
+    }
+    if (!/[0-9]/.test(password)) {
+      return { valid: false, message: 'Debe incluir al menos un número' };
+    }
+    return { valid: true, message: '' };
+  }
+
   createUser() {
+    const validation = this.validatePassword(this.newUser.password);
+    if (!validation.valid) {
+      this.openModal({
+        title: '❌ Contraseña inválida',
+        message: validation.message,
+        type: 'error',
+        confirmText: 'Aceptar'
+      });
+      return;
+    }
+
     this.adminService.createUser(this.newUser).subscribe({
       next: () => {
         this.loadUsers();
@@ -137,6 +164,19 @@ export class AdminUsersComponent implements OnInit {
   }
 
   updateUser() {
+    if (this.editingUser.password) {
+      const validation = this.validatePassword(this.editingUser.password);
+      if (!validation.valid) {
+        this.openModal({
+          title: '❌ Contraseña inválida',
+          message: validation.message,
+          type: 'error',
+          confirmText: 'Aceptar'
+        });
+        return;
+      }
+    }
+
     this.adminService.updateUser(this.editingUser.id, this.editingUser).subscribe({
       next: () => {
         this.loadUsers();
@@ -165,23 +205,100 @@ export class AdminUsersComponent implements OnInit {
     });
   }
 
+  // Modal state
+  showModal = false;
+  modalConfig: any = {};
+
+  openModal(config: any) {
+    this.modalConfig = config;
+    this.showModal = true;
+  }
+
+  closeModal() {
+    this.showModal = false;
+    this.modalConfig = {};
+  }
+
   deleteUser(user: any) {
-    if (confirm('¿Estás seguro de eliminar este usuario?')) {
-      this.adminService.deleteUser(user.id).subscribe({
-        next: () => {
-          this.loadUsers();
-        },
-        error: (error) => {
-          console.error('Error deleting user:', error);
-        }
-      });
-    }
+    this.openModal({
+      title: '¿Eliminar usuario?',
+      message: `¿Estás seguro de eliminar a ${user.profile?.firstName} ${user.profile?.lastName}?`,
+      type: 'danger',
+      confirmText: 'Eliminar',
+      cancelText: 'Cancelar',
+      onConfirm: () => {
+        this.adminService.deleteUser(user.id).subscribe({
+          next: () => {
+            this.loadUsers();
+            this.openModal({
+              title: '✅ Usuario eliminado',
+              message: 'El usuario ha sido eliminado exitosamente',
+              type: 'success',
+              confirmText: 'Aceptar'
+            });
+          },
+          error: (error) => {
+            console.error('Error deleting user:', error);
+            this.openModal({
+              title: '❌ Error',
+              message: 'No se pudo eliminar el usuario',
+              type: 'error',
+              confirmText: 'Aceptar'
+            });
+          }
+        });
+      }
+    });
   }
 
   deleteTestUsers() {
-    if (confirm('¿Eliminar todos los usuarios de prueba?')) {
-      // Implementar eliminación de usuarios de prueba
-    }
+    this.openModal({
+      title: '¿Eliminar usuarios de prueba?',
+      message: 'Esta acción no se puede deshacer',
+      type: 'warning',
+      confirmText: 'Eliminar',
+      cancelText: 'Cancelar',
+      onConfirm: () => {
+        // Implementar eliminación
+      }
+    });
+  }
+
+  resetPassword(user: any) {
+    this.openModal({
+      title: '¿Resetear contraseña?',
+      message: `Se generará una nueva contraseña para ${user.email}`,
+      type: 'warning',
+      confirmText: 'Resetear',
+      cancelText: 'Cancelar',
+      onConfirm: () => {
+        this.adminService.resetUserPassword(user.id).subscribe({
+          next: (response: any) => {
+            this.openModal({
+              title: '🔑 Nueva contraseña generada',
+              message: `<div style="background: #f7fafc; padding: 16px; border-radius: 8px; margin: 16px 0;">
+                <strong style="font-size: 18px; color: #2d3748;">${response.tempPassword}</strong>
+              </div>
+              <p style="color: #718096; margin-top: 12px;">Guarda esta contraseña y compártela con el usuario.</p>`,
+              type: 'success',
+              confirmText: 'Copiar y Cerrar',
+              onConfirm: () => {
+                navigator.clipboard.writeText(response.tempPassword);
+              }
+            });
+          },
+          error: (error: any) => {
+            console.error('Error resetting password:', error);
+            this.openModal({
+              title: '❌ Error',
+              message: 'No se pudo resetear la contraseña',
+              type: 'error',
+              confirmText: 'Aceptar'
+            });
+          }
+        });
+      }
+    });
   }
 
   selectedRole = '';

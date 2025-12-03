@@ -15,19 +15,11 @@ export class App implements OnInit {
   constructor(private authService: AuthService) {}
   
   ngOnInit() {
-    // Forzar inicialización del AuthService
-    console.log('🔧 Inicializando AuthService...');
     const token = localStorage.getItem('token');
     if (token) {
-      console.log('✅ Token encontrado, verificando usuario...');
       this.authService.getProfile().subscribe({
-        next: (response) => {
-          console.log('✅ Usuario verificado:', response.user.email);
-        },
-        error: (error) => {
-          console.log('❌ Token inválido, limpiando...');
-          this.authService.logout();
-        }
+        next: () => {},
+        error: () => this.authService.logout()
       });
     }
   }

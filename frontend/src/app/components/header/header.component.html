@@ -12,53 +12,7 @@
       <h1 class="brand-name">Agendarte</h1>
     </div>
 
-    <!-- Menú Hamburguesa -->
-    <div class="hamburger-menu" *ngIf="isLoggedIn">
-      <button class="hamburger-btn" (click)="toggleMenu()" [class.active]="isMenuOpen">
-        <span></span>
-        <span></span>
-        <span></span>
-      </button>
-      
-      <!-- Menú desplegable -->
-      <div class="dropdown-menu" [class.show]="isMenuOpen">
-        <div class="menu-header">
-          <div class="user-info-menu">
-            <div class="user-avatar-menu">
-              {{ userProfile?.firstName?.charAt(0) || 'U' }}
-            </div>
-            <div class="user-details">
-              <span class="user-name-menu">{{ userProfile?.firstName || 'Usuario' }} {{ userProfile?.lastName || '' }}</span>
-              <span class="user-role">{{ getRoleLabel(userProfile?.role) }}</span>
-            </div>
-          </div>
-        </div>
-        
-        <div class="menu-divider"></div>
-        
-        <nav class="menu-nav">
-          <a *ngFor="let option of availableMenuOptions; trackBy: trackByFn" 
-             [routerLink]="option.route" 
-             routerLinkActive="active"
-             class="menu-item"
-             (click)="closeMenu()">
-            <span class="menu-icon">{{ option.icon }}</span>
-            <span class="menu-label">{{ option.label }}</span>
-          </a>
-        </nav>
-        
-        <div class="menu-divider"></div>
-        
-        <div class="menu-footer">
-          <button class="logout-btn-menu" (click)="logout()">
-            <span class="menu-icon">🚪</span>
-            <span class="menu-label">Cerrar Sesión</span>
-          </button>
-        </div>
-      </div>
-    </div>
 
-    <!-- Navegación Desktop removida -->
 
     <!-- Usuario y acciones -->
     <div class="header-actions">
@@ -86,6 +40,5 @@
     </div>
   </div>
   
-  <!-- Overlay para cerrar menú -->
-  <div class="menu-overlay" [class.show]="isMenuOpen" (click)="closeMenu()"></div>
+
 </header>

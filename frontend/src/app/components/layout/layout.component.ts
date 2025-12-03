@@ -24,7 +24,8 @@ import { PermissionsService, MenuOption } from '../../services/permissions.servi
             <div class="menu-item" 
                  *ngFor="let option of section.options" 
                  [routerLink]="option.route"
-                 routerLinkActive="active">
+                 routerLinkActive="active"
+                 (click)="closeMenu()">
               <span class="menu-icon">{{ option.icon }}</span>
               <span class="menu-title">{{ option.label }}</span>
             </div>
@@ -258,6 +259,10 @@ export class LayoutComponent implements OnInit {
 
   ngOnInit() {
     this.loadMenuSections();
+  }
+
+  closeMenu() {
+    this.sidebarOpen = false;
   }
 
   loadMenuSections() {

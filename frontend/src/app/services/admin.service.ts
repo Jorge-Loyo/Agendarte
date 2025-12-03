@@ -12,9 +12,6 @@ export class AdminService {
 
   getAllUsers(): Observable<any> {
     const token = localStorage.getItem('token');
-    console.log('Token:', token ? 'Existe' : 'No existe');
-    console.log('URL:', `${this.baseUrl}/users`);
-    
     return this.http.get(`${this.baseUrl}/users`, {
       headers: { Authorization: `Bearer ${token}` }
     });

@@ -15,8 +15,6 @@ import { Subject, takeUntil } from 'rxjs';
 export class HeaderComponent implements OnInit, OnDestroy {
   isLoggedIn = false;
   userProfile: any = null;
-  isMenuOpen = false;
-  availableMenuOptions: MenuOption[] = [];
   private destroy$ = new Subject<void>();
 
   private roles = {
@@ -33,30 +31,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    // Limpiar permisos guardados y forzar recarga
-    this.permissionsService.clearStoredPermissions();
-    
-    // Suscribirse a cambios de autenticación
     this.authService.currentUser$
       .pipe(takeUntil(this.destroy$))
       .subscribe(user => {
         this.isLoggedIn = !!user;
         this.userProfile = user;
-        this.updateMenuOptions();
-        
-        // Debug temporal
-        if (user?.role === 'professional') {
-          console.log('Professional user permissions:');
-          console.log('Has view_profile:', this.permissionsService.hasPermission('view_profile'));
-          console.log('Available options:', this.permissionsService.getAvailableMenuOptions().map(o => o.label));
-        }
-      });
-
-    // Suscribirse a cambios de permisos
-    this.permissionsService.rolePermissions$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(() => {
-        this.updateMenuOptions();
       });
   }
 
@@ -65,25 +44,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  private updateMenuOptions() {
-    if (this.isLoggedIn) {
-      this.availableMenuOptions = this.permissionsService.getAvailableMenuOptions();
-    } else {
-      this.availableMenuOptions = [];
-    }
-  }
 
-  toggleMenu() {
-    this.isMenuOpen = !this.isMenuOpen;
-  }
-
-  closeMenu() {
-    this.isMenuOpen = false;
-  }
-
-  getRoleLabel(role: string): string {
-    return this.roles[role as keyof typeof this.roles] || role;
-  }
 
   getUserDisplayName(): string {
     if (this.userProfile?.profile?.firstName) {
@@ -93,26 +54,12 @@ export class HeaderComponent implements OnInit, OnDestroy {
     return this.userProfile?.firstName || 'Usuario';
   }
 
-  loadUserProfile() {
-    this.authService.getProfile().subscribe({
-      next: (profile) => {
-        this.userProfile = profile;
-      },
-      error: (error) => {
-        console.error('Error loading profile:', error);
-      }
-    });
-  }
 
-  trackByFn(index: number, item: any) {
-    return item.key;
-  }
 
   logout() {
     this.authService.logout();
     this.isLoggedIn = false;
     this.userProfile = null;
-    this.isMenuOpen = false;
     this.router.navigate(['/login']);
   }
 }
