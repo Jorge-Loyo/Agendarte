@@ -448,38 +448,7 @@ export class ProfessionalDashboardComponent implements OnInit {
   }
 
   loadUpcomingEvents(): void {
-    const googleCalendarService = this.injector.get(GoogleCalendarService);
-    googleCalendarService.getEvents().subscribe({
-      next: (response: any) => {
-        const events = response.events || response || [];
-        const now = new Date();
-        
-        // Filtrar y formatear próximos eventos
-        const upcomingEvents = events
-          .filter((event: any) => {
-            const eventStart = new Date(event.start?.dateTime || event.start?.date);
-            return eventStart > now;
-          })
-          .sort((a: any, b: any) => {
-            const dateA = new Date(a.start?.dateTime || a.start?.date);
-            const dateB = new Date(b.start?.dateTime || b.start?.date);
-            return dateA.getTime() - dateB.getTime();
-          })
-          .slice(0, 3)
-          .map((event: any) => ({
-            title: event.summary || 'Sin título',
-            description: event.description,
-            start: new Date(event.start?.dateTime || event.start?.date),
-            type: this.getEventType(event.summary)
-          }));
-        
-        this.upcomingEvents = upcomingEvents;
-      },
-      error: (error) => {
-        console.error('Error cargando eventos:', error);
-        this.upcomingEvents = [];
-      }
-    });
+    this.upcomingEvents = [];
   }
 
   getEventType(title: string): string {
@@ -503,40 +472,7 @@ export class ProfessionalDashboardComponent implements OnInit {
   }
 
   loadLastEvent(): void {
-    const googleCalendarService = this.injector.get(GoogleCalendarService);
-    googleCalendarService.getEvents().subscribe({
-      next: (response: any) => {
-        const events = response.events || response || [];
-        const now = new Date();
-        
-        const pastEvents = events
-          .filter((event: any) => {
-            const eventStart = new Date(event.start?.dateTime || event.start?.date);
-            return eventStart < now;
-          })
-          .sort((a: any, b: any) => {
-            const dateA = new Date(a.start?.dateTime || a.start?.date);
-            const dateB = new Date(b.start?.dateTime || b.start?.date);
-            return dateB.getTime() - dateA.getTime();
-          });
-        
-        if (pastEvents.length > 0) {
-          const lastEvent = pastEvents[0];
-          this.lastEvent = {
-            title: lastEvent.summary || 'Sin título',
-            description: lastEvent.description,
-            start: new Date(lastEvent.start?.dateTime || lastEvent.start?.date),
-            type: this.getEventType(lastEvent.summary)
-          };
-        } else {
-          this.lastEvent = null;
-        }
-      },
-      error: (error) => {
-        console.error('Error cargando último evento:', error);
-        this.lastEvent = null;
-      }
-    });
+    this.lastEvent = null;
   }
 
   joinNextMeet(): void {

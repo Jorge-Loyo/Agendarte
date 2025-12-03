@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class GoogleMeetService {
-  private baseUrl = 'http://localhost:3000/api/google-meet';
+  private baseUrl = `${environment.apiUrl}/google-meet`;
 
   constructor(private http: HttpClient) {}
 

@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class GoogleCalendarService {
-  private baseUrl = 'http://localhost:3000/api/google-calendar';
+  private baseUrl = `${environment.apiUrl}/google-calendar`;
 
   constructor(private http: HttpClient) {}
 
