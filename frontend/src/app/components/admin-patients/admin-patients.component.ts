@@ -12,8 +12,10 @@ import { AdminService } from '../../services/admin.service';
 })
 export class AdminPatientsComponent implements OnInit {
   patients: any[] = [];
+  filteredPatients: any[] = [];
   loading = false;
   showCreatePatient = false;
+  searchTerm = '';
   
   newPatient = {
     email: '',
@@ -38,6 +40,7 @@ export class AdminPatientsComponent implements OnInit {
     this.adminService.getPatients().subscribe({
       next: (patients) => {
         this.patients = patients;
+        this.filteredPatients = [...patients];
         this.loading = false;
       },
       error: (error) => {
@@ -45,6 +48,34 @@ export class AdminPatientsComponent implements OnInit {
         this.loading = false;
       }
     });
+  }
+
+  filterPatients() {
+    if (!this.searchTerm) {
+      this.filteredPatients = [...this.patients];
+    } else {
+      const term = this.searchTerm.toLowerCase();
+      this.filteredPatients = this.patients.filter(p => 
+        p.firstName?.toLowerCase().includes(term) ||
+        p.lastName?.toLowerCase().includes(term) ||
+        p.email?.toLowerCase().includes(term) ||
+        p.dni?.includes(term)
+      );
+    }
+  }
+
+  getActivePatients(): number {
+    return this.patients.filter(p => p.isActive !== false).length;
+  }
+
+  getRecentPatients(): number {
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    return this.patients.filter(p => new Date(p.createdAt) >= thirtyDaysAgo).length;
+  }
+
+  goBack(): void {
+    window.history.back();
   }
 
   createPatient() {

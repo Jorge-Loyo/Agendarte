@@ -1,15 +1,51 @@
 <div class="admin-patients-container">
   <div class="header">
-    <h1>🧑⚕️ Registro de Pacientes</h1>
-    <button class="btn-create" (click)="showCreatePatient = !showCreatePatient">
+    <div class="header-content">
+      <button class="btn-back" (click)="goBack()">
+        ← Volver
+      </button>
+      <div>
+        <h1>🧑⚕️ Gestión de Pacientes</h1>
+        <p>Administra el registro de pacientes</p>
+      </div>
+    </div>
+    <button class="btn-primary" (click)="showCreatePatient = !showCreatePatient">
       {{ showCreatePatient ? 'Cancelar' : '+ Registrar Paciente' }}
     </button>
   </div>
 
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    <div class="stat-card total">
+      <div class="stat-icon">👥</div>
+      <div class="stat-info">
+        <h3>{{ patients.length }}</h3>
+        <p>Total Pacientes</p>
+      </div>
+    </div>
+    <div class="stat-card active">
+      <div class="stat-icon">✅</div>
+      <div class="stat-info">
+        <h3>{{ getActivePatients() }}</h3>
+        <p>Activos</p>
+      </div>
+    </div>
+    <div class="stat-card recent">
+      <div class="stat-icon">📅</div>
+      <div class="stat-info">
+        <h3>{{ getRecentPatients() }}</h3>
+        <p>Últimos 30 días</p>
+      </div>
+    </div>
+  </div>
+
   <!-- Create Patient Form -->
-  <div class="create-form" *ngIf="showCreatePatient">
-    <div class="form-card">
-      <h3>Registrar Nuevo Paciente</h3>
+  <div class="create-form-modal" *ngIf="showCreatePatient">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Registrar Nuevo Paciente</h3>
+        <button class="btn-close" (click)="showCreatePatient = false">×</button>
+      </div>
       
       <div class="form-grid">
         <div class="form-group">
@@ -59,8 +95,8 @@
       </div>
       
       <div class="form-actions">
-        <button class="btn-save" (click)="createPatient()">Registrar Paciente</button>
-        <button class="btn-cancel" (click)="showCreatePatient = false; resetPatientForm()">Cancelar</button>
+        <button class="btn-secondary" (click)="showCreatePatient = false; resetPatientForm()">Cancelar</button>
+        <button class="btn-primary" (click)="createPatient()">Registrar Paciente</button>
       </div>
     </div>
   </div>
@@ -73,61 +109,55 @@
 
   <!-- Patients Table -->
   <div class="patients-section" *ngIf="!loading">
-    <div class="table-card">
-      <h3>Pacientes Registrados ({{ patients.length }})</h3>
-      
-      <div class="table-container">
-        <table class="patients-table">
-          <thead>
-            <tr>
-              <th>Paciente</th>
-              <th>DNI</th>
-              <th>Edad</th>
-              <th>Contacto</th>
-              <th>Fecha Registro</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let patient of patients">
-              <td>
-                <div class="patient-info">
-                  <div class="patient-avatar">
-                    {{ (patient.firstName || 'P').charAt(0) }}
-                  </div>
-                  <div class="patient-details">
-                    <strong>{{ patient.firstName }} {{ patient.lastName }}</strong>
-                    <small>{{ patient.email }}</small>
-                  </div>
+    <div class="section-header">
+      <h2>Pacientes Registrados</h2>
+      <input type="text" placeholder="🔍 Buscar paciente..." class="search-input" [(ngModel)]="searchTerm" (input)="filterPatients()">
+    </div>
+    
+    <div class="users-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Paciente</th>
+            <th>DNI</th>
+            <th>Edad</th>
+            <th>Teléfono</th>
+            <th>Dirección</th>
+            <th>Registro</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let patient of filteredPatients">
+            <td>
+              <div class="user-cell">
+                <div class="user-avatar-small">
+                  {{ (patient.firstName || 'P').charAt(0) }}
                 </div>
-              </td>
-              
-              <td>{{ patient.dni }}</td>
-              <td>{{ patient.age || '-' }}</td>
-              
-              <td>
-                <div class="contact-info">
-                  <div *ngIf="patient.phone">📞 {{ patient.phone }}</div>
-                  <div *ngIf="patient.address">📍 {{ patient.address }}</div>
+                <div>
+                  <span class="user-name">{{ patient.firstName }} {{ patient.lastName }}</span>
+                  <small style="display: block; color: #718096;">{{ patient.email }}</small>
                 </div>
-              </td>
-              
-              <td>{{ patient.createdAt | date:'dd/MM/yyyy' }}</td>
-              
-              <td>
-                <div class="actions">
-                  <button class="btn-edit" (click)="editPatient(patient)" title="Editar">
-                    ✏️
-                  </button>
-                  <button class="btn-delete" (click)="deletePatient(patient)" title="Eliminar">
-                    🗑️
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+              </div>
+            </td>
+            <td>{{ patient.dni || '-' }}</td>
+            <td>{{ patient.age || '-' }}</td>
+            <td>{{ patient.phone || '-' }}</td>
+            <td>{{ patient.address || '-' }}</td>
+            <td>{{ patient.createdAt | date:'dd/MM/yyyy' }}</td>
+            <td>
+              <div class="user-actions">
+                <button class="btn-action edit" (click)="editPatient(patient)" title="Editar">
+                  ✏️
+                </button>
+                <button class="btn-action delete" (click)="deletePatient(patient)" title="Eliminar">
+                  🗑️
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 </div>

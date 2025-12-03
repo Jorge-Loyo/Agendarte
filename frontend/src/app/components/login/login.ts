@@ -13,6 +13,7 @@ import { AuthService } from '../../services/auth.service';
 export class Login {
   email = '';
   password = '';
+  showPassword = false;
 
   loading = false;
   error = '';
@@ -61,5 +62,9 @@ export class Login {
         this.loading = false;
       }
     });
+  }
+
+  togglePassword() {
+    this.showPassword = !this.showPassword;
   }
 }
