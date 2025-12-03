@@ -22,12 +22,12 @@ async function createMasterUser() {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const [user] = await sequelize.query(`
-            INSERT INTO users (email, password, role, "isActive", "createdAt", "updatedAt")
+            INSERT INTO users (email, password, role, is_active, created_at, updated_at)
             VALUES (:email, :password, 'master', true, NOW(), NOW())
             ON CONFLICT (email) DO UPDATE SET 
                 password = :password,
                 role = 'master',
-                "isActive" = true
+                is_active = true
             RETURNING id, email, role
         `, {
             replacements: { email, password: hashedPassword }
