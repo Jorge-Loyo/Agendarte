@@ -120,7 +120,6 @@ export class ModernCalendarComponent implements OnInit, AfterViewInit {
     try {
       const response = await this.googleCalendarService.getCalendars().toPromise();
       this.isAuthenticated = true;
-      // Cargar eventos silenciosamente
       this.loadCalendarSilent();
     } catch (error) {
       this.isAuthenticated = false;

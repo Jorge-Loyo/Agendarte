@@ -13,6 +13,7 @@
           [(ngModel)]="email" 
           required 
           email
+          autocomplete="email"
           class="form-control"
           placeholder="tu@email.com">
       </div>
@@ -27,6 +28,7 @@
             [(ngModel)]="password" 
             required 
             minlength="8"
+            autocomplete="current-password"
             class="form-control"
             placeholder="••••••••">
           <button type="button" class="toggle-password" (click)="togglePassword()">
