@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AdminService {
-  private baseUrl = 'http://localhost:3000/api/admin';
+  private baseUrl = `${environment.apiUrl}/admin`;
 
   constructor(private http: HttpClient) {}
 
@@ -73,7 +74,7 @@ export class AdminService {
   }
 
   searchPatients(query: string): Observable<any> {
-    return this.http.get(`http://localhost:3000/api/patients/search?q=${query}`, {
+    return this.http.get(`${environment.apiUrl}/patients/search?q=${query}`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     });
   }
@@ -110,19 +111,19 @@ export class AdminService {
   }
 
   getSpecialties(): Observable<any> {
-    return this.http.get(`http://localhost:3000/api/specialties`, {
+    return this.http.get(`${environment.apiUrl}/specialties`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     });
   }
 
   createSpecialty(specialtyData: any): Observable<any> {
-    return this.http.post(`http://localhost:3000/api/specialties`, specialtyData, {
+    return this.http.post(`${environment.apiUrl}/specialties`, specialtyData, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     });
   }
 
   deleteSpecialty(specialtyId: number): Observable<any> {
-    return this.http.delete(`http://localhost:3000/api/specialties/${specialtyId}`, {
+    return this.http.delete(`${environment.apiUrl}/specialties/${specialtyId}`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     });
   }
