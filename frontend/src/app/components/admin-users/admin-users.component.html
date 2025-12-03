@@ -10,9 +10,6 @@
       </div>
     </div>
     <div class="header-actions">
-      <button class="btn-danger" (click)="deleteTestUsers()" *ngIf="currentUser?.role === 'master'">
-        🗑️ Limpiar Pruebas
-      </button>
       <button class="btn-primary" (click)="showCreateForm = !showCreateForm">
         {{ showCreateForm ? 'Cancelar' : '+ Crear Usuario' }}
       </button>

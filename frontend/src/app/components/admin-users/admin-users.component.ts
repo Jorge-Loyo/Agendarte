@@ -251,18 +251,7 @@ export class AdminUsersComponent implements OnInit {
     });
   }
 
-  deleteTestUsers() {
-    this.openModal({
-      title: '¿Eliminar usuarios de prueba?',
-      message: 'Esta acción no se puede deshacer',
-      type: 'warning',
-      confirmText: 'Eliminar',
-      cancelText: 'Cancelar',
-      onConfirm: () => {
-        // Implementar eliminación
-      }
-    });
-  }
+
 
   resetPassword(user: any) {
     this.openModal({
