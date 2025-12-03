@@ -1,6 +1,7 @@
 import { Component, OnInit, AfterViewInit, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { GoogleCalendarService } from '../../services/google-calendar.service';
 import { AuthService } from '../../services/auth.service';
 import { ToastService } from '../../services/toast.service';
@@ -29,7 +30,8 @@ export class ModernCalendarComponent implements OnInit, AfterViewInit {
   constructor(
     private googleCalendarService: GoogleCalendarService,
     private authService: AuthService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -126,8 +128,7 @@ export class ModernCalendarComponent implements OnInit, AfterViewInit {
   }
 
   async authenticate() {
-    // Redirigir a la página de autenticación personalizada
-    window.location.href = '/google-auth';
+    this.router.navigate(['/google-auth']);
   }
 
 
