@@ -75,6 +75,9 @@ const authRoutes = require("./routes/auth.routes");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Trust proxy for Render
+app.set('trust proxy', 1);
+
 // Middleware de seguridad
 app.use(helmetConfig);
 app.use(apiLimiter);
