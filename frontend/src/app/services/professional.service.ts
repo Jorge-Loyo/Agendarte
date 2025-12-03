@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { environment } from '../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
@@ -21,7 +22,7 @@ export interface Professional {
   providedIn: 'root'
 })
 export class ProfessionalService {
-  private baseUrl = 'http://localhost:3000/api/professionals';
+  private baseUrl = `${environment.apiUrl}/professionals`;
 
   constructor(private http: HttpClient) {}
 
@@ -66,13 +67,13 @@ export class ProfessionalService {
   }
 
   createPatient(patientData: any): Observable<any> {
-    return this.http.post(`http://localhost:3000/api/patients/create`, patientData, {
+    return this.http.post(`${environment.apiUrl}/patients/create`, patientData, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     });
   }
 
   checkDNI(dni: string): Observable<any> {
-    return this.http.get(`http://localhost:3000/api/admin/check-dni/${dni}`, {
+    return this.http.get(`${environment.apiUrl}/admin/check-dni/${dni}`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     });
   }

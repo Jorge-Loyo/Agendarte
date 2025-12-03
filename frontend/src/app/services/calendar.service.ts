@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { environment } from '../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
@@ -21,7 +22,7 @@ export interface TimeSlot {
   providedIn: 'root'
 })
 export class CalendarService {
-  private baseUrl = 'http://localhost:3000/api/calendar';
+  private baseUrl = `${environment.apiUrl}/calendar`;
 
   constructor(private http: HttpClient) {}
 

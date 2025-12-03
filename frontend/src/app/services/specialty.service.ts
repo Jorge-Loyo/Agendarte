@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { environment } from '../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
@@ -13,7 +14,7 @@ export interface Specialty {
   providedIn: 'root'
 })
 export class SpecialtyService {
-  private apiUrl = 'http://localhost:3000/api/specialties';
+  private apiUrl = `${environment.apiUrl}/specialties`;
 
   constructor(private http: HttpClient) { }
 

@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { environment } from '../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
@@ -6,7 +7,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class StatsService {
-  private baseUrl = 'http://localhost:3000/api/stats';
+  private baseUrl = `${environment.apiUrl}/stats`;
 
   constructor(private http: HttpClient) {}
 
