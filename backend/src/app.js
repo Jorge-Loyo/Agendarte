@@ -85,21 +85,22 @@ app.use(apiLimiter);
 // CORS
 app.use(
   cors({
-    origin:
-      process.env.NODE_ENV === "production"
-        ? [
-            "https://agendarte-x1d9.onrender.com",
-            "https://agendarte-frontend.onrender.com"
-          ]
-        : [
-            "http://localhost:4200",
-            "http://[::1]:4200",
-            "http://127.0.0.1:4200",
-            "http://localhost:52632",
-          ],
+    origin: process.env.NODE_ENV === "production"
+      ? [
+          "https://agendarte-x1d9.onrender.com",
+          "https://agendarte-frontend.onrender.com"
+        ]
+      : [
+          "http://localhost:4200",
+          "http://[::1]:4200",
+          "http://127.0.0.1:4200",
+          "http://localhost:52632",
+        ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
+    preflightContinue: false,
+    optionsSuccessStatus: 204
   })
 );
 
